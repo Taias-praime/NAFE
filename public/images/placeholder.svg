@@ -1,0 +1,13 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+	<title>New Project</title>
+	<defs>
+		<image  width="800" height="800" id="img1" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAAMgAQMAAADhvpQrAAAAAXNSR0IB2cksfwAAAANQTFRF////p8QbyAAAAS1JREFUeJztzUERAAAMAqDZv/Ra+PCgALmCSCQSiUQikUgkEolEIpFIJBKJRCKRSCQSiUQikUgkEolEIpFIJBKJRCKRSCQSiUQikUgkEolEIpFIJBKJRCKRSCQSiUQikUgkEolEIpFIJBKJRCKRSCQSiUQikUgkEolEIpFIJBKJRCKRSCQSiUQikUgkEolEIpFIJBKJRCKRSCQSiUQikUgkEolEIpFIJBKJRCKRSCQSiUQikUgkEolEIpFIJBKJRCKRSCQSiUQikUgkEolEIpFIJBKJRCKRSCQSiUQikUgkEolEIpFIJBKJRCKRSCQSiUQikUgkEolEIpFIJBKJRCKRSCQSiUQikUgkEolEIpFIJBKJRCKRSCQSiUQikUgkEolEIpFIJBKJRCKR7CQPIHEDIbMPz1oAAAAASUVORK5CYII="/>
+	</defs>
+	<style>
+		.s0 { fill: #717171 } 
+		.s1 { fill: #3c3c3c } 
+	</style>
+	<use id="Background" href="#img1" x="0" y="0"/>
+	<path id="Shape 2" class="s0" d="m400 1248c-179.7 0-325-180.4-325-403.5 0-223.1 145.3-403.5 325-403.5 179.7 0 325 180.4 325 403.5 0 223.1-145.3 403.5-325 403.5z"/>
+	<path id="Shape 1" class="s1" d="m399.5 495c-86 0-155.5-69.5-155.5-155.5 0-86 69.5-155.5 155.5-155.5 86 0 155.5 69.5 155.5 155.5 0 86-69.5 155.5-155.5 155.5z"/>
+</svg>
