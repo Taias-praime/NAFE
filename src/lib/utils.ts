@@ -22,12 +22,13 @@ export const USER_PLACEHOLDER_IMG_URL = '/images/placeholder.svg';
 
 // localstorage getter
 
-export const local = (propName: string, val?: string): any | void  => {
+export const local = (name: string, val?: string): any | void  => {
   const NF_PREFIX = 'NF_';
+  const key = NF_PREFIX + name;
 
-  if (val) return localStorage.setItem(NF_PREFIX + propName, val);
+  if (val) return localStorage.setItem(key, val);
   else {
-    const data = localStorage.getItem(NF_PREFIX + propName);
+    const data = localStorage.getItem(key);
     return data ? data.includes('{') ? JSON.parse(data) : data : null;
   }
 }

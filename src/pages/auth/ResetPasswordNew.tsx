@@ -4,7 +4,7 @@ import { Button } from "../../components/ui/button";
 import KeyIcon from "/icons/Bold Duotone/Security/Key Minimalistic Square 4.svg"
 import { ChevronLeft } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import SubmitButton from "../../components/custom/submitButton";
+import SubmitButton from "../../components/ui-custom/submitButton";
 import { useFormik } from "formik";
 
 const ResetPasswordNew = () => {

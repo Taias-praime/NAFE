@@ -3,13 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '../components/ui/use-toast';
 import { local, local_clear } from '../lib/utils';
 import useFetch from './useFetch';
+import { useEffect, useState } from 'react';
 
 const useAuth = () => {
+
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
     const nav = useNavigate();
     const { toast } = useToast();
 
-    const isLoggedIn = local('user');
     const token = local('token');
 
     // login
@@ -52,6 +54,11 @@ const useAuth = () => {
         local_clear();
         setTimeout(() => nav('/login'), 500);
     }
+
+
+    useEffect(() => {
+        setIsLoggedIn(!!token);
+    }, [])
 
     return {
         token,

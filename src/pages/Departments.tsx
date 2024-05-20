@@ -1,16 +1,46 @@
 import { PlusCircle, Search } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { useState } from "react";
 import { Input } from "../components/ui/input";
-import ProfileImg from "../components/custom/profileImg";
+import ProfileImg from "../components/ui-custom/profileImg";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "../components/ui/table";
 import { Badge } from "../components/ui/badge";
-import { HEADER_HEIGHT } from "../lib/utils";
+import { HEADER_HEIGHT, USER_PLACEHOLDER_IMG_URL } from "../lib/utils";
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../components/ui/pagination";
+import { useEffect, useState } from "react";
+import { useToast } from "../components/ui/use-toast";
+import useFetch from "../hooks/useFetch";
 
 const Departments = () => {
   const PAGINATION_HEIGHT = 40;
-  const [deps,] = useState([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+
+  const [deps, setDeps] = useState([]);
+  const [depsCount, setDepsCount] = useState(0);
+
+  const { toast } = useToast();
+
+
+  const { onFetch: getDeps, isFetching: isLoadingDeps } = useFetch(
+    '/tenants/sa/',
+    (data) => {
+      setDeps(data.data.results)
+      setDepsCount(data.data.number_of_items);
+    },
+    (error, status) => {
+      const { message, ...err } = error;
+      // notify
+      toast({
+        title: `${message} (${status})`,
+        description: err.errors.error_message,
+        variant: 'destructive',
+      })
+    },
+  );
+
+
+  useEffect(() => {
+    getDeps();
+  }, []);
+
 
   return (
     <div className="pb-5 pt-10 px-10" style={{
@@ -30,7 +60,7 @@ const Departments = () => {
             <div className="">
               <h5 className="text-xl"> List of Users </h5>
               <small className="text-muted-foreground">
-                {deps.length || 0} Departments
+                {depsCount} Departments
               </small>
             </div>
             <div className="relative flex items-center w-fit">
@@ -51,36 +81,34 @@ const Departments = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {deps.map((e: number) => (
-                <TableRow key={e}>
-                  <TableCell className="font-medium">
-                    NCCQE
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <ProfileImg
-                        url={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${Math.random()}`}
-                      />
-                      <ProfileImg
-                        url={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${Math.random()}`}
-                        className="-ml-4"
-                      />
-                      <ProfileImg
-                        url={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${Math.random()}`}
-                        className="-ml-4"
-                      />
-                      <span className="ms-2"> + 300 </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>30</TableCell>
-                  <TableCell className="flex justify-center items-center gap-3">
-                    <span>5</span>
-                    <Badge variant={'destructive'}>
-                      Live
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {
+                deps.map((d: any) => (
+                  <TableRow key={d.tenant_id}>
+                    <TableCell className="font-medium">
+                      {d.code}
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="flex items-center">
+                        {[...Array(d.total_members).keys()].map((_, i) =>
+                          <ProfileImg className={i ? "-ml-4" : ''} url={USER_PLACEHOLDER_IMG_URL} />
+                        ).slice(0, 3)}
+                        <span className="ms-2">
+                          {(d.total_members > 3) ? '+ ' + (d.total_members - 3) : ''}
+                        </span>
+                      </div>
+                    </TableCell>
+
+                    <TableCell> {d.total_events} </TableCell>
+
+                    <TableCell className="flex justify-center items-center gap-3">
+                      <span> {d.webinars} </span>
+                      <Badge variant={"destructive"}> Live </Badge>
+                    </TableCell>
+
+                  </TableRow>
+                ))
+              }
             </TableBody>
           </Table>
         </div>

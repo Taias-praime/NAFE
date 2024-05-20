@@ -1,14 +1,14 @@
 import { Building2, CalendarDays, PlusCircle, RadioTower } from "lucide-react";
 
 import CalImg from "/icons/cal.svg";
-import Card from "../components/custom/card";
-import UpcomingEvents from "../components/custom/upcomingEvents";
+import Card from "../components/ui-custom/card";
+import UpcomingEvents from "../components/ui-custom/upcomingEvents";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
 import { Button } from "../components/ui/button";
 import { useEffect, useState } from "react";
 import { Badge } from "../components/ui/badge";
-import { HEADER_HEIGHT } from "../lib/utils";
-import ProfileImg from "../components/custom/profileImg";
+import { HEADER_HEIGHT, USER_PLACEHOLDER_IMG_URL } from "../lib/utils";
+import ProfileImg from "../components/ui-custom/profileImg";
 import useFetch from "../hooks/useFetch";
 import { Skeleton } from "../components/ui/skeleton";
 import { Link } from "react-router-dom";
@@ -62,6 +62,7 @@ const Dashboard = () => {
         <div className="overflow-y-auto pb-5 pt-10 px-10 bg-foreground/5" style={{
             height: `calc(100vh - ${HEADER_HEIGHT}px)`
         }}>
+            
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                 <div className="col-span-2">
 
@@ -125,7 +126,7 @@ const Dashboard = () => {
                                                 <TableCell>
                                                     <div className="flex items-center">
                                                         {[...Array(d.total_members).keys()].map((_,i) =>
-                                                            <ProfileImg className={i ? "-ml-4" : ''} url={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${Math.random()}`} />
+                                                            <ProfileImg className={i ? "-ml-4" : ''} url={USER_PLACEHOLDER_IMG_URL} />
                                                         ).slice(0, 3)}
                                                         <span className="ms-2"> 
                                                             { (d.total_members > 3) ? '+ ' + (d.total_members - 3) : '' } 

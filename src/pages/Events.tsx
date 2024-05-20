@@ -1,17 +1,19 @@
 import { LayoutGrid, ListFilter, ListOrdered, Pencil, PlusCircle, Search } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
-import { useState } from 'react';
-import ProfileImg from '../components/custom/profileImg';
+import { useEffect, useState } from 'react';
+import ProfileImg from '../components/ui-custom/profileImg';
 import { Badge } from '../components/ui/badge';
 import { Input } from '../components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from '../components/ui/dropdown-menu';
 import { Checkbox } from '../components/ui/checkbox';
 import { HEADER_HEIGHT } from '../lib/utils';
+import useFetch from '../hooks/useFetch';
+import AddEvent from '../components/ui-custom/addEvent';
 
 const Events = () => {
-    const [events, ] = useState([1, 1, 1, 1, 1, 1, 1]);
+    const [events, setEvents] = useState([]);
     const [isList, setIsList] = useState<boolean>(false);
     const [tab, setTab] = useState<string>('all');
 
@@ -27,15 +29,30 @@ const Events = () => {
         return num;
     }
 
+    const { onFetch: getEvents, isFetching: isLoadingEvents } = useFetch(
+        '/events/sa/upcoming',
+        (data) => {
+            setEvents(data.data.results)
+            console.log(data.data.results)
+        },
+        () => { },
+    );
+
+    useEffect(() => {
+        getEvents();
+    }, [])
+
 	return (
 		<div className="overflow-y-auto pb-5 pt-10 px-10" style={{
             height: `calc(100vh - ${HEADER_HEIGHT}px)`
         }}>
 			<div className="flex justify-between">
 				<div className=""></div>
-				<Button className="lg:absolute top-5 right-10 flex gap-3">
-					<PlusCircle />
-					Create Event
+				<Button className="lg:absolute top-5 right-10 p-0">
+                    <AddEvent className="flex items-center gap-3 p-3">
+                        <PlusCircle />
+                        Create Event
+                    </AddEvent>
 				</Button>
 			</div>
 

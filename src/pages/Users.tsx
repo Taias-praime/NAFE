@@ -2,7 +2,7 @@ import { PlusCircle, Search } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { useState } from "react";
 import { Input } from "../components/ui/input";
-import ProfileImg from "../components/custom/profileImg";
+import ProfileImg from "../components/ui-custom/profileImg";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "../components/ui/table";
 import { Badge } from "../components/ui/badge";
 import { HEADER_HEIGHT } from "../lib/utils";

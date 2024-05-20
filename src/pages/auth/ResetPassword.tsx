@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import useFetch from '../../hooks/useFetch';
 import { toast } from '../../components/ui/use-toast';
-import SubmitButton from '../../components/custom/submitButton';
+import SubmitButton from '../../components/ui-custom/submitButton';
 
 const ResetPassword = () => {
 	const nav = useNavigate();

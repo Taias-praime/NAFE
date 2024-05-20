@@ -1,5 +1,5 @@
-import SideMenu from "./components/custom/sideMenu"
-import { Header } from "./components/custom/header"
+import SideMenu from "./components/ui-custom/sideMenu"
+import { Header } from "./components/ui-custom/header"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useEffect } from "react";
 

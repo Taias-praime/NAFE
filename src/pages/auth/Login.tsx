@@ -1,19 +1,18 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { setBG } from '../../lib/utils';
 import useAuth from '../../hooks/useAuth';
 import { useFormik } from 'formik';
-import { Loader2 } from 'lucide-react';
-import SubmitButton from '../../components/custom/submitButton';
+import SubmitButton from '../../components/ui-custom/submitButton';
+import { useEffect } from 'react';
 
 const SAMPLE_IMG = '';
 // 'https://images.unsplash.com/photo-1512238350357-c3180a5d7e2f?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
 
 const Login = () => {
-	const { login, isLoggingIn } = useAuth();
+	const { login, isLoggingIn, isLoggedIn } = useAuth();
 
-	// const nav = useNavigate();
+	const nav = useNavigate();
 
 	const initialValues = {
 		username: '',
@@ -35,6 +34,12 @@ const Login = () => {
 		initialValues,
 		onSubmit: handleLogin,
 	});
+
+	
+	useEffect(() => {
+		
+		if (isLoggedIn) nav('/dashboard');
+	}, [isLoggedIn])
 
 	return (
 		<div className="grid lg:grid-cols-5 h-svh">
