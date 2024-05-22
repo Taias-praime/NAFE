@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { local } from "../lib/utils";
 
-const RouterGuard = ({ children }) => {
+const RouterGuard = ({ children }: any) => {
     const isLoggedIn = local('user');
     const exclusions = useMemo(() => ['login', 'reset', 'OTP', '2FA'], []);
 

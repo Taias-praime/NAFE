@@ -3,7 +3,7 @@ import { Header } from "./components/ui-custom/header"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useEffect } from "react";
 
-const AdminLayout = ({ children }) => {
+const AdminLayout = ({ children }: any) => {
 
     // make sure '/' leads to '/dashboard'
 

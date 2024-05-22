@@ -10,7 +10,7 @@ import {
 	SheetTrigger,
 } from '../ui/sheet';
 
-const AddEvent = ({ children, className }) => {
+const AddEvent = ({ children, className }: any) => {
 
 	return (
 		<Sheet>
