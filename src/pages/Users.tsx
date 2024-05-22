@@ -1,6 +1,6 @@
 import { PlusCircle, Search } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "../components/ui/input";
 import ProfileImg from "../components/ui-custom/profileImg";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "../components/ui/table";
@@ -34,6 +34,10 @@ const Users = () => {
     },
     {}, // options
   );
+
+  useEffect(() => {
+    onFetchUsers();
+  }, [])
 
   return (
     <div className="pb-5 pt-10 px-10" style={{

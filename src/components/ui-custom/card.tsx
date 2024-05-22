@@ -10,7 +10,7 @@ const Card = ({
     title,
     ctaIcon,
     className = '',
-    type = 'default',
+    // type = 'default',
 }: ICard) => {
     return (
         <div className={cn("bg-background/70 min-h-[200px] w-full px-5 2xl:px-10 py-5 flex items-center justify-between overflow-hidden rounded", className)}>

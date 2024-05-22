@@ -7,7 +7,7 @@ import { Badge } from '../components/ui/badge';
 import { Input } from '../components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from '../components/ui/dropdown-menu';
-import { Checkbox } from '../components/ui/checkbox';
+// import { Checkbox } from '../components/ui/checkbox';
 import { HEADER_HEIGHT } from '../lib/utils';
 import useFetch from '../hooks/useFetch';
 import AddEvent from '../components/ui-custom/addEvent';
@@ -29,7 +29,7 @@ const Events = () => {
         return num;
     }
 
-    const { onFetch: getEvents, isFetching: isLoadingEvents } = useFetch(
+    const { onFetch: getEvents } = useFetch(
         '/events/sa/upcoming',
         (data) => {
             setEvents(data.data.results)
@@ -160,7 +160,7 @@ const Events = () => {
 	);
 };
 
-const TableView = ({ events }) => {
+const TableView = ({ events }: any) => {
     return (
         <Table className="">
             <TableHeader>
@@ -209,7 +209,7 @@ const TableView = ({ events }) => {
     )
 }
 
-const GridView = ({ events }) => {
+const GridView = ({ events }: any) => {
 
     const SAMPLE_IMG = 'https://scontent.facc1-1.fna.fbcdn.net/v/t39.30808-6/440128026_279179215284777_2129238623055120663_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=5f2048&_nc_ohc=q4IsD8czVyEQ7kNvgFSSf3s&_nc_oc=Adj2apt5hiLe3FAtky7rXBEQnbAUJokC87FI6bgRUWx_u1DqheqIEmoNWQ12EqsEdeU&_nc_ht=scontent.facc1-1.fna&oh=00_AfCnkDFP5RkNPfmx0k8xOYin6SM3x4wU7TTpMA6r83XmPw&oe=662F70BF'
 
@@ -239,18 +239,18 @@ const GridView = ({ events }) => {
     )
 }
 
-const CheckboxWithLabel = ({ label }: { label: string }) => {
-    return (
-        <div className = "flex items-center space-x-2" >
-        <Checkbox id={label.replaceAll(' ', '')} />
-        <label
-            htmlFor={label.replaceAll(' ', '')}
-            className="text-sm font-medium leading-none"
-        >
-            {label}
-        </label>
-        </div >
-    )
-}
+// const CheckboxWithLabel = ({ label }: { label: string }) => {
+//     return (
+//         <div className = "flex items-center space-x-2" >
+//         <Checkbox id={label.replaceAll(' ', '')} />
+//         <label
+//             htmlFor={label.replaceAll(' ', '')}
+//             className="text-sm font-medium leading-none"
+//         >
+//             {label}
+//         </label>
+//         </div >
+//     )
+// }
 
 export default Events;

@@ -45,10 +45,10 @@ const Dashboard = () => {
     const [deps, setDeps] = useState([]);
     const [depsCount, setDepsCount] = useState(0);
 
-    const [events, setEvents] = useState([]);
+    const [, setEvents] = useState([]);
     const [eventsCount, setEventsCount] = useState(0);
 
-    const [webinars, setWebinars] = useState([]);
+    const [, setWebinars] = useState([]);
     const [webinarsCount, setWebinarsCount] = useState(0);
 
     // on component mount

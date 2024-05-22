@@ -41,9 +41,9 @@ const CreateEvent = () => {
         setStep(step + 1);
     } 
 
-    const handleCancel = () => {
+    // const handleCancel = () => {
 
-    }
+    // }
 
     const handleNext = () => {
         if ( step > MAX_STEPS ) return;

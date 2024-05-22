@@ -1,6 +1,5 @@
 import { cn } from '../../lib/utils';
 import CreateEvent from '../../modules/CreateEvent';
-import { Button } from '../ui/button';
 import {
 	Sheet,
 	SheetContent,
