@@ -19,7 +19,7 @@ const Departments = () => {
   const { toast } = useToast();
 
 
-  const { onFetch: getDeps, isFetching: isLoadingDeps } = useFetch(
+  const { onFetch: getDeps } = useFetch(
     '/tenants/sa/',
     (data) => {
       setDeps(data.data.results)

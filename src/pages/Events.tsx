@@ -216,7 +216,7 @@ const GridView = ({ events }: any) => {
     return (
         <div className='grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-10'>
             {
-                events.map((e, k) => 
+                events.map(() => // (e,k)
                     <div className='relative col-span-1 rounded-lg border grid grid-cols-[160px_1fr] h-40 bg-foreground/5'>
                         <img className='w-full h-full object-center object-cover' src={SAMPLE_IMG} alt="" />
 

@@ -6,7 +6,9 @@ import { Textarea } from "../components/ui/textarea"
 const Announcements = () => {
 
   const formik = useFormik({
-    initialValues: {},
+    initialValues: {
+      announcementTitle: ''
+    },
     onSubmit: () => {
 
     }
