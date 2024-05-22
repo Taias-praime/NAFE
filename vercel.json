@@ -1,0 +1,44 @@
+{
+    "rewrites": [
+        {
+            "source": "/login",
+            "destination": "/"
+        },
+        {
+            "source": "/reset",
+            "destination": "/"
+        },
+        {
+            "source": "/reset/new",
+            "destination": "/"
+        },
+        {
+            "source": "/dashboard",
+            "destination": "/"
+        },
+        {
+            "source": "/chief-of-army-staff",
+            "destination": "/"
+        },
+        {
+            "source": "/events",
+            "destination": "/"
+        },
+        {
+            "source": "/departments",
+            "destination": "/"
+        },
+        {
+            "source": "/users",
+            "destination": "/"
+        },
+        {
+            "source": "/announcements",
+            "destination": "/"
+        },
+        {
+            "source": "/settings",
+            "destination": "/"
+        }
+    ]
+}
