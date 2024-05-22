@@ -4,13 +4,36 @@ import { useState } from "react";
 import { Input } from "../components/ui/input";
 import ProfileImg from "../components/ui-custom/profileImg";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "../components/ui/table";
-import { Badge } from "../components/ui/badge";
 import { HEADER_HEIGHT } from "../lib/utils";
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../components/ui/pagination";
+import useFetch from "../hooks/useFetch";
+import { toast } from "../components/ui/use-toast";
 
 const Users = () => {
   const PAGINATION_HEIGHT = 40;
-  const [deps,] = useState([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+  const [users, setUsers] = useState([]);
+
+  // get users
+  const { onFetch: onFetchUsers } = useFetch(
+    '/users/sa/',
+    (data, status) => {
+      if (status === 200) {
+        const _data = data.data;
+        const results = _data.results;
+        setUsers(results)
+      }
+    },
+    (error, status) => { // on error
+      const { message, ...err } = error;
+      // notify
+      toast({
+        title: `${message} (${status})`,
+        description: err.errors.error_message,
+        variant: 'destructive',
+      })
+    },
+    {}, // options
+  );
 
   return (
     <div className="pb-5 pt-10 px-10" style={{
@@ -28,9 +51,9 @@ const Users = () => {
         <div className="">
           <div className="lg:flex justify-between items-center p-5 space-y-5">
             <div className="">
-              <h5 className="text-xl"> List of Departments </h5>
+              <h5 className="text-xl"> List of Users </h5>
               <small className="text-muted-foreground">
-                {deps.length || 0} Departments
+                {/* {users.length || 0} Departments */}
               </small>
             </div>
             <div className="relative flex items-center w-fit">
@@ -50,7 +73,7 @@ const Users = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {deps.map((e: number) => (
+              {users.map((e: number) => (
                 <TableRow key={e}>
                   <TableCell className="font-medium">
                     <div className="flex items-center">

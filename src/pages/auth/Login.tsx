@@ -5,6 +5,7 @@ import useAuth from '../../hooks/useAuth';
 import { useFormik } from 'formik';
 import SubmitButton from '../../components/ui-custom/submitButton';
 import { useEffect } from 'react';
+import { LoginVS } from '../../models/validationSchema';
 
 const SAMPLE_IMG = '';
 // 'https://images.unsplash.com/photo-1512238350357-c3180a5d7e2f?q=80&w=3570&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
@@ -86,7 +87,7 @@ const Login = () => {
 						label="Password"
 					/>
 
-                    <SubmitButton state={isLoggingIn} className='w-full'> Login </SubmitButton>
+                    <SubmitButton state={isLoggingIn} className='w-full' > Login </SubmitButton>
 
 					<div className="py-5 text-center">
 						<Link to="/reset"> Forgot Password? </Link>

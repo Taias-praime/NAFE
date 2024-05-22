@@ -33,7 +33,6 @@ const Events = () => {
         '/events/sa/upcoming',
         (data) => {
             setEvents(data.data.results)
-            console.log(data.data.results)
         },
         () => { },
     );

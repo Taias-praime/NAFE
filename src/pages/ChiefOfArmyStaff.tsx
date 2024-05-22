@@ -37,11 +37,7 @@ const ChiefOfArmyStaff = () => {
             if (status === 200) {
                 const _data = data.data;
                 const results = _data.results;
-                
-                // if (results.length)
                 setCOAS(results.filter((coa: ArmyStaff) => coa.current)[0])
-
-                console.log(results.filter((coa: ArmyStaff) => coa.current)[0])
             }
         },
         (error, status) => { // on error
@@ -104,7 +100,10 @@ const ChiefOfArmyStaff = () => {
             }
 
             {/* List of files */}
-            <FilesList />
+            {
+                COAS?.files.length &&
+                <FilesList files={COAS.files} />
+            }
         </aside>
     </div>
   )

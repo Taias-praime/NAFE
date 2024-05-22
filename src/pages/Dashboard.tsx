@@ -53,8 +53,8 @@ const Dashboard = () => {
 
     // on component mount
     useEffect(() => {
-        getEvents();
         getDeps();
+        getEvents();
         getWebinars();
     }, [])
 
