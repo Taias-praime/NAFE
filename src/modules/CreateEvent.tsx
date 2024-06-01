@@ -26,6 +26,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import AddUser from './AddUser';
 import TimeInput from '../components/ui-custom/timeInput';
 import { useDashboardContext } from '../contexts/dashboard.context';
+import { useLocation } from 'react-router-dom';
 
 const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
 
@@ -52,7 +53,7 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
     const handleCancel = onCancel;
 
     const { reload } = useDashboardContext(); // reload function to refect dashboard data and statistics
-
+    const { pathname } = useLocation();
 
     const handleNext = () => {
         if (step > MAX_STEPS) return;
@@ -68,7 +69,6 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
             image: formikForm.values.image || DEFAULT_IMG,
         };
         createEvent(body);
-        // console.log(body)
     }
 
     const formikForm = useFormik({
@@ -142,15 +142,21 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
                     variant: 'default',
                 });
 
+                // Reset form and states
                 formikForm.resetForm();
-                // refetch events data for dashboard
-                reload();
+                setFeaturedImg('');
+                setEventDate(undefined);
+                setStartTime('');
+                setEndTime('');
+                setMods([]);
+                setSpeakers([]);
 
+                // refetch events data for dashboard
+                if (pathname === '/dashboard') reload();
 
                 // self delete notification after 5 seconds
                 setTimeout(() => notification.dismiss(), 5_000)
             }
-
         },
         (error, status) => {
             const { message } = error;
@@ -379,12 +385,14 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
                                             label='Admin instructions title'
                                             placeholder='title here'
                                             name='adminInstructionsTitle'
+                                            value={formikForm.values.adminInstructionsTitle}
                                             onChange={formikForm.handleChange}
                                             className='max-w-[350px] mb-10'
                                         />
 
                                         <Input
                                             type='file'
+                                            disabled
                                             label='Upload admin instructions'
                                             onChange={(e) => handleFileUpload(e, 'adminInstructionsUrl')}
                                             className='max-w-[350px] mb-10 rounded border border-gray-300 bg-gray-100 px-4'
@@ -392,6 +400,7 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
 
                                         <Input
                                             type='file'
+                                            disabled
                                             label='Upload Programme'
                                             onChange={(e) => handleFileUpload(e, 'programmeUrl')}
                                             className='max-w-[350px] rounded border border-gray-300 bg-gray-100 px-4'
