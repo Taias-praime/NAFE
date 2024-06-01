@@ -14,9 +14,8 @@ import { Skeleton } from "../components/ui/skeleton";
 import { Link } from "react-router-dom";
 
 const Dashboard = () => {
-
     const { onFetch: getEvents, isFetching: isLoadingEvents } = useFetch(
-        '/events/sa/upcoming',
+        '/events/sa/',
         (data) => {
             setEvents(data.data.results);
             setEventsCount(data.data.number_of_items);

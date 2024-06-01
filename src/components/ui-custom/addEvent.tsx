@@ -23,7 +23,7 @@ const AddEvent = ({ children, className }: { children: ReactNode, className: str
 				{children}
 			</SheetTrigger>
 
-			<SheetContent className="!max-w-full w-full md:w-[1200px]">
+			<SheetContent className="!max-w-full w-full md:w-[1200px] overflow-y-auto">
 				<SheetHeader>
 					<SheetTitle className='pb-10'> Create Event </SheetTitle>
 					{/* <SheetDescription></SheetDescription> */}

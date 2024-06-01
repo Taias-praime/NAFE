@@ -2,18 +2,19 @@ import { LayoutGrid, ListFilter, ListOrdered, Pencil, PlusCircle, Search } from 
 import { Button } from '../components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { useEffect, useState } from 'react';
-import ProfileImg from '../components/ui-custom/profileImg';
 import { Badge } from '../components/ui/badge';
 import { Input } from '../components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from '../components/ui/dropdown-menu';
-// import { Checkbox } from '../components/ui/checkbox';
 import { HEADER_HEIGHT } from '../lib/utils';
 import useFetch from '../hooks/useFetch';
 import AddEvent from '../components/ui-custom/addEvent';
+import { IEvent } from '../models/interfaces';
 
 const Events = () => {
-    const [events, setEvents] = useState([]);
+    const [events, setEvents] = useState<IEvent[]>([]);
+    const [eventsCount, setEventsCount] = useState<number>(0);
+    const [filteredEvents, setFilteredEvents] = useState<IEvent[]>([]);
     const [isList, setIsList] = useState<boolean>(false);
     const [tab, setTab] = useState<string>('all');
 
@@ -30,16 +31,36 @@ const Events = () => {
     }
 
     const { onFetch: getEvents } = useFetch(
-        '/events/sa/upcoming',
+        '/events/sa/',
         (data) => {
             setEvents(data.data.results)
+            setEventsCount(data.data.number_of_items);
         },
         () => { },
     );
 
+    const handleSearch = () => {
+
+    }
+
     useEffect(() => {
         getEvents();
     }, [])
+
+    useEffect(() => {
+        if ( tab === 'all' ) setFilteredEvents(events)
+        else if ( tab === 'ongoing' ) setFilteredEvents([])
+        else if ( tab === 'live' ) setFilteredEvents(events.filter(e => e.event_link))
+    }, [tab]);
+
+
+    useEffect(() => {
+        setFilteredEvents([]);
+        if (showNormalEvent) setFilteredEvents([...filteredEvents, ...events.filter(e => e.type === 'general')])
+        if (showRestrictedEvent) setFilteredEvents([...filteredEvents, ...events.filter(e => e.type === 'restricted')])
+        if (showSecretEvent) setFilteredEvents([...filteredEvents, ...events.filter(e => e.type === 'registered')])
+    }, [ showNormalEvent, showRestrictedEvent, showSecretEvent, events]);
+
 
 	return (
 		<div className="overflow-y-auto pb-5 pt-10 px-10" style={{
@@ -70,7 +91,7 @@ const Events = () => {
 					</div>
                     <div className="flex gap-5 items-center">
                         <div className="relative flex items-center w-fit">
-                            <Input className='p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[300px]' />
+                            <Input className='p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[300px]' onChange={handleSearch} />
                             <Search className='absolute right-5 opacity-30' />
                         </div>
 
@@ -145,14 +166,14 @@ const Events = () => {
 
                 <div className="">
                     <h5 className="text-xl">
-                        All Events ({events.length || 0})
+                        All Events {`(${eventsCount})`}
                     </h5>
                 </div>
 
                 {
                     isList  ?
-                    <TableView events={events} /> :
-                    <GridView events={events} />
+                    <TableView events={filteredEvents} /> :
+                    <GridView events={filteredEvents} />
                 }
 
 			</div>
@@ -160,47 +181,27 @@ const Events = () => {
 	);
 };
 
-const TableView = ({ events }: any) => {
+const TableView = ({ events }: { events: IEvent[] }) => {
     return (
         <Table className="">
             <TableHeader>
                 <TableRow>
-                    <TableHead>Departments</TableHead>
-                    <TableHead>No. of Users</TableHead>
-                    <TableHead>Events</TableHead>
-                    <TableHead className="text-center">
-                        Live Webinars
-                    </TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Event Type</TableHead>
+                    <TableHead>Date</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {events.map((e: number) => (
-                    <TableRow key={e}>
+                {events.map((event: IEvent, index: number) => (
+                    <TableRow key={index}>
                         <TableCell className="font-medium">
-                            NCCQE
+                            {event.title}
                         </TableCell>
                         <TableCell>
-                            <div className="flex items-center">
-                                <ProfileImg
-                                    url={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${Math.random()}`}
-                                />
-                                <ProfileImg
-                                    url={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${Math.random()}`}
-                                    className="-ml-4"
-                                />
-                                <ProfileImg
-                                    url={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${Math.random()}`}
-                                    className="-ml-4"
-                                />
-                                <span className="ms-2"> + 300 </span>
-                            </div>
+                            {event.type}
                         </TableCell>
-                        <TableCell>30</TableCell>
-                        <TableCell className="flex justify-center items-center gap-3">
-                            <span>5</span>
-                            <Badge variant={'destructive'}>
-                                Live
-                            </Badge>
+                        <TableCell>
+                            {new Date(event.start_date).toDateString()}
                         </TableCell>
                     </TableRow>
                 ))}
@@ -209,22 +210,20 @@ const TableView = ({ events }: any) => {
     )
 }
 
-const GridView = ({ events }: any) => {
-
-    const SAMPLE_IMG = 'https://scontent.facc1-1.fna.fbcdn.net/v/t39.30808-6/440128026_279179215284777_2129238623055120663_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=5f2048&_nc_ohc=q4IsD8czVyEQ7kNvgFSSf3s&_nc_oc=Adj2apt5hiLe3FAtky7rXBEQnbAUJokC87FI6bgRUWx_u1DqheqIEmoNWQ12EqsEdeU&_nc_ht=scontent.facc1-1.fna&oh=00_AfCnkDFP5RkNPfmx0k8xOYin6SM3x4wU7TTpMA6r83XmPw&oe=662F70BF'
+const GridView = ({ events }: { events: IEvent[] }) => {
 
     return (
         <div className='grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-10'>
             {
-                events.map(() => // (e,k)
-                    <div className='relative col-span-1 rounded-lg border grid grid-cols-[160px_1fr] h-40 bg-foreground/5'>
-                        <img className='w-full h-full object-center object-cover' src={SAMPLE_IMG} alt="" />
+                events.map((event: IEvent) => // (e,k)
+                    <div className='relative col-span-1 rounded-lg border overflow-hidden grid grid-cols-[160px_1fr] h-40 bg-foreground/5'>
+                        <img className='w-full max-h-full min-h-full object-center object-cover' src={event.image} alt="" />
 
                         <div className="overflow-hidden p-5">
-                            <h1 className='text-xl line-clamp-2 mb-5'> Workshop on Aviation Emergency Response Preparedness </h1>
+                            <h1 className='text-xl line-clamp-2 mb-5'> { event.title } </h1>
 
                             <div className="flex justify-between items-center">
-                                <h1 className='text-10 opacity-50'> 12 December, 2025 </h1>
+                                <h1 className='text-sm opacity-50'> { new Date(event.start_date).toDateString() }  </h1>
 
                                 <Button size={'sm'} className="flex gap-3">
                                     <Pencil />

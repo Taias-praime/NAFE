@@ -26,9 +26,15 @@ export interface ICard {
 }
 
 export interface IEvent {
+    id: string;
+    theme_description: string;
+    type: string;
+    venue: string;
+    image:string;
     title: string;
     img: string;
     location: string;
-    startDate: string;
-    endDate: string;
+    start_date: string;
+    end_date: string;
+    event_link: string;
 }
