@@ -172,9 +172,8 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
     // File upload
     const { onPost: uploadFile } = useFetch(
         '/files/upload',
-        (data, status) => {
-            console.log(data.url); // assuming the response contains the URL
-
+        (data, ) => {
+            return data;
         },
         (error, status) => {
             const { message, ...err } = error;
@@ -229,15 +228,18 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
         const file = e.target.files?.[0];
-        console.log(file);
+
         if (file) {
             const formData = new FormData();
             formData.append('file', file);
 
-            const { data, status } = await uploadFile(formData);
-            if (status === 200) {
-                formikForm.setFieldValue(field, data.url);
-            }
+            await uploadFile(formData).then((res: any) => {
+                console.log("AFTER UPLOAD", res);
+                console.log("FIELD VAL", field);
+                // if (res === 200) {
+                //     formikForm.setFieldValue(field, data.url);
+                // }
+            });
         }
     };
 
