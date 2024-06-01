@@ -10,7 +10,7 @@ const TimeInput = ({ label, name, value, onChange }: {
 }) => {
     const [error, setError] = useState('');
 
-    const handleBlur = (e) => {
+    const handleBlur = (e: any) => {
         const value = e.target.value;
         const regex = /^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
 

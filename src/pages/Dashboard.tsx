@@ -12,7 +12,7 @@ import ProfileImg from "../components/ui-custom/profileImg";
 import useFetch from "../hooks/useFetch";
 import { Skeleton } from "../components/ui/skeleton";
 import { Link } from "react-router-dom";
-import { DashboardProvider, useDashboardContext } from "../contexts/dashboard.context";
+import { DashboardProvider } from "../contexts/dashboard.context";
 
 const Dashboard = () => {
     const { onFetch: getEvents, isFetching: isLoadingEvents } = useFetch(
