@@ -1,39 +1,22 @@
-import { useFormik } from "formik"
-import { Input } from "../components/ui/input"
-import { HEADER_HEIGHT, local } from "../lib/utils"
-import { Textarea } from "../components/ui/textarea"
-import { Button } from "../components/ui/button"
-import { useEffect, useState } from "react"
-import { ListFilter, Loader2, PencilLine } from "lucide-react"
+import { useFormik } from "formik";
+import { Input } from "../components/ui/input";
+import { HEADER_HEIGHT, local } from "../lib/utils";
+import { Textarea } from "../components/ui/textarea";
+import { Button } from "../components/ui/button";
+import { useEffect, useState } from "react";
+import { ListFilter, Loader2, PencilLine } from "lucide-react";
 import { format } from "date-fns"
-import { toast } from "../components/ui/use-toast"
-import Select from 'react-select';
-import useFetch from "../hooks/useFetch"
+import { toast } from "../components/ui/use-toast";
+import { IAnnouncements, ITenants } from "../models/interfaces";
+import useFetch from "../hooks/useFetch";
+import MultiSelect from "../components/ui/multi-select";
 
 const token = local("token");
 
-type Tenants = {
-  "tenant_id": string,
-  "name": string,
-  "code": string,
-  "total_events": number,
-  "total_members": number,
-  "webinars": number
-}
-
-type TAnnouncements = {
-  "id": string,
-  "date_created": string,
-  "date_updated": string,
-  "title": string,
-  "tenant_ids": string[],
-  "description": string
-}
-
 const Announcements = () => {
-  const [announcements, setAnnouncement] = useState<TAnnouncements[]>([]);
-  const [tenants, setTenants] = useState<Tenants[]>([]);
-  const [editTenant, setEditTenant] = useState<Tenants[]>([]);
+  const [announcements, setAnnouncement] = useState<IAnnouncements[]>([]);
+  const [tenants, setTenants] = useState<ITenants[]>([]);
+  const [tenantsId, setEditTenantsId] = useState<ITenants[]>([]);
   const [isEdit, setIsEdit] = useState(false);
   const [id, setId] = useState('');
 
@@ -67,8 +50,8 @@ const Announcements = () => {
         description: err.errors.error_message,
         variant: 'destructive',
       });
-    }, // on error
-    {}, //
+    },
+    {},
     {
       "Authorization": `Bearer ${token}`,
     }
@@ -78,7 +61,7 @@ const Announcements = () => {
     `/announcements/sa/${id}/edit`,
     (data) => {
       toast({ description: data.message });
-    }, // on success
+    },
     (e) => {
       const { message, ...err } = e;
       // notify
@@ -87,8 +70,8 @@ const Announcements = () => {
         description: err.errors.error_message,
         variant: 'destructive',
       });
-    }, // on error
-    {}, //
+    },
+    {},
     {
       "Authorization": `Bearer ${token}`,
     }
@@ -113,28 +96,29 @@ const Announcements = () => {
       }
       formik.resetForm();
       setIsEdit(false)
-      setEditTenant([])
+      setEditTenantsId([])
       setId('')
     }
   })
 
-  const extract = (tenant_ids: Tenants[]) => {
+  const getIdsFromTenants = (tenant_ids: ITenants[]) => {
     const tenants = []
-    for (const person of tenant_ids) {
-      tenants.push(person.tenant_id);
+    for (const department of tenant_ids) {
+      tenants.push(department.tenant_id);
     }
     return tenants;
   }
 
-  const handleEventTypeSelect = (tenant_ids: Tenants[]) => {
-    setEditTenant(tenant_ids)
-    const tenants = extract(tenant_ids)
+  const handleEventTypeSelect = (tenant_ids: ITenants[]) => {
+    setEditTenantsId(tenant_ids)
+    const tenants = getIdsFromTenants(tenant_ids)
     formik.setFieldValue('tenant_ids', tenants)
   }
 
-  const editAnnouncement = (obj: TAnnouncements) => {
+  const editAnnouncement = (obj: IAnnouncements) => {
     const matchedTenants = [];
     setId(obj.id)
+    setIsEdit(true);
 
     for (const id of obj.tenant_ids) {
       for (const tenant of tenants) {
@@ -145,33 +129,14 @@ const Announcements = () => {
       }
     }
 
-    setEditTenant(matchedTenants);
-    setIsEdit(true);
+    setEditTenantsId(matchedTenants);
+
     formik.setValues({
       title: obj.title,
       description: obj.description,
       tenant_ids: obj.tenant_ids,
     })
   }
-
-  const customStyles = {
-    control: (baseStyles) => ({
-      ...baseStyles,
-      border: 'none',
-      borderBottom: '1px solid',
-      boxShadow: 'none',
-      borderRadius: 'none',
-      padding: '5px 0 !important',
-      '&:hover': {
-        borderBottom: '1px solid',
-        outline: 'none',
-      },
-    }),
-    placeholder: (styles) => ({
-      ...styles,
-      color: '#CECECE',
-    }),
-  };
 
   return (
     <div className="overflow-y-auto pb-5 pt-10 px-10 bg-foreground/5" style={{
@@ -205,14 +170,12 @@ const Announcements = () => {
             />
 
             <label className="block pb-3"> Select Department </label>
-            <Select isMulti options={tenants} onChange={handleEventTypeSelect}
-              getOptionLabel={(tenants) => tenants.name}
-              getOptionValue={(tenants) => tenants.tenant_id}
-              value={isEdit ? editTenant : undefined}
-              styles={customStyles}
-              placeholder='select department'
-            >
-            </Select>
+            <MultiSelect
+              tenants={tenants}
+              handleEventTypeSelect={handleEventTypeSelect}
+              tenantsId={tenantsId}
+              isEdit={isEdit}
+            />
             <div className="flex justify-end mt-12">
               {
                 isEdit ? (
@@ -233,7 +196,6 @@ const Announcements = () => {
                   </Button>
                 )
               }
-
             </div>
           </form>
         </div>
@@ -270,7 +232,12 @@ const Announcements = () => {
 
 export default Announcements
 
-const AnnouncementCard = ({ announcement, editAnnouncement }: any) => {
+interface IAnnouncementCard {
+  announcement: IAnnouncements;
+  editAnnouncement: (announcement: IAnnouncements) => void
+}
+
+const AnnouncementCard = ({ announcement, editAnnouncement }: IAnnouncementCard) => {
   return (
     <div key={announcement.id} className="rounded-md bg-white p-4 my-4 border-b border-b-foreground">
       <div className="flex justify-between">
