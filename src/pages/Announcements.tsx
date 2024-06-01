@@ -247,8 +247,8 @@ const AnnouncementCard = ({ announcement, editAnnouncement }: IAnnouncementCard)
           <p className="opacity-50 text-sm"> Nafe </p>
         </div>
         <div className="">
-          <Button onClick={() => editAnnouncement(announcement)} size='sm' className="px-4 flex gap-2">
-            <PencilLine />
+          <Button onClick={() => editAnnouncement(announcement)} size='sm' className="px-4 flex gap-2 text-sm">
+            <PencilLine size='16' />
             Edit
           </Button>
         </div>

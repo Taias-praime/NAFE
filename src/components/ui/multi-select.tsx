@@ -18,7 +18,7 @@ const MultiSelect = ({ tenants, handleEventTypeSelect, tenantsId, isEdit, label 
             borderBottom: '1px solid',
             boxShadow: 'none',
             borderRadius: 'none',
-            padding: '5px 0 !important',
+            padding: '3px 0 !important',
             '&:hover': {
                 borderBottom: '1px solid',
                 outline: 'none',
@@ -29,11 +29,19 @@ const MultiSelect = ({ tenants, handleEventTypeSelect, tenantsId, isEdit, label 
             color: '#CECECE',
             fontSize: '14px',
         }),
+        indicatorSeparator: (styles) => ({
+            ...styles,
+            display: 'none'
+        }),
+        ValueContainer2: (styles) => ({
+            ...styles,
+            padding: 'none'
+        }),
     };
 
     return (
         <>
-            <label className="block pb-3"> {label} </label>
+            <label className="block pb-1"> {label} </label>
             <Select isMulti options={tenants} onChange={handleEventTypeSelect}
                 getOptionLabel={(tenants) => tenants.name}
                 getOptionValue={(tenants) => tenants.tenant_id}
