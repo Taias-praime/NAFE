@@ -10,8 +10,10 @@ import { toast } from "../components/ui/use-toast";
 import { IAnnouncements, ITenants } from "../models/interfaces";
 import useFetch from "../hooks/useFetch";
 import MultiSelect from "../components/ui/multi-select";
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../components/ui/pagination";
 
 const token = local("token");
+const PAGINATION_HEIGHT = 50;
 
 const Announcements = () => {
   const [announcements, setAnnouncement] = useState<IAnnouncements[]>([]);
@@ -140,10 +142,10 @@ const Announcements = () => {
   }
 
   return (
-    <div className="overflow-y-auto pb-5 pt-10 px-10 bg-foreground/5" style={{
-      height: `calc(100vh - ${HEADER_HEIGHT}px)`
+    <div className=" pt-10 px-10 bg-foreground/5" style={{
+      height: `calc(100vh - ${HEADER_HEIGHT}px - ${PAGINATION_HEIGHT}px)`
     }}>
-      <div className="grid grid-cols-12 gap-x-10">
+      <div className="grid grid-cols-12 gap-x-10 overflow-y-scroll h-full">
         <div className="col-span-7">
           <div className="">
             <h4 className="mb-2 text-xl"> Create Announcement </h4>
@@ -214,20 +216,36 @@ const Announcements = () => {
               </Button>
             </div>
           </div>
-          {
-            !isLoadingAnnouncements ? (
-              announcements.map((announcement) => (
-                <AnnouncementCard announcement={announcement} editAnnouncement={editAnnouncement} />
-              ))
-            ) : (
-              <div className="flex items-center justify-center h-full w-full">
-                <Loader2 className="animate-spin" />
-              </div>
-            )
-          }
+            {
+              !isLoadingAnnouncements ? (
+                announcements.map((announcement) => (
+                  <AnnouncementCard announcement={announcement} editAnnouncement={editAnnouncement} />
+                ))
+              ) : (
+                <div className="flex items-center justify-center h-full w-full">
+                  <Loader2 className="animate-spin" />
+                </div>
+              )
+            }
         </div>
       </div>
-    </div >
+      <Pagination className={`!h-[${PAGINATION_HEIGHT}px]`}>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious href="#" />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationLink href="#">1</PaginationLink>
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationEllipsis />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationNext href="#" />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    </div>
   )
 };
 
@@ -240,7 +258,7 @@ interface IAnnouncementCard {
 
 const AnnouncementCard = ({ announcement, editAnnouncement }: IAnnouncementCard) => {
   return (
-    <div key={announcement.id} className="rounded-md bg-white p-4 my-4 border-b border-b-foreground">
+    <div key={announcement.id} className="rounded-md bg-white p-4 mb-4 border-b border-b-foreground">
       <div className="flex justify-between overflow-hidden">
         <div className="">
           <h4 className="mb-2"> {announcement.title} </h4>
