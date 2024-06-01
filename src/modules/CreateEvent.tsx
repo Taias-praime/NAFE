@@ -25,6 +25,7 @@ import { Textarea } from '../components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import AddUser from './AddUser';
 import TimeInput from '../components/ui-custom/timeInput';
+import { useDashboardContext } from '../contexts/dashboard.context';
 
 const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
 
@@ -48,9 +49,10 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
         setStep(step + 1);
     }
 
-    const handleCancel = () => {
-        onCancel();
-    }
+    const handleCancel = onCancel;
+
+    const { reload } = useDashboardContext(); // reload function to refect dashboard data and statistics
+
 
     const handleNext = () => {
         if (step > MAX_STEPS) return;
@@ -141,6 +143,9 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
                 });
 
                 formikForm.resetForm();
+                // refetch events data for dashboard
+                reload();
+
 
                 // self delete notification after 5 seconds
                 setTimeout(() => notification.dismiss(), 5_000)

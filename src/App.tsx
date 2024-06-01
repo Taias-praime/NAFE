@@ -6,14 +6,13 @@ import RouterGuard from "./services/routerGuard";
 
 const App = () => {
   return (
-    <>    
-      {/* <DialogContext.Provider value={}> */}
-      <div className="text-foreground m-0">
-        <RouterGuard>
-          <RouterProvider router={router} />
-        </RouterGuard>
-      </div>
-      {/* </DialogContext.Provider> */}
+    <>   
+        <div className="text-foreground m-0">
+          <RouterGuard>
+            <RouterProvider router={router} />
+          </RouterGuard>
+        </div>
+
       <Toaster />
     </>
   );
