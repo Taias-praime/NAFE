@@ -12,12 +12,30 @@ import useFetch from "../hooks/useFetch"
 
 const token = local("token");
 
+type Tenants = {
+  "tenant_id": string,
+  "name": string,
+  "code": string,
+  "total_events": number,
+  "total_members": number,
+  "webinars": number
+}
+
+type TAnnouncements = {
+  "id": string,
+  "date_created": string,
+  "date_updated": string,
+  "title": string,
+  "tenant_ids": string[],
+  "description": string
+}
+
 const Announcements = () => {
-  const [announcements, setAnnouncement] = useState([]);
-  const [tenants, setTenants] = useState([]);
-  const [editTenant, setEditTenant] = useState([]);
+  const [announcements, setAnnouncement] = useState<TAnnouncements[]>([]);
+  const [tenants, setTenants] = useState<Tenants[]>([]);
+  const [editTenant, setEditTenant] = useState<Tenants[]>([]);
   const [isEdit, setIsEdit] = useState(false);
-  const [id, setId] = useState('false');
+  const [id, setId] = useState('');
 
   const { onFetch: getEvents, isFetching: isLoadingAnnouncements } = useFetch(
     '/announcements/sa/',
@@ -92,15 +110,15 @@ const Announcements = () => {
         onPost(values)
       } else {
         onPut(values)
-
       }
-      setIsEdit(false)
       formik.resetForm();
+      setIsEdit(false)
       setEditTenant([])
+      setId('')
     }
   })
 
-  const extract = (tenant_ids) => {
+  const extract = (tenant_ids: Tenants[]) => {
     const tenants = []
     for (const person of tenant_ids) {
       tenants.push(person.tenant_id);
@@ -108,12 +126,13 @@ const Announcements = () => {
     return tenants;
   }
 
-  const handleEventTypeSelect = (tenant_ids) => {
+  const handleEventTypeSelect = (tenant_ids: Tenants[]) => {
     setEditTenant(tenant_ids)
     const tenants = extract(tenant_ids)
+    formik.setFieldValue('tenant_ids', tenants)
   }
 
-  const editAnnouncement = (obj) => {
+  const editAnnouncement = (obj: TAnnouncements) => {
     const matchedTenants = [];
     setId(obj.id)
 
