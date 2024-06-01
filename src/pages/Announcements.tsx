@@ -17,14 +17,15 @@ const Announcements = () => {
   const [announcements, setAnnouncement] = useState<IAnnouncements[]>([]);
   const [tenants, setTenants] = useState<ITenants[]>([]);
   const [tenantsId, setEditTenantsId] = useState<ITenants[]>([]);
+  const [numOfAnnouncement, setNumOfAnnouncement] = useState(0);
   const [isEdit, setIsEdit] = useState(false);
   const [id, setId] = useState('');
 
   const { onFetch: getEvents, isFetching: isLoadingAnnouncements } = useFetch(
     '/announcements/sa/',
     (data) => {
-      setAnnouncement(data.data.results)
-
+      setAnnouncement(data.data.results);
+      setNumOfAnnouncement(data.data.number_of_items);
     },
     () => { },
   );
@@ -169,8 +170,8 @@ const Announcements = () => {
               label="Details"
             />
 
-            <label className="block pb-3"> Select Department </label>
             <MultiSelect
+              label="Select Department"
               tenants={tenants}
               handleEventTypeSelect={handleEventTypeSelect}
               tenantsId={tenantsId}
@@ -201,10 +202,10 @@ const Announcements = () => {
         </div>
 
         <div className="col-span-5">
-          <div className="flex justify-between">
+          <div className="flex justify-between mb-12">
             <div className="">
               <h4 className="mb-2 text-xl"> Recent Announcements </h4>
-              <p className="opacity-50 text-sm"> 10 announcements </p>
+              <p className="opacity-50 text-sm"> {numOfAnnouncement} announcements </p>
             </div>
             <div className="">
               <Button className='flex gap-3' variant={'secondary'}>
@@ -228,9 +229,9 @@ const Announcements = () => {
       </div>
     </div >
   )
-}
+};
 
-export default Announcements
+export default Announcements;
 
 interface IAnnouncementCard {
   announcement: IAnnouncements;
@@ -240,21 +241,21 @@ interface IAnnouncementCard {
 const AnnouncementCard = ({ announcement, editAnnouncement }: IAnnouncementCard) => {
   return (
     <div key={announcement.id} className="rounded-md bg-white p-4 my-4 border-b border-b-foreground">
-      <div className="flex justify-between">
+      <div className="flex justify-between overflow-hidden">
         <div className="">
           <h4 className="mb-2"> {announcement.title} </h4>
           <p className="opacity-50 text-sm"> Nafe </p>
         </div>
         <div className="">
-          <Button onClick={() => editAnnouncement(announcement)} className="px-5 flex gap-2">
+          <Button onClick={() => editAnnouncement(announcement)} size='sm' className="px-4 flex gap-2">
             <PencilLine />
             Edit
           </Button>
         </div>
       </div>
-      <div className="py-4"> {announcement.description} </div>
+      <div className="py-4 text-sm"> {announcement.description} </div>
       <div className="flex justify-end text-disabled text-sm "> {format(announcement.date_created, 'p | MMM dd, yyyy')}</div>
     </div>
   )
-}
+};
 

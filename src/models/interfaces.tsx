@@ -34,19 +34,19 @@ export interface IEvent {
 }
 
 export interface ITenants {
-    "tenant_id": string;
+    tenant_id: string;
     name: string;
     code: string;
-    "total_events": number;
-    "total_members": number;
+    total_events: number;
+    total_members: number;
     webinars: number;
   }
   
   export interface IAnnouncements {
     id: string;
-    "date_created": string;
-    "date_updated": string;
+    date_created: string;
+    date_updated: string;
     title: string;
-    "tenant_ids": string[];
+    tenant_ids: string[];
     description: string;
   }
