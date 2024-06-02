@@ -4,35 +4,35 @@
 
 
 @font-face {
-  font-family: 'Euclid Circular';
-  font-weight: normal;
-  font-style: normal;
-  src: url('assets/fonts/Euclid Circular/Euclid Circular A Regular.ttf') format('truetype');
+	font-family: 'Euclid Circular';
+	font-weight: normal;
+	font-style: normal;
+	src: url('assets/fonts/Euclid Circular/Euclid Circular A Regular.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: 'Euclid Circular';
-  font-weight: lighter;
-  font-style: normal;
-  src: url('assets/fonts/Euclid Circular/Euclid\ Circular\ A\ Light.ttf') format('truetype');
+	font-family: 'Euclid Circular';
+	font-weight: lighter;
+	font-style: normal;
+	src: url('assets/fonts/Euclid Circular/Euclid\ Circular\ A\ Light.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: 'Euclid Circular';
-  font-weight: medium;
-  font-style: normal;
-  src: url('assets/fonts/Euclid Circular/Euclid\ Circular\ A\ Medium.ttf') format('truetype');
+	font-family: 'Euclid Circular';
+	font-weight: medium;
+	font-style: normal;
+	src: url('assets/fonts/Euclid Circular/Euclid\ Circular\ A\ Medium.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: 'Euclid Circular';
-  font-weight: bolder;
-  font-style: normal;
-  src: url('assets/fonts/Euclid Circular/Euclid\ Circular\ A\ Bold.ttf') format('truetype');
+	font-family: 'Euclid Circular';
+	font-weight: bolder;
+	font-style: normal;
+	src: url('assets/fonts/Euclid Circular/Euclid\ Circular\ A\ Bold.ttf') format('truetype');
 }
 
 body {
-  font-family: 'Euclid Circular', sans-serif;
+	font-family: 'Euclid Circular', sans-serif;
 }
 
 @layer base {
@@ -107,7 +107,36 @@ body {
 	* {
 		@apply border-border;
 	}
+
 	body {
 		@apply bg-background text-foreground;
 	}
+
+	.pagination {
+		display: flex;
+		justify-content: flex-end;
+		gap: 10px;
+		list-style: none;
+		cursor: pointer;
+		padding-top: 10px;
+	}
+
+	.pagination a {
+		padding: 5px 10px;
+		border-radius: 5px;
+		@apply bg-background text-foreground;
+	}
+
+	.pagination__link {
+		font-weight: bold;
+	}
+
+	.pagination__link--active a {
+		@apply bg-foreground text-background;
+	}
+
+	.pagination__link--disabled a {
+		@apply text-disabled;
+	}
+
 }

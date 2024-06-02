@@ -10,7 +10,7 @@ import { toast } from "../components/ui/use-toast";
 import { IAnnouncements, ITenants } from "../models/interfaces";
 import useFetch from "../hooks/useFetch";
 import MultiSelect from "../components/ui/multi-select";
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../components/ui/pagination";
+import Paginate from "../components/ui/paginate";
 
 const token = local("token");
 const PAGINATION_HEIGHT = 50;
@@ -20,14 +20,17 @@ const Announcements = () => {
   const [tenants, setTenants] = useState<ITenants[]>([]);
   const [tenantsId, setEditTenantsId] = useState<ITenants[]>([]);
   const [numOfAnnouncement, setNumOfAnnouncement] = useState(0);
+  const [numOfPages, setNumOfPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isEdit, setIsEdit] = useState(false);
   const [id, setId] = useState('');
 
   const { onFetch: getEvents, isFetching: isLoadingAnnouncements } = useFetch(
-    '/announcements/sa/',
+    `/announcements/sa/?page=${currentPage}`,
     (data) => {
       setAnnouncement(data.data.results);
       setNumOfAnnouncement(data.data.number_of_items);
+      setNumOfPages(data.data.number_of_pages);
     },
     () => { },
   );
@@ -83,7 +86,7 @@ const Announcements = () => {
   useEffect(() => {
     getEvents();
     getTenants();
-  }, [isLoadingCreate, isLoadingEdit])
+  }, [isLoadingCreate, isLoadingEdit, currentPage])
 
   const formik = useFormik({
     initialValues: {
@@ -140,6 +143,10 @@ const Announcements = () => {
       tenant_ids: obj.tenant_ids,
     })
   }
+
+  const handlePageClick = (event: { selected: number; }) => {
+    setCurrentPage(event.selected + 1);
+  };
 
   return (
     <div className=" pt-10 px-10 bg-foreground/5" style={{
@@ -215,41 +222,28 @@ const Announcements = () => {
               </Button>
             </div>
           </div>
-            {
-              !isLoadingAnnouncements ? (
-                announcements.map((announcement) => (
-                  <AnnouncementCard announcement={announcement} editAnnouncement={editAnnouncement} />
-                ))
-              ) : (
-                <div className="flex items-center justify-center h-full w-full">
-                  <Loader2 className="animate-spin" />
-                </div>
-              )
-            }
+          {
+            !isLoadingAnnouncements ? (
+              announcements.map((announcement) => (
+                <AnnouncementCard announcement={announcement} editAnnouncement={editAnnouncement} />
+              ))
+            ) : (
+              <div className="flex items-center justify-center h-full w-full">
+                <Loader2 className="animate-spin" />
+              </div>
+            )
+          }
         </div>
       </div>
-      <Pagination className={`!h-[${PAGINATION_HEIGHT}px]`}>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious href="#" />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">1</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext href="#" />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      <Paginate
+        handlePageClick={handlePageClick}
+        numOfPages={numOfPages}
+      />
     </div>
   )
 };
 
 export default Announcements;
-
 interface IAnnouncementCard {
   announcement: IAnnouncements;
   editAnnouncement: (announcement: IAnnouncements) => void
