@@ -112,7 +112,7 @@ const Announcements = () => {
     return tenants;
   }
 
-  const handleEventTypeSelect = (tenant_ids: ITenants[]) => {
+  const handleSelect = (tenant_ids: ITenants[]) => {
     setEditTenantsId(tenant_ids)
     const tenants = getIdsFromTenants(tenant_ids)
     formik.setFieldValue('tenant_ids', tenants)
@@ -174,10 +174,9 @@ const Announcements = () => {
 
             <MultiSelect
               label="Select Department"
-              tenants={tenants}
-              handleEventTypeSelect={handleEventTypeSelect}
-              tenantsId={tenantsId}
-              isEdit={isEdit}
+              options={tenants}
+              handleSelect={handleSelect}
+              value={tenantsId}
             />
             <div className="flex justify-end mt-12">
               {
