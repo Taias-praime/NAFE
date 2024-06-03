@@ -92,7 +92,7 @@ const Announcements = () => {
     initialValues: {
       title: '',
       description: '',
-      tenant_ids: [],
+      tenant_ids: [] as string[],
     },
     onSubmit: (values) => {
       if (!isEdit) {
