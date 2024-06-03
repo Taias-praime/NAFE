@@ -3,7 +3,7 @@ import { ITenants } from '../../models/interfaces';
 
 interface IMultiSelect {
     options: ITenants[];
-    handleSelect: (tenant_ids: ITenants[]) => void;
+    handleSelect: (tenant_ids: ITenants[] | any) => void;
     value: ITenants[];
     label: string;
 }
@@ -11,7 +11,7 @@ interface IMultiSelect {
 const MultiSelect = ({ options, handleSelect, value, label }: IMultiSelect) => {
 
     const customStyles = {
-        control: (baseStyles) => ({
+        control: (baseStyles: any) => ({
             ...baseStyles,
             border: 'none',
             borderBottom: '1px solid',
@@ -23,16 +23,16 @@ const MultiSelect = ({ options, handleSelect, value, label }: IMultiSelect) => {
                 outline: 'none',
             },
         }),
-        placeholder: (styles) => ({
+        placeholder: (styles: any) => ({
             ...styles,
             color: '#CECECE',
             fontSize: '14px',
         }),
-        indicatorSeparator: (styles) => ({
+        indicatorSeparator: (styles: any) => ({
             ...styles,
             display: 'none'
         }),
-        ValueContainer2: (styles) => ({
+        ValueContainer2: (styles: any) => ({
             ...styles,
             padding: 'none'
         }),
