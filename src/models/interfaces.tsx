@@ -32,3 +32,21 @@ export interface IEvent {
     startDate: string;
     endDate: string;
 }
+
+export interface ITenants {
+    tenant_id: string;
+    name: string;
+    code: string;
+    total_events: number;
+    total_members: number;
+    webinars: number;
+  }
+  
+  export interface IAnnouncements {
+    id: string;
+    date_created: string;
+    date_updated: string;
+    title: string;
+    tenant_ids: string[];
+    description: string;
+  }
