@@ -21,6 +21,7 @@ module.exports = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+        placeholder: "hsl(var(--placeholder))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
@@ -50,6 +51,10 @@ module.exports = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        disabled: {
+          DEFAULT: "hsl(var(--disabled))",
+          foreground: "hsl(var(--disabled-foreground))",
         },
       },
       borderRadius: {
