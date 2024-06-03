@@ -1,11 +1,14 @@
 import { ReactNode } from "react";
 
 export interface IUser {
-    firstname: string;
-    lastname: string;
+    full_name: string;
     email: string;
     address: string;
     role: string;
+    id: string;
+    department_name: string;
+    image: string;
+    rank: string;
 }
 
 export interface IMenu {
