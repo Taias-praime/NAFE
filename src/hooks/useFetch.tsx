@@ -61,7 +61,7 @@ const useFetch = (
             });
 
             //debugging
-            console.log(`[${method}] ${path}: ${res.status}`); 
+            // console.log(`[${method}] ${path}: ${res.status}`); 
 
             if (res.ok) {
                 try {

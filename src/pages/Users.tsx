@@ -2,16 +2,16 @@ import { PlusCircle, Search } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { useEffect, useState } from "react";
 import { Input } from "../components/ui/input";
-import ProfileImg from "../components/ui-custom/profileImg";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "../components/ui/table";
 import { HEADER_HEIGHT } from "../lib/utils";
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../components/ui/pagination";
 import useFetch from "../hooks/useFetch";
 import { toast } from "../components/ui/use-toast";
+import { IUser } from "../models/interfaces";
 
 const Users = () => {
   const PAGINATION_HEIGHT = 40;
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<IUser[]>([]);
 
   // get users
   const { onFetch: onFetchUsers } = useFetch(
@@ -21,6 +21,7 @@ const Users = () => {
         const _data = data.data;
         const results = _data.results;
         setUsers(results)
+        console.log(results)
       }
     },
     (error, status) => { // on error
@@ -77,26 +78,26 @@ const Users = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.map((e: number) => (
-                <TableRow key={e}>
+              {users.map((user: IUser) => (
+                <TableRow key={user.id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center">
-                      <ProfileImg url={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${Math.random()}`}/>
+                      {/* <ProfileImg url={user.image || ''}/> */}
                       <span className="ms-2">
-                        John Doe
+                        {user.full_name}
                       </span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center">
-                      <span className=""> NSHSC </span>
+                      <span className=""> {user.department_name} </span>
                     </div>
                   </TableCell>
                   <TableCell> 
-                    <span> B. General </span>
+                    <span> {user.rank || 'N/A'} </span>
                   </TableCell>
                   <TableCell className="">
-                    <span> example@mail.com </span>
+                    <span> {user.email} </span>
                   </TableCell>
                 </TableRow>
               ))}

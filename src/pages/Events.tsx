@@ -1,25 +1,28 @@
-import { LayoutGrid, ListFilter, ListOrdered, Pencil, PlusCircle, Search } from 'lucide-react';
+import { LayoutGrid, ListFilter, ListOrdered, Loader2, Pencil, PlusCircle, Search } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { useEffect, useState } from 'react';
-import ProfileImg from '../components/ui-custom/profileImg';
 import { Badge } from '../components/ui/badge';
 import { Input } from '../components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from '../components/ui/dropdown-menu';
-// import { Checkbox } from '../components/ui/checkbox';
 import { HEADER_HEIGHT } from '../lib/utils';
 import useFetch from '../hooks/useFetch';
 import AddEvent from '../components/ui-custom/addEvent';
+import { IEvent } from '../models/interfaces';
+import { format } from 'date-fns';
 
 const Events = () => {
-    const [events, setEvents] = useState([]);
+    const [events, setEvents] = useState<IEvent[]>([]);
+    const [eventsCount, setEventsCount] = useState<number>(0);
+    const [filteredEvents, setFilteredEvents] = useState<IEvent[]>([]);
     const [isList, setIsList] = useState<boolean>(false);
     const [tab, setTab] = useState<string>('all');
 
     const [showNormalEvent, setShowNormalEvent] = useState<boolean>(false);
     const [showRestrictedEvent, setShowRestrictedEvent] = useState<boolean>(false);
     const [showSecretEvent, setShowSecretEvent] = useState<boolean>(false);
+    const [searchTerm, setSearchTerm] = useState<string>('');
 
     const count = (): number => {
         let num = 0;
@@ -29,35 +32,111 @@ const Events = () => {
         return num;
     }
 
-    const { onFetch: getEvents } = useFetch(
-        '/events/sa/upcoming',
+    const { onFetch: getEvents, isFetching } = useFetch(
+        '/events/sa/',
         (data) => {
             setEvents(data.data.results)
+            setFilteredEvents(data.data.results);
+            setEventsCount(data.data.number_of_items);
         },
         () => { },
     );
 
+    const { 
+        onFetch: getLiveEvents, 
+        // isFetching: isFetchingLE 
+    } = useFetch(
+        '/events/sa/',
+        (data) => {
+            setEvents(data.data.results)
+            setFilteredEvents(data.data.results);
+            setEventsCount(data.data.number_of_items);
+        },
+        () => { },
+    );
+
+    const { 
+        onFetch: getOngoingEvents, 
+        // isFetching: isFetchingOE 
+    } = useFetch(
+        '/events/sa/',
+        (data) => {
+            setEvents(data.data.results)
+            setFilteredEvents(data.data.results);
+            setEventsCount(data.data.number_of_items);
+        },
+        () => { },
+    );
+
+    const { 
+        onFetch: getPastEvents, 
+        // isFetching: isFetchingPE 
+    } = useFetch(
+        '/events/sa/',
+        (data) => {
+            setEvents(data.data.results)
+            setFilteredEvents(data.data.results);
+            setEventsCount(data.data.number_of_items);
+        },
+        () => { },
+    );
+
+    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
+    }
+
     useEffect(() => {
         getEvents();
-    }, [])
 
-	return (
-		<div className="overflow-y-auto pb-5 pt-10 px-10" style={{
+        
+    }, []);
+
+    useEffect(() => {
+        let filtered = events;
+
+        if (tab !== 'all') filtered = tab === 'live' ? filtered.filter(e => e.event_link) : [];
+
+        if (showNormalEvent || showRestrictedEvent || showSecretEvent) {
+            filtered = filtered.filter(e => {
+                if (showNormalEvent && e.type === 'general') return true;
+                if (showRestrictedEvent && e.type === 'restricted') return true;
+                if (showSecretEvent && e.type === 'registered') return true;
+                return false;
+            });
+        }
+
+        if (searchTerm) filtered = filtered.filter(e => e.title.toLowerCase().includes(searchTerm.toLowerCase()));
+
+        setFilteredEvents(filtered);
+    }, [tab, showNormalEvent, showRestrictedEvent, showSecretEvent, searchTerm, events]);
+
+
+    // tabs
+    useEffect(() => {
+        if (tab === 'all') getEvents();
+        if (tab === 'ongoing') getOngoingEvents();
+        if (tab === 'live') getLiveEvents();
+        if (tab === 'past') getPastEvents();
+    }, [tab])
+
+
+    return (
+        <div className="overflow-y-auto pb-5 pt-10 px-10" style={{
             height: `calc(100vh - ${HEADER_HEIGHT}px)`
         }}>
-			<div className="flex justify-between">
-				<div className=""></div>
-				<Button className="lg:absolute top-5 right-10 p-0">
+            <div className="flex justify-between">
+                <div className=""></div>
+                <Button className="lg:absolute top-5 right-10 p-0">
                     <AddEvent className="flex items-center gap-3 p-3">
                         <PlusCircle />
                         Create Event
                     </AddEvent>
-				</Button>
-			</div>
+                </Button>
+            </div>
 
-			<div className="space-y-10">
-				<div className="xl:flex justify-between items-center space-y-3">
-					<div className="">
+            <div className="space-y-10">
+                <div className="xl:flex justify-between items-center space-y-3">
+                    <div className="">
                         <Tabs defaultValue={tab} onValueChange={(e) => setTab(e)} className="w-[400px]">
                             <TabsList>
                                 <TabsTrigger value="all">All</TabsTrigger>
@@ -66,20 +145,19 @@ const Events = () => {
                                 <TabsTrigger value="past">Past</TabsTrigger>
                             </TabsList>
                         </Tabs>
-
-					</div>
+                    </div>
                     <div className="flex gap-5 items-center">
                         <div className="relative flex items-center w-fit">
-                            <Input className='p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[300px]' />
+                            <Input className='p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[300px]' onChange={handleSearch} />
                             <Search className='absolute right-5 opacity-30' />
                         </div>
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button className='flex gap-3' variant={!count() ? 'ghost' : 'secondary'}>
-                                    { !!count() && 
+                                    {!!count() &&
                                         <Badge className='flex items-center justify-center p-0 w-5 h-5'>
-                                            { count() }
+                                            {count()}
                                         </Badge>}
                                     Filter
                                     <ListFilter />
@@ -95,7 +173,7 @@ const Events = () => {
                                 </DropdownMenuCheckboxItem>
 
                                 <DropdownMenuSeparator />
-                                
+
                                 <DropdownMenuCheckboxItem
                                     className='py-2'
                                     checked={showRestrictedEvent}
@@ -116,91 +194,61 @@ const Events = () => {
                             </DropdownMenuContent>
                         </DropdownMenu>
 
-                        {/* <DropdownMenu>
-                            <DropdownMenuTrigger>
-                                <Button className='flex gap-3' variant={'ghost'}> 
-                                    Filter 
-                                    <ListFilter />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuItem> <CheckboxWithLabel label="Normal Event" /> </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem> <CheckboxWithLabel label="Restricted Event" /> </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem> <CheckboxWithLabel label="Secret Event" /> </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu> */}
-
-
-                        <Button className='flex gap-3' variant={'ghost'} onClick={() => setIsList(!isList)}> 
-                            { 
-                                isList ? 
-                                <ListOrdered /> : 
-                                <LayoutGrid /> 
+                        <Button className='flex gap-3' variant={'ghost'} onClick={() => setIsList(!isList)}>
+                            {
+                                isList ?
+                                    <ListOrdered /> :
+                                    <LayoutGrid />
                             }
                         </Button>
                     </div>
-				</div>
+                </div>
 
                 <div className="">
                     <h5 className="text-xl">
-                        All Events ({events.length || 0})
+                        All Events {`(${eventsCount})`}
                     </h5>
                 </div>
 
                 {
-                    isList  ?
-                    <TableView events={events} /> :
-                    <GridView events={events} />
+                    isFetching && !events.length &&
+                    <div className='w-full h-[400px] flex justify-center items-center'>
+                        <Loader2 className='animate-spin mx-auto' />
+                    </div>
                 }
 
-			</div>
-		</div>
-	);
+                {
+                    isList ?
+                        <TableView events={filteredEvents} /> :
+                        <GridView events={filteredEvents} />
+                }
+
+            </div>
+        </div>
+    );
 };
 
-const TableView = ({ events }: any) => {
+const TableView = ({ events }: { events: IEvent[] }) => {
     return (
         <Table className="">
             <TableHeader>
                 <TableRow>
-                    <TableHead>Departments</TableHead>
-                    <TableHead>No. of Users</TableHead>
-                    <TableHead>Events</TableHead>
-                    <TableHead className="text-center">
-                        Live Webinars
-                    </TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Event Type</TableHead>
+                    <TableHead>Date</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {events.map((e: number) => (
-                    <TableRow key={e}>
+                {events.map((event: IEvent, index: number) => (
+                    <TableRow key={index}>
                         <TableCell className="font-medium">
-                            NCCQE
+                            {event.title}
                         </TableCell>
                         <TableCell>
-                            <div className="flex items-center">
-                                <ProfileImg
-                                    url={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${Math.random()}`}
-                                />
-                                <ProfileImg
-                                    url={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${Math.random()}`}
-                                    className="-ml-4"
-                                />
-                                <ProfileImg
-                                    url={`https://api.dicebear.com/8.x/pixel-art/svg?seed=${Math.random()}`}
-                                    className="-ml-4"
-                                />
-                                <span className="ms-2"> + 300 </span>
-                            </div>
+                            {event.type}
                         </TableCell>
-                        <TableCell>30</TableCell>
-                        <TableCell className="flex justify-center items-center gap-3">
-                            <span>5</span>
-                            <Badge variant={'destructive'}>
-                                Live
-                            </Badge>
+                        <TableCell>
+                            {new Date(event.start_date).toDateString()}
                         </TableCell>
                     </TableRow>
                 ))}
@@ -209,22 +257,19 @@ const TableView = ({ events }: any) => {
     )
 }
 
-const GridView = ({ events }: any) => {
-
-    const SAMPLE_IMG = 'https://scontent.facc1-1.fna.fbcdn.net/v/t39.30808-6/440128026_279179215284777_2129238623055120663_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=5f2048&_nc_ohc=q4IsD8czVyEQ7kNvgFSSf3s&_nc_oc=Adj2apt5hiLe3FAtky7rXBEQnbAUJokC87FI6bgRUWx_u1DqheqIEmoNWQ12EqsEdeU&_nc_ht=scontent.facc1-1.fna&oh=00_AfCnkDFP5RkNPfmx0k8xOYin6SM3x4wU7TTpMA6r83XmPw&oe=662F70BF'
-
+const GridView = ({ events }: { events: IEvent[] }) => {
     return (
         <div className='grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-10'>
             {
-                events.map(() => // (e,k)
-                    <div className='relative col-span-1 rounded-lg border grid grid-cols-[160px_1fr] h-40 bg-foreground/5'>
-                        <img className='w-full h-full object-center object-cover' src={SAMPLE_IMG} alt="" />
+                events.map((event: IEvent) => // (e,k)
+                    <div key={event.id} className='relative col-span-1 rounded-lg border overflow-hidden grid grid-cols-[160px_1fr] h-40 bg-foreground/5'>
+                        <img className='w-full max-h-full min-h-full object-center object-cover' src={event.image} alt="" />
 
-                        <div className="overflow-hidden p-5">
-                            <h1 className='text-xl line-clamp-2 mb-5'> Workshop on Aviation Emergency Response Preparedness </h1>
+                        <div className="overflow-hidden p-5 flex flex-col justify-between ">
+                            <h1 className='text-lg line-clamp-2 mb-5'> {event.title} </h1>
 
                             <div className="flex justify-between items-center">
-                                <h1 className='text-10 opacity-50'> 12 December, 2025 </h1>
+                                <h1 className='text-sm opacity-50'> {format(event.start_date, 'do MMMM yyyy')}  </h1>
 
                                 <Button size={'sm'} className="flex gap-3">
                                     <Pencil />
@@ -238,6 +283,7 @@ const GridView = ({ events }: any) => {
         </div>
     )
 }
+
 
 // const CheckboxWithLabel = ({ label }: { label: string }) => {
 //     return (
