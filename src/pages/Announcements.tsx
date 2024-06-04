@@ -26,7 +26,7 @@ const Announcements = () => {
   const [id, setId] = useState('');
 
   const { onFetch: getEvents, isFetching: isLoadingAnnouncements } = useFetch(
-    `/announcements/sa/?page=${currentPage}`,
+    `/announcements/sa/?page=${currentPage}&items_per_page=3`,
     (data) => {
       setAnnouncement(data.data.results);
       setNumOfAnnouncement(data.data.number_of_items);
