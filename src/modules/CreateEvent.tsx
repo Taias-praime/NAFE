@@ -231,7 +231,7 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
 
         if (file) {
             const formData = new FormData();
-            formData.append('file', file);
+            ('file', file);
 
             await uploadFile(formData).then((res: any) => {
                 console.log("AFTER UPLOAD", res);
@@ -394,7 +394,7 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
 
                                         <Input
                                             type='file'
-                                            disabled
+                                            // disabled
                                             label='Upload admin instructions'
                                             onChange={(e) => handleFileUpload(e, 'adminInstructionsUrl')}
                                             className='max-w-[350px] mb-10 rounded border border-gray-300 bg-gray-100 px-4'
@@ -402,7 +402,7 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
 
                                         <Input
                                             type='file'
-                                            disabled
+                                            // disabled
                                             label='Upload Programme'
                                             onChange={(e) => handleFileUpload(e, 'programmeUrl')}
                                             className='max-w-[350px] rounded border border-gray-300 bg-gray-100 px-4'

@@ -2,10 +2,25 @@ import { PlusCircle, Search } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import ProfileImg from "../components/ui-custom/profileImg";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "../components/ui/table";
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "../components/ui/table";
 import { Badge } from "../components/ui/badge";
 import { HEADER_HEIGHT, USER_PLACEHOLDER_IMG_URL } from "../lib/utils";
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../components/ui/pagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../components/ui/pagination";
 import { useEffect, useState } from "react";
 import { useToast } from "../components/ui/use-toast";
 import useFetch from "../hooks/useFetch";
@@ -18,11 +33,10 @@ const Departments = () => {
 
   const { toast } = useToast();
 
-
   const { onFetch: getDeps } = useFetch(
-    '/tenants/sa/',
+    "/tenants/sa/",
     (data) => {
-      setDeps(data.data.results)
+      setDeps(data.data.results);
       setDepsCount(data.data.number_of_items);
     },
     (error, status) => {
@@ -31,21 +45,22 @@ const Departments = () => {
       toast({
         title: `${message} (${status})`,
         description: err.errors.error_message,
-        variant: 'destructive',
-      })
-    },
+        variant: "destructive",
+      });
+    }
   );
-
 
   useEffect(() => {
     getDeps();
   }, []);
 
-
   return (
-    <div className="pb-5 pt-10 px-10" style={{
-      height: `calc(100vh - ${HEADER_HEIGHT}px - ${PAGINATION_HEIGHT}px)`
-    }}>
+    <div
+      className="pb-5 pt-10 px-10"
+      style={{
+        height: `calc(100vh - ${HEADER_HEIGHT}px - ${PAGINATION_HEIGHT}px)`,
+      }}
+    >
       <div className="h-full overflow-y-auto">
         <div className="flex justify-between">
           <div className=""></div>
@@ -58,14 +73,14 @@ const Departments = () => {
         <div className="">
           <div className="lg:flex justify-between items-center p-5 space-y-5">
             <div className="">
-              <h5 className="text-xl"> List of Users </h5>
+              <h5 className="text-xl "> List of Users </h5>
               <small className="text-muted-foreground">
                 {depsCount} Departments
               </small>
             </div>
             <div className="relative flex items-center w-fit">
-              <Input className='p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[300px]' />
-              <Search className='absolute right-5 opacity-30' />
+              <Input className="p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[300px]" />
+              <Search className="absolute right-5 opacity-30" />
             </div>
           </div>
           <Table className="">
@@ -75,40 +90,40 @@ const Departments = () => {
                 <TableHead>Departments</TableHead>
                 <TableHead>No. of Users</TableHead>
                 <TableHead>Events</TableHead>
-                <TableHead className="text-center">
-                  Live Webinars
-                </TableHead>
+                <TableHead className="text-center">Live Webinars</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {
-                deps.map((d: any) => (
-                  <TableRow key={d.tenant_id}>
-                    <TableCell className="font-medium">
-                      {d.code}
-                    </TableCell>
+              {deps.map((d: any) => (
+                <TableRow key={d.tenant_id}>
+                  <TableCell className="font-medium">{d.code}</TableCell>
 
-                    <TableCell>
-                      <div className="flex items-center">
-                        {[...Array(d.total_members).keys()].map((_, i) =>
-                          <ProfileImg className={i ? "-ml-4" : ''} url={USER_PLACEHOLDER_IMG_URL} />
-                        ).slice(0, 3)}
-                        <span className="ms-2">
-                          {(d.total_members > 3) ? '+ ' + (d.total_members - 3) : ''}
-                        </span>
-                      </div>
-                    </TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      {[...Array(d.total_members).keys()]
+                        .map((_, i) => (
+                          <ProfileImg
+                            className={i ? "-ml-4" : ""}
+                            url={USER_PLACEHOLDER_IMG_URL}
+                          />
+                        ))
+                        .slice(0, 3)}
+                      <span className="ms-2">
+                        {d.total_members > 3
+                          ? "+ " + (d.total_members - 3)
+                          : ""}
+                      </span>
+                    </div>
+                  </TableCell>
 
-                    <TableCell> {d.total_events} </TableCell>
+                  <TableCell> {d.total_events} </TableCell>
 
-                    <TableCell className="flex justify-center items-center gap-3">
-                      <span> {d.webinars} </span>
-                      <Badge variant={"destructive"}> Live </Badge>
-                    </TableCell>
-
-                  </TableRow>
-                ))
-              }
+                  <TableCell className="flex justify-center items-center gap-3">
+                    <span> {d.webinars} </span>
+                    <Badge variant={"destructive"}> Live </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </div>
@@ -131,6 +146,6 @@ const Departments = () => {
       </Pagination>
     </div>
   );
-}
+};
 
-export default Departments
+export default Departments;
