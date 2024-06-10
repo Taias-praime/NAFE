@@ -21,31 +21,19 @@ import { Textarea } from "../components/ui/textarea";
 import CreatePressRelease from "../components/ui-custom/createPressRelease";
 import CreateLiveEvents from "../components/ui-custom/createLiveEvents";
 import { useFormik } from "formik";
-
-interface ArmyStaff {
-    id: string;
-    date_created: string;
-    date_updated: string;
-    fullname: string;
-    title: string;
-    image: string;
-    description: string;
-    files: any[]; // Specify the type of files if known, e.g., string[] or File[]
-    appointment_start_date: string | null;
-    appointment_end_date: string | null;
-    current: boolean;
-}
+import { ArmyStaff, ILiveEvent, IPressRelease, ISuggestions } from "../models/interfaces";
 
 const token = local("token");
+const tabValue = ["press release", "live events", "suggestions"]
 
 const ChiefOfArmyStaff = () => {
     const [COAS, setCOAS] = useState<ArmyStaff | null>(null);
-    const [pressRelease, setPressRelease] = useState<any>([]);
-    const [liveEvents, setLiveEvents] = useState<any>([]);
-    const [suggestions, setSuggestions] = useState<any>([]);
+    const [pressRelease, setPressRelease] = useState<IPressRelease[]>([]);
+    const [liveEvents, setLiveEvents] = useState<ILiveEvent[]>([]);
+    const [suggestions, setSuggestions] = useState<ISuggestions[]>([]);
     const [numOfPR, setNumOfPR] = useState(0);
     const [numOfLV, setNumOfLV] = useState(0);
-    const [suggest, setSuggest] = useState({});
+    const [suggest, setSuggest] = useState<ISuggestions>(suggestions[0]);
     const [isPREdit, setIsPREdit] = useState(false);
     const [isLVEdit, setIsLVEdit] = useState(false);
     const [editCOASModal, setEditCOASModal] = useState(false);
@@ -56,11 +44,6 @@ const ChiefOfArmyStaff = () => {
     const [rawImg, setRawImg] = useState('');
     const [prId, setPrId] = useState('');
     const [lvId, setLvId] = useState('');
-    const [tabValue, setTabValue] = useState([
-        "press release",
-        "live events",
-        "suggestions",
-    ]);
 
     const { toast } = useToast();
 
@@ -303,7 +286,7 @@ const ChiefOfArmyStaff = () => {
         setEditLVModal(!editLVModal)
     }
 
-    const viewSuggestion = (suggestion) => {
+    const viewSuggestion = (suggestion: ISuggestions) => {
         setSuggest(suggestion)
     }
 
@@ -384,7 +367,7 @@ const ChiefOfArmyStaff = () => {
                                             {formik.values.files && (
                                                 <div className="flex flex-col gap-4">
                                                     {formik.values.files.map((file) => (
-                                                        <FileItem showDelete={true} onClick={(e) => removeFile(e, file)} file={file} />
+                                                        <FileItem showDelete={true} onClick={(e: { preventDefault: () => void; }) => removeFile(e, file)} file={file} />
                                                     ))}
                                                 </div>
                                             )}
@@ -479,15 +462,15 @@ const ChiefOfArmyStaff = () => {
                             )
                         )
                     }
-                    {
-                        tab === "suggestions" && (
+                    {isFetchingSuggestion ? <Empty /> : (
+                        tab === "suggestions" && suggestions.length !== 0 && (
                             <>
                                 <SubHeader title="Suggestions" />
                                 <div className="flex py-4">
                                     <div className="w-64">
                                         {
                                             suggestions.map(item => (
-                                                <button className="p-3 border-b-2 flex flex-start flex-col gap-3 w-64" onClick={() => viewSuggestion(item)} >
+                                                <button className={`p-3 border-b-2 flex flex-start flex-col gap-3 w-64 ${item.id === suggest.id && "bg-foreground/5"}`} onClick={() => viewSuggestion(item)} >
                                                     <div className="text-lg">Anonymous</div>
                                                     <div className="text-xs">{format(item.date_created, 'MMM dd, yyyy | p')} </div>
                                                 </button>
@@ -495,17 +478,19 @@ const ChiefOfArmyStaff = () => {
                                         }
                                     </div>
 
-                                    <div className="flex-1 p-3">
+                                    <div className="flex-1 p-3 flex flex-col gap-6 px-6 bg-foreground/5 h-fit">
                                         <div className="">
                                             <div className="text-lg">Anonymous</div>
-                                            <div className="">{format(suggest.date_created, 'p | MMM dd, yyyy')} </div>
+                                           <div className="text-xs">{format(suggest.date_created, 'MMM dd, yyyy | p')} </div>
                                         </div>
-                                        <div className="">{suggest.theme_description} </div>
+                                        <div className="normal-case">{suggest.description} </div>
                                     </div>
                                 </div>
                             </>
 
                         )
+                    )
+
                     }
                 </div>
             </div>

@@ -24,7 +24,7 @@ interface CreateLiveEventsProps {
     open: boolean;
 }
 
-const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal,setIsLVEdit, LV, open }: CreateLiveEventsProps) => {
+const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal, setIsLVEdit, LV, open }: CreateLiveEventsProps) => {
     const [eventDate, setEventDate] = useState<Date>();
     const [featuredImg, setFeaturedImg] = useState('');
     const [rawImg, setRawImg] = useState('');
@@ -41,6 +41,9 @@ const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal,setIsLVEdit, LV,
         },
         onSubmit: (obj) => {
             const date = format((eventDate as Date), "yyyy-MM-dd");
+            if (rawImg) {
+                handleFileUpload(rawImg)
+            }
             const data = {
                 ...obj,
                 date: date
@@ -59,6 +62,8 @@ const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal,setIsLVEdit, LV,
         `/army-staffs/sa/add-live-event`,
         (data) => {
             toast({ description: data.message });
+            formik.resetForm();
+            setEditLVModal(false);
         },
         (e) => {
             const { message, ...err } = e;
@@ -80,6 +85,8 @@ const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal,setIsLVEdit, LV,
         `/army-staffs/sa/${id}/edit-live-event`,
         (data) => {
             toast({ description: data.message });
+            formik.resetForm();
+            setEditLVModal(false);
         },
         (e) => {
             const { message, ...err } = e;
@@ -93,6 +100,27 @@ const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal,setIsLVEdit, LV,
         {},
         {
             "Authorization": `Bearer ${token}`,
+        }
+    );
+
+    // upload file
+    const { onPost: uploadFile } = useFetch(
+        '/files/upload',
+        (data,) => {
+            console.log(data);
+            return data;
+        },
+        (error, status) => {
+            const { message, ...err } = error;
+            toast({
+                title: `${message} (${status})`,
+                description: err.errors.error_message,
+                variant: 'destructive',
+            })
+        },
+        {},
+        {
+            'Content-Type': 'multipart/form-data'
         }
     );
 
@@ -112,6 +140,16 @@ const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal,setIsLVEdit, LV,
             })
         }
     }, [isLVEdit, LV])
+
+    const handleFileUpload = async (file: string) => {
+        if (file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            await uploadFile(formData).then((res: any) => {
+                console.log("AFTER UPLOAD", res);
+            });
+        }
+    };
 
     useEffect(() => {
         formik.setFieldValue("date", eventDate)

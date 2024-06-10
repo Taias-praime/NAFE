@@ -42,6 +42,9 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
         },
         onSubmit: (obj) => {
             const date = format((eventDate as Date), "yyyy-MM-dd");
+            if (rawImg) {
+                handleFileUpload(rawImg)
+            }
             const data = {
                 ...obj,
                 date: date
@@ -51,6 +54,8 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
             } else {
                 onPost(data);
             }
+            formik.resetForm();
+            setEditPRModal(false);
         }
     })
 
@@ -59,6 +64,8 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
         `/press-releases/sa/add`,
         (data) => {
             toast({ description: data.message });
+            formik.resetForm();
+            setEditPRModal(false);
         },
         (e) => {
             const { message, ...err } = e;
@@ -80,6 +87,8 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
         `/press-releases/sa/${id}/edit`,
         (data) => {
             toast({ description: data.message });
+            formik.resetForm();
+            setEditPRModal(false);
         },
         (e) => {
             const { message, ...err } = e;
@@ -96,15 +105,30 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
         }
     );
 
+        // upload file
+        const { onPost: uploadFile } = useFetch(
+            '/files/upload',
+            (data,) => {
+                console.log(data);
+                return data;
+            },
+            (error, status) => {
+                const { message, ...err } = error;
+                toast({
+                    title: `${message} (${status})`,
+                    description: err.errors.error_message,
+                    variant: 'destructive',
+                })
+            },
+            {},
+            {
+                'Content-Type': 'multipart/form-data'
+            }
+        );
+
     useEffect(() => {
         formik.setFieldValue("date", eventDate)
     }, [eventDate])
-
-    // useEffect(() => {        
-    //     if (isPREdit) {
-    //         setEditPRModal(true);
-    //     }
-    // }, [isPREdit])
 
     useEffect(() => {
         if (isPREdit) {
@@ -121,6 +145,16 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
             })
         }
     }, [isPREdit])
+
+    const handleFileUpload = async (file: string) => {
+        if (file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            await uploadFile(formData).then((res: any) => {
+                console.log("AFTER UPLOAD", res);
+            });
+        }
+    };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -202,7 +236,7 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
                 {formik.values.files && (
                     <div className="flex flex-col gap-4">
                         {formik.values.files.map((file) => (
-                            <FileItem showDelete={true} onClick={(e) => removeFile(e, file)} file={file} />
+                            <FileItem showDelete={true} onClick={(e: { preventDefault: () => void }) => removeFile(e, file)} file={file} />
                         ))}
                     </div>
                 )}

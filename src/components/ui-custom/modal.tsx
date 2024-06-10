@@ -1,13 +1,10 @@
 import { ReactNode } from 'react';
 import { cn } from '../../lib/utils';
 import {
-    Sheet,
     SheetContent,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from '../ui/sheet2';
+} from '../ui/modified-sheet';
 import { Trash2 } from 'lucide-react';
+import { Sheet, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
 
 interface ModalProps {
     open: boolean,
@@ -16,7 +13,7 @@ interface ModalProps {
     label: ReactNode | string,
     children: ReactNode,
     openModal: () => void;
-    deleteImage?: (e) => void;
+    deleteImage?: (e: { preventDefault: () => void }) => void;
     onOpenChange: (value: boolean) => void;
 }
 
