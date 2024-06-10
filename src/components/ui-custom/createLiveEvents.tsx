@@ -1,23 +1,34 @@
 import { Textarea } from '../ui/textarea'
 import { Input } from '../ui/input'
-import { ArrowUpToLine } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { Button } from '../ui/button'
 import Modal from './modal'
 import { useEffect, useState } from 'react'
-import { FilesList } from './files'
 import { useFormik } from 'formik'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { format } from 'date-fns'
 import { Calendar } from '../ui/calendar'
-import { cn } from '../../lib/utils'
+import { cn, local } from '../../lib/utils'
 import { FeaturedImg } from '../../pages/ChiefOfArmyStaff'
+import { toast } from '../ui/use-toast'
+import useFetch from '../../hooks/useFetch'
 
-const CreateLiveEvents = ({ isLVEdit }: { isLVEdit: boolean }) => {
+const token = local("token");
 
-    const [editLVModal, setEditLVModal] = useState(false);
+interface CreateLiveEventsProps {
+    isLVEdit: boolean;
+    openModal: () => void;
+    setEditLVModal: (value: boolean) => void;
+    setIsLVEdit: (value: boolean) => void;
+    LV: any;
+    open: boolean;
+}
+
+const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal,setIsLVEdit, LV, open }: CreateLiveEventsProps) => {
     const [eventDate, setEventDate] = useState<Date>();
     const [featuredImg, setFeaturedImg] = useState('');
     const [rawImg, setRawImg] = useState('');
+    const [id, setId] = useState('');
 
     const formik = useFormik({
         initialValues: {
@@ -29,27 +40,93 @@ const CreateLiveEvents = ({ isLVEdit }: { isLVEdit: boolean }) => {
             files: [] as string[]
         },
         onSubmit: (obj) => {
-            console.log(obj);
+            const date = format((eventDate as Date), "yyyy-MM-dd");
+            const data = {
+                ...obj,
+                date: date
+            }
+
+            if (isLVEdit) {
+                onPut(data);
+            } else {
+                onPost(data);
+            }
         }
     })
+
+    // Create
+    const { onPost, isFetching: isLoadingCreate } = useFetch(
+        `/army-staffs/sa/add-live-event`,
+        (data) => {
+            toast({ description: data.message });
+        },
+        (e) => {
+            const { message, ...err } = e;
+            // notify
+            toast({
+                title: `${message} (${status})`,
+                description: err.errors.error_message,
+                variant: 'destructive',
+            });
+        },
+        {},
+        {
+            "Authorization": `Bearer ${token}`,
+        }
+    );
+
+    // edit
+    const { onPut, isFetching: isLoadingEdit } = useFetch(
+        `/army-staffs/sa/${id}/edit-live-event`,
+        (data) => {
+            toast({ description: data.message });
+        },
+        (e) => {
+            const { message, ...err } = e;
+            // notify
+            toast({
+                title: `${message} (${status})`,
+                description: err.errors.error_message,
+                variant: 'destructive',
+            });
+        },
+        {},
+        {
+            "Authorization": `Bearer ${token}`,
+        }
+    );
+
+    useEffect(() => {
+        if (LV.length !== 0) {
+            const liveEvent = LV[0]
+            setId(liveEvent.id)
+            setEventDate(liveEvent.date)
+            setFeaturedImg(liveEvent.image)
+            formik.setValues({
+                image: liveEvent.image,
+                date: liveEvent.date,
+                link: liveEvent.event_link,
+                title: liveEvent.title,
+                description: liveEvent.theme_description,
+                files: liveEvent.files,
+            })
+        }
+    }, [isLVEdit, LV])
 
     useEffect(() => {
         formik.setFieldValue("date", eventDate)
     }, [eventDate])
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                formik.setFieldValue('files', [...formik.values.files, (reader.result as string)]);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
+    const lvModal = (value: boolean) => {
+        setEditLVModal(value);
+        setIsLVEdit(false);
+        setFeaturedImg('');
+        formik.resetForm();
+        setEventDate(undefined);
+    }
 
     return (
-        <Modal open={editLVModal} openModal={() => setEditLVModal(!editLVModal)} onOpenChange={(value) => setEditLVModal(value)} className="flex items-center gap-3 p-3"
+        <Modal open={open} openModal={openModal} onOpenChange={(value) => lvModal(value)} className="flex items-center gap-3 p-3"
             label="Create Live Event"
         >
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
@@ -103,20 +180,12 @@ const CreateLiveEvents = ({ isLVEdit }: { isLVEdit: boolean }) => {
                     className="mb-10"
                     label="Description"
                 />
-                {formik.values.files && <FilesList files={formik.values.files} showDelete={true} />}
 
-                <div className="flex items-start justify-between mt-6">
-                    <Button variant="blue" type='submit' className="px-10">
-                        <label className="flex items-center justify-center gap-2 w-full h-full cursor-pointer text-white">
-                            <div className="bg-white rounded">
-                                <ArrowUpToLine className="text-blue" />
-                            </div>
-                            Upload Files
-                            <input type="file" accept="*/" onChange={handleFileChange} className="hidden" />
-                        </label>
-                    </Button>
+                <div className="flex items-start justify-end mt-6">
                     <Button variant="default" type='submit' className="px-10">
-                        {isLVEdit ? 'Update' : 'Create'}
+                        {
+                            isLoadingEdit || isLoadingCreate ? <Loader2 className='animate-spin' /> : (isLVEdit ? 'Update' : 'Create')
+                        }
                     </Button>
                 </div>
             </form>

@@ -20,7 +20,7 @@ export const FileItem = ({ file, onClick, showDelete }: any) => {
 				<p className="line-clamp-2 text-ellipsis">{file}</p>
 				{
 					showDelete && (
-						<button onClick={onClick} className="">
+						<button onClick={onClick}>
 							<Trash2 className="text-red-600" />
 						</button>
 					)

@@ -1,9 +1,9 @@
 import { Button } from "../components/ui/button";
 import { Skeleton } from "../components/ui/skeleton";
-import { FilesList } from "../components/ui-custom/files";
-import { ArrowUpToLine, ImageUpIcon, Pencil, PencilLine, Trash2 } from "lucide-react";
+import { FileItem, FilesList } from "../components/ui-custom/files";
+import { ArrowUpToLine, ImageUpIcon, Loader2, Pencil, PencilLine } from "lucide-react";
 import { HEADER_HEIGHT, local, USER_PLACEHOLDER_IMG_URL } from "../lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
     Tooltip,
@@ -45,13 +45,17 @@ const ChiefOfArmyStaff = () => {
     const [suggestions, setSuggestions] = useState<any>([]);
     const [numOfPR, setNumOfPR] = useState(0);
     const [numOfLV, setNumOfLV] = useState(0);
-    const [numOfSuggestions, setNumOfSuggestions] = useState(0);
+    const [suggest, setSuggest] = useState({});
     const [isPREdit, setIsPREdit] = useState(false);
     const [isLVEdit, setIsLVEdit] = useState(false);
     const [editCOASModal, setEditCOASModal] = useState(false);
+    const [editLVModal, setEditLVModal] = useState(false);
+    const [editPRModal, setEditPRModal] = useState(false);
     const [tab, setTab] = useState("press release");
     const [featuredImg, setFeaturedImg] = useState('');
     const [rawImg, setRawImg] = useState('');
+    const [prId, setPrId] = useState('');
+    const [lvId, setLvId] = useState('');
     const [tabValue, setTabValue] = useState([
         "press release",
         "live events",
@@ -69,8 +73,9 @@ const ChiefOfArmyStaff = () => {
             files: [] as string[]
         },
         onSubmit: (obj) => {
+            onPut(obj)
             if (rawImg) {
-                handleFileUpload(rawImg, 'imageURL')
+                handleFileUpload(rawImg)
             }
 
         }
@@ -85,6 +90,30 @@ const ChiefOfArmyStaff = () => {
                 const results = _data.results;
                 setCOAS(results[0]);
                 // setCOAS(results.filter((coa: ArmyStaff) => coa.current)[0]);
+            }
+        },
+        (error, status) => {
+            // on error
+            const { message, ...err } = error;
+            // notify
+            toast({
+                title: `${message} (${status})`,
+                description: err.errors.error_message,
+                variant: "destructive",
+            });
+        },
+        {} // options
+    );
+
+    // get Suggestions
+    const { isFetching: isFetchingSuggestion, onFetch: onFetchSuggestion } = useFetch(
+        "/army-staffs/sa/suggestions",
+        (data, status) => {
+            if (status === 200) {
+                const _data = data.data;
+                const results = _data.results;
+                setSuggestions(results);
+                setSuggest(results[0])
             }
         },
         (error, status) => {
@@ -125,12 +154,13 @@ const ChiefOfArmyStaff = () => {
 
     // get Live Events (LV)
     const { isFetching: isFetchingLV, onFetch: onFetchLV } = useFetch(
-        "/events/sa/list-live-webinars",
+        "/army-staffs/sa/list-live-event",
         (data, status) => {
             if (status === 200) {
                 const _data = data.data;
                 setLiveEvents(_data.results)
                 setNumOfLV(_data.number_of_items)
+
             }
         },
         (error, status) => {
@@ -146,11 +176,11 @@ const ChiefOfArmyStaff = () => {
         {} // options
     );
 
+    // upload file
     const { onPost: uploadFile } = useFetch(
         '/files/upload',
         (data,) => {
             console.log(data);
-
             return data;
         },
         (error, status) => {
@@ -167,6 +197,7 @@ const ChiefOfArmyStaff = () => {
         }
     );
 
+    // edit COAS
     const { onPut, isFetching: isLoadingEdit } = useFetch(
         `/army-staffs/sa/${COAS?.id}/edit`,
         (data) => {
@@ -187,12 +218,25 @@ const ChiefOfArmyStaff = () => {
         }
     );
 
-    // get Suggestions
+    const PR = useMemo(() => {
+        const PR = pressRelease.filter((item: any) => {
+            return item.id === prId
+        })
+        return PR;
+    }, [prId])
+
+    const LV = useMemo(() => {
+        const LV = liveEvents.filter((item: any) => {
+            return item.id === lvId
+        })
+        return LV;
+    }, [lvId])
 
     useEffect(() => {
         onFetchCOAS();
         onFetchPR();
         onFetchLV();
+        onFetchSuggestion();
     }, []);
 
     useEffect(() => {
@@ -214,12 +258,9 @@ const ChiefOfArmyStaff = () => {
     }
 
     const handleFileUpload = async (file: string) => {
-        // const file = e.target.files?.[0];
-
         if (file) {
             const formData = new FormData();
             formData.append('file', file);
-
             await uploadFile(formData).then((res: any) => {
                 console.log("AFTER UPLOAD", res);
             });
@@ -236,6 +277,40 @@ const ChiefOfArmyStaff = () => {
             reader.readAsDataURL(file);
         }
     };
+
+    const editLiveEvents = (id: string) => {
+        setLvId(id)
+        setIsLVEdit(true);
+        setEditLVModal(true);
+    }
+
+    const editPressRelease = (id: string) => {
+        setPrId(id)
+        setIsPREdit(true);
+        setEditPRModal(true);
+    }
+
+    const removeFile = (e: { preventDefault: () => void }, id: string) => {
+        e.preventDefault();
+        const files = formik.values.files.filter((file) => file !== id);
+        formik.setFieldValue("files", files)
+    }
+    const togglePRModal = () => {
+        setEditPRModal(!editPRModal)
+    }
+
+    const toggleLVModal = () => {
+        setEditLVModal(!editLVModal)
+    }
+
+    const viewSuggestion = (suggestion) => {
+        setSuggest(suggestion)
+    }
+
+    const deleteImage = (e: { preventDefault: () => void; }) => {
+        e.preventDefault();
+        setFeaturedImg('')
+    }
 
     return (
         <div
@@ -272,7 +347,7 @@ const ChiefOfArmyStaff = () => {
 
                             <div className="">
                                 <Button size={"sm"} className="flex gap-3 px-5">
-                                    <Modal open={editCOASModal} openModal={editCOAS} title="Chief of Army Staff" onOpenChange={(value) => setEditCOASModal(value)} className="flex items-center gap-3 p-3"
+                                    <Modal deleteImage={deleteImage} open={editCOASModal} openModal={editCOAS} title="Chief of Army Staff" onOpenChange={(value) => setEditCOASModal(value)} className="flex items-center gap-3 p-3"
                                         label={
                                             <>
                                                 <PencilLine /> Edit
@@ -306,7 +381,13 @@ const ChiefOfArmyStaff = () => {
                                                 className="mb-10"
                                                 label="Philosophy"
                                             />
-                                            {formik.values.files && <FilesList files={formik.values.files} showDelete={true} />}
+                                            {formik.values.files && (
+                                                <div className="flex flex-col gap-4">
+                                                    {formik.values.files.map((file) => (
+                                                        <FileItem showDelete={true} onClick={(e) => removeFile(e, file)} file={file} />
+                                                    ))}
+                                                </div>
+                                            )}
 
                                             <div className="flex items-start justify-between mt-6">
                                                 <Button variant="blue" type='submit' className="px-10">
@@ -319,7 +400,9 @@ const ChiefOfArmyStaff = () => {
                                                     </label>
                                                 </Button>
                                                 <Button variant="default" type='submit' className="px-10">
-                                                    Update
+                                                    {
+                                                        isLoadingEdit ? <Loader2 className='animate-spin' /> : 'Update'
+                                                    }
                                                 </Button>
                                             </div>
                                         </form>
@@ -357,44 +440,73 @@ const ChiefOfArmyStaff = () => {
                 </div>
                 <div className="px-10">
                     {
-                        tab === "press release" && (
-                            <>
-                                <SubHeader title="Press Release" number={`${numOfPR} Release`}>
-                                    <CreatePressRelease isPREdit={isPREdit} />
-                                </SubHeader>
-                                <div className="grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-5">
-                                    {
-                                        pressRelease.map(item => (
-                                            <GridView key={item.title} title={item.title} date={item.date} image={item.image} />
-                                        ))
-                                    }
-                                </div>
-                            </>
+                        isFetchingPR ? <Empty /> : (
+
+                            tab === "press release" && (
+                                <>
+                                    <SubHeader title="Press Release" number={`${numOfPR} Release`}>
+                                        <CreatePressRelease isPREdit={isPREdit} setIsPREdit={setIsPREdit} PR={PR} open={editPRModal} openModal={togglePRModal} setEditPRModal={setEditPRModal} />
+                                    </SubHeader>
+                                    <div className="grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-5">
+                                        {
+                                            pressRelease.map(item => (
+                                                <GridView key={item.title} title={item.title} date={item.date} image={item.image} id={item.id} onClick={editPressRelease} />
+                                            ))
+                                        }
+                                    </div>
+                                </>
+                            )
+
+                        )
+                    }
+
+                    {
+                        isFetchingLV ? <Empty /> : (
+                            tab === "live events" && (
+                                <>
+                                    <SubHeader title="Live Events" number={`${numOfLV} Events`} >
+                                        <CreateLiveEvents isLVEdit={isLVEdit} setIsLVEdit={setIsLVEdit} LV={LV} open={editLVModal} openModal={toggleLVModal} setEditLVModal={setEditLVModal} />
+                                    </SubHeader>
+                                    <div className="grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-5">
+                                        {
+                                            liveEvents.map(item => (
+                                                <GridView key={item.title} title={item.title} date={item.date} image={item.image} onClick={editLiveEvents} id={item.id} />
+                                            ))
+                                        }
+                                    </div>
+
+                                </>
+                            )
                         )
                     }
                     {
-                        tab === "live events" && (
+                        tab === "suggestions" && (
                             <>
-                                <SubHeader title="Live Events" number={`${numOfPR} Events`} >
-                                    <CreateLiveEvents isLVEdit={isLVEdit} />
-                                </SubHeader>
-                                <div className="grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-5">
-                                    {
-                                        liveEvents.map(item => (
-                                            <GridView key={item.title} title={item.title} image={item.image} />
-                                        ))
-                                    }
-                                </div>
+                                <SubHeader title="Suggestions" />
+                                <div className="flex py-4">
+                                    <div className="w-64">
+                                        {
+                                            suggestions.map(item => (
+                                                <button className="p-3 border-b-2 flex flex-start flex-col gap-3 w-64" onClick={() => viewSuggestion(item)} >
+                                                    <div className="text-lg">Anonymous</div>
+                                                    <div className="text-xs">{format(item.date_created, 'MMM dd, yyyy | p')} </div>
+                                                </button>
+                                            ))
+                                        }
+                                    </div>
 
+                                    <div className="flex-1 p-3">
+                                        <div className="">
+                                            <div className="text-lg">Anonymous</div>
+                                            <div className="">{format(suggest.date_created, 'p | MMM dd, yyyy')} </div>
+                                        </div>
+                                        <div className="">{suggest.theme_description} </div>
+                                    </div>
+                                </div>
                             </>
+
                         )
                     }
-                    {
-                        tab === "suggestions" && <SubHeader title="Suggestions" />
-                    }
-
-
-
                 </div>
             </div>
         </div>
@@ -419,9 +531,33 @@ const SkeletonCard = () => {
     );
 };
 
+const Empty = () => {
+    return (
+        <div className="grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-5 my-20">
+            <div className="flex space-y-3 mb-10 gap-4">
+                <Skeleton className="aspect-square w-32 rounded-xl" />
+                <div className="space-y-4 w-full">
+                    <Skeleton className="h-10 w-[100px]" />
+                    <Skeleton className="h-5 w-full max-w-[300px]" />
+                    <Skeleton className="h-4 w-[150px]" />
+                </div>
+            </div>
+            <div className="flex space-y-3 mb-10 gap-4">
+                <Skeleton className="aspect-square w-32 rounded-xl" />
+                <div className="space-y-4 w-full">
+                    <Skeleton className="h-10 w-[100px]" />
+                    <Skeleton className="h-5 w-full max-w-[300px]" />
+                    <Skeleton className="h-4 w-[150px]" />
+                </div>
+            </div>
+        </div>
+
+    );
+};
+
 export default ChiefOfArmyStaff;
 
-const GridView = ({ title, date, image }: any) => {
+const GridView = ({ title, date, image, id, onClick }: any) => {
     return (
         <div
             key={"id"}
@@ -435,9 +571,9 @@ const GridView = ({ title, date, image }: any) => {
                 <div className="flex justify-between items-center border">
                     <h1 className="text-sm opacity-50"> {date ? format(date, ' MMM dd, yyyy') : ''} </h1>
 
-                    <Button size={"sm"} className="flex gap-3">
-                        <Pencil />
-                        Edit
+                    <Button size={"sm"} className="flex gap-2" onClick={() => onClick(id)} >
+                        <Pencil className="w-4 h-4" />
+                        <span className="text-sm">Edit</span>
                     </Button>
                 </div>
             </div>
@@ -473,7 +609,7 @@ export const FeaturedImg = ({ setFeaturedImg, setRawImg, featuredImg }: { setFea
 
     useEffect(() => {
         setPreview(featuredImg)
-    }, [])
+    }, [featuredImg])
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -488,29 +624,24 @@ export const FeaturedImg = ({ setFeaturedImg, setRawImg, featuredImg }: { setFea
         }
     };
 
-    const handleUnset = () => {
-        setFeaturedImg('');
-        setRawImg('');
-        setPreview(null);
-        const fileInput = document.getElementById('featImg') as HTMLInputElement;
-        if (fileInput) fileInput.value = '';
-    }
-
     return (
-        <div className="max-w-full w-full h-64 rounded border flex items-center justify-center bg-black/30">
-            {preview ? (
+        <div className="max-w-full w-full h-64 rounded flex items-center justify-center bg-black/30">
+            <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer text-white">
                 <div
-                    onClick={handleUnset}
                     style={{ backgroundImage: `url(${preview})` }}
-                    className="max-w-full w-full h-full rounded border flex items-center justify-center bg-cover bg-center"
+                    className="max-w-full w-full h-full rounded flex items-center justify-center bg-cover bg-center"
                 />
-            ) : (
-                <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer text-white">
+                <div className="absolute">
                     <ImageUpIcon className='mx-auto scale-125' />
-                    <div className="mt-2">Featured Image</div>
-                    <input id="featImg" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-                </label>
-            )}
+                    <div className="">
+                        {
+                            preview ? 'Change Image' : 'Upload Image'
+                        }
+                    </div>
+                </div>
+
+                <input id="featImg" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+            </label>
         </div>
     );
 };

@@ -1,23 +1,36 @@
 import { Textarea } from '../ui/textarea'
 import { Input } from '../ui/input'
-import { ArrowUpToLine } from 'lucide-react'
+import { ArrowUpToLine, Loader2 } from 'lucide-react'
 import { Button } from '../ui/button'
 import Modal from './modal'
 import { useEffect, useState } from 'react'
-import { FilesList } from './files'
+import { FileItem } from './files'
 import { useFormik } from 'formik'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { Calendar } from '../ui/calendar'
 import { format } from 'date-fns'
-import { cn } from '../../lib/utils'
+import { cn, local } from '../../lib/utils'
 import { FeaturedImg } from '../../pages/ChiefOfArmyStaff'
+import useFetch from '../../hooks/useFetch'
+import { toast } from '../ui/use-toast'
 
-const CreatePressRelease = ({ isPREdit }: { isPREdit: boolean }) => {
+const token = local("token");
 
-    const [editPRModal, setEditPRModal] = useState(false);
+interface CreatePressReleaseProps {
+    isPREdit: boolean;
+    openModal: () => void;
+    setEditPRModal: (value: boolean) => void;
+    setIsPREdit: (value: boolean) => void;
+    PR: any;
+    open: boolean;
+}
+
+const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, PR, open, }: CreatePressReleaseProps) => {
+
     const [eventDate, setEventDate] = useState<Date>();
     const [featuredImg, setFeaturedImg] = useState('');
     const [rawImg, setRawImg] = useState('');
+    const [id, setId] = useState('');
 
     const formik = useFormik({
         initialValues: {
@@ -28,13 +41,86 @@ const CreatePressRelease = ({ isPREdit }: { isPREdit: boolean }) => {
             files: [] as string[]
         },
         onSubmit: (obj) => {
-            console.log(obj);
+            const date = format((eventDate as Date), "yyyy-MM-dd");
+            const data = {
+                ...obj,
+                date: date
+            }
+            if (isPREdit) {
+                onPut(data);
+            } else {
+                onPost(data);
+            }
         }
     })
+
+    // edit
+    const { onPost, isFetching: isLoadingPost } = useFetch(
+        `/press-releases/sa/add`,
+        (data) => {
+            toast({ description: data.message });
+        },
+        (e) => {
+            const { message, ...err } = e;
+            // notify
+            toast({
+                title: `${message} (${status})`,
+                description: err.errors.error_message,
+                variant: 'destructive',
+            });
+        },
+        {},
+        {
+            "Authorization": `Bearer ${token}`,
+        }
+    );
+
+    // edit
+    const { onPut, isFetching: isLoadingPut } = useFetch(
+        `/press-releases/sa/${id}/edit`,
+        (data) => {
+            toast({ description: data.message });
+        },
+        (e) => {
+            const { message, ...err } = e;
+            // notify
+            toast({
+                title: `${message} (${status})`,
+                description: err.errors.error_message,
+                variant: 'destructive',
+            });
+        },
+        {},
+        {
+            "Authorization": `Bearer ${token}`,
+        }
+    );
 
     useEffect(() => {
         formik.setFieldValue("date", eventDate)
     }, [eventDate])
+
+    // useEffect(() => {        
+    //     if (isPREdit) {
+    //         setEditPRModal(true);
+    //     }
+    // }, [isPREdit])
+
+    useEffect(() => {
+        if (isPREdit) {
+            const pressRelease = PR[0]
+            setId(pressRelease.id)
+            setEventDate(pressRelease.date)
+            setFeaturedImg(pressRelease.image)
+            formik.setValues({
+                image: pressRelease.image,
+                date: pressRelease.date,
+                title: pressRelease.title,
+                description: pressRelease.description,
+                files: pressRelease.files,
+            })
+        }
+    }, [isPREdit])
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -47,12 +133,31 @@ const CreatePressRelease = ({ isPREdit }: { isPREdit: boolean }) => {
         }
     };
 
+    const removeFile = (e: { preventDefault: () => void }, id: string) => {
+        e.preventDefault();
+        const files = formik.values.files.filter((file) => file !== id);
+        formik.setFieldValue("files", files)
+    }
+
+    const prModal = (value: boolean) => {
+        setEditPRModal(value);
+        setIsPREdit(false);
+        setFeaturedImg('');
+        formik.resetForm();
+        setEventDate(undefined);
+    }
+
+    const deleteImage = (e: { preventDefault: () => void; }) => {
+        e.preventDefault();
+        setFeaturedImg('')
+    }
+
     return (
-        <Modal open={editPRModal} openModal={() => setEditPRModal(!editPRModal)} onOpenChange={(value) => setEditPRModal(value)} className="flex items-center gap-3 p-3"
+        <Modal deleteImage={deleteImage} open={open} openModal={openModal} onOpenChange={(value) => prModal(value)} className="flex items-center gap-3 p-3"
             label="Upload Press Release"
         >
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-            <FeaturedImg setFeaturedImg={setFeaturedImg} setRawImg={setRawImg} featuredImg={featuredImg} />
+                <FeaturedImg setFeaturedImg={setFeaturedImg} setRawImg={setRawImg} featuredImg={featuredImg} />
                 <Input
                     value={formik.values.title}
                     onChange={formik.handleChange}
@@ -94,10 +199,16 @@ const CreatePressRelease = ({ isPREdit }: { isPREdit: boolean }) => {
                     className="mb-10"
                     label="Description"
                 />
-                {formik.values.files && <FilesList files={formik.values.files} showDelete={true} />}
+                {formik.values.files && (
+                    <div className="flex flex-col gap-4">
+                        {formik.values.files.map((file) => (
+                            <FileItem showDelete={true} onClick={(e) => removeFile(e, file)} file={file} />
+                        ))}
+                    </div>
+                )}
 
                 <div className="flex items-start justify-between mt-6">
-                    <Button variant="blue" type='submit' className="px-10">
+                    <Button variant="blue" className="px-10">
                         <label className="flex items-center justify-center gap-2 w-full h-full cursor-pointer text-white">
                             <div className="bg-white rounded">
                                 <ArrowUpToLine className="text-blue" />
@@ -107,7 +218,9 @@ const CreatePressRelease = ({ isPREdit }: { isPREdit: boolean }) => {
                         </label>
                     </Button>
                     <Button variant="default" type='submit' className="px-10">
-                        {isPREdit ? 'Update' : 'Create'}
+                        {
+                            isLoadingPut || isLoadingPost ? <Loader2 className='animate-spin' /> : (isPREdit ? 'Update' : 'Create')
+                        }
                     </Button>
                 </div>
             </form>
