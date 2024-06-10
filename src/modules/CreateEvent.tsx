@@ -231,7 +231,7 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
 
         if (file) {
             const formData = new FormData();
-            ('file', file);
+            formData.append('file', file);
 
             await uploadFile(formData).then((res: any) => {
                 console.log("AFTER UPLOAD", res);
