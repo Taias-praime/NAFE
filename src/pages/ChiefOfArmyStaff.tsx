@@ -1,7 +1,7 @@
 import { Button } from "../components/ui/button";
 import { Skeleton } from "../components/ui/skeleton";
 import { FileItem, FilesList } from "../components/ui-custom/files";
-import { ArrowUpToLine, ImageUpIcon, Loader2, Pencil, PencilLine } from "lucide-react";
+import { ArrowUpToLine, ImageUpIcon, Loader2, Pencil, PencilLine, Trash2 } from "lucide-react";
 import { HEADER_HEIGHT, local, USER_PLACEHOLDER_IMG_URL } from "../lib/utils";
 import { useEffect, useMemo, useState } from "react";
 
@@ -290,8 +290,7 @@ const ChiefOfArmyStaff = () => {
         setSuggest(suggestion)
     }
 
-    const deleteImage = (e: { preventDefault: () => void; }) => {
-        e.preventDefault();
+    const deleteImage = () => {
         setFeaturedImg('')
     }
 
@@ -330,7 +329,7 @@ const ChiefOfArmyStaff = () => {
 
                             <div className="">
                                 <Button size={"sm"} className="flex gap-3 px-5">
-                                    <Modal deleteImage={deleteImage} open={editCOASModal} openModal={editCOAS} title="Chief of Army Staff" onOpenChange={(value) => setEditCOASModal(value)} className="flex items-center gap-3 p-3"
+                                    <Modal open={editCOASModal} openModal={editCOAS} title="Chief of Army Staff" onOpenChange={(value) => setEditCOASModal(value)} className="flex items-center gap-3 p-3"
                                         label={
                                             <>
                                                 <PencilLine /> Edit
@@ -338,7 +337,7 @@ const ChiefOfArmyStaff = () => {
                                         }
                                     >
                                         <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                                            <FeaturedImg setFeaturedImg={setFeaturedImg} setRawImg={setRawImg} featuredImg={featuredImg} />
+                                            <FeaturedImg setFeaturedImg={setFeaturedImg} deleteImage={deleteImage} setRawImg={setRawImg} featuredImg={featuredImg} />
                                             <Input
                                                 value={formik.values.fullname}
                                                 onChange={formik.handleChange}
@@ -481,7 +480,7 @@ const ChiefOfArmyStaff = () => {
                                     <div className="flex-1 p-3 flex flex-col gap-6 px-6 bg-foreground/5 h-fit">
                                         <div className="">
                                             <div className="text-lg">Anonymous</div>
-                                           <div className="text-xs">{format(suggest.date_created, 'MMM dd, yyyy | p')} </div>
+                                            <div className="text-xs">{format(suggest.date_created, 'MMM dd, yyyy | p')} </div>
                                         </div>
                                         <div className="normal-case">{suggest.description} </div>
                                     </div>
@@ -588,7 +587,7 @@ const SubHeader = ({ title, number, children }: any) => {
     )
 }
 
-export const FeaturedImg = ({ setFeaturedImg, setRawImg, featuredImg }: { setFeaturedImg: (img: string) => void, setRawImg: (img: string) => void, featuredImg: string }) => {
+export const FeaturedImg = ({ setFeaturedImg, setRawImg, featuredImg, deleteImage }: { setFeaturedImg: (img: string) => void, setRawImg: (img: string) => void, featuredImg: string, deleteImage?: () => void }) => {
 
     const [preview, setPreview] = useState<string | null>(null);
 
@@ -610,7 +609,7 @@ export const FeaturedImg = ({ setFeaturedImg, setRawImg, featuredImg }: { setFea
     };
 
     return (
-        <div className="max-w-full w-full h-64 rounded flex items-center justify-center bg-black/30">
+        <div className="max-w-full w-full h-64 rounded flex items-center justify-center bg-black/30 relative">
             <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer text-white">
                 <div
                     style={{ backgroundImage: `url(${preview})` }}
@@ -627,6 +626,14 @@ export const FeaturedImg = ({ setFeaturedImg, setRawImg, featuredImg }: { setFea
 
                 <input id="featImg" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
             </label>
+            {
+                preview && (
+                    <div onClick={deleteImage} className="absolute right-2 top-1 bg-white p-2 rounded-full">
+                        <Trash2 className="text-red-600" />
+                    </div>
+                )
+            }
+
         </div>
     );
 };

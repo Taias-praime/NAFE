@@ -41,8 +41,8 @@ const SheetContent = React.forwardRef<
       {...props}
     >
       {children}
-      <SheetPrimitive.Close className=" flex item-center justify-center absolute left-4 top-7 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
-        <ChevronLeft />
+      <SheetPrimitive.Close className="text-sm flex item-center justify-center absolute left-4 top-7 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+        <ChevronLeft className="w-4 h-4 mt-0.5" />
         <span>Back</span>
         <span className="sr-only">Close</span>
       </SheetPrimitive.Close>

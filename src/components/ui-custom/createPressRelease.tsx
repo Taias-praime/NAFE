@@ -181,17 +181,16 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
         setEventDate(undefined);
     }
 
-    const deleteImage = (e: { preventDefault: () => void; }) => {
-        e.preventDefault();
+    const deleteImage = () => {
         setFeaturedImg('')
     }
 
     return (
-        <Modal deleteImage={deleteImage} open={open} openModal={openModal} onOpenChange={(value) => prModal(value)} className="flex items-center gap-3 p-3"
+        <Modal open={open} openModal={openModal} onOpenChange={(value) => prModal(value)} className="flex items-center gap-3 p-3"
             label="Upload Press Release"
         >
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                <FeaturedImg setFeaturedImg={setFeaturedImg} setRawImg={setRawImg} featuredImg={featuredImg} />
+                <FeaturedImg  deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} setRawImg={setRawImg} featuredImg={featuredImg} />
                 <Input
                     value={formik.values.title}
                     onChange={formik.handleChange}

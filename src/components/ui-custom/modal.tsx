@@ -3,7 +3,6 @@ import { cn } from '../../lib/utils';
 import {
     SheetContent,
 } from '../ui/modified-sheet';
-import { Trash2 } from 'lucide-react';
 import { Sheet, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
 
 interface ModalProps {
@@ -13,11 +12,10 @@ interface ModalProps {
     label: ReactNode | string,
     children: ReactNode,
     openModal: () => void;
-    deleteImage?: (e: { preventDefault: () => void }) => void;
     onOpenChange: (value: boolean) => void;
 }
 
-const Modal = ({ open, label, title, className, children, openModal, deleteImage, onOpenChange }: ModalProps) => {
+const Modal = ({ open, label, title, className, children, openModal, onOpenChange }: ModalProps) => {
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetTrigger onClick={openModal} className={cn(className, 'outline-none')}>
@@ -25,11 +23,8 @@ const Modal = ({ open, label, title, className, children, openModal, deleteImage
             </SheetTrigger>
 
             <SheetContent className="w-96 overflow-y-auto">
-                <SheetHeader>
-                    <SheetTitle className='pb-10'>{title}</SheetTitle>
-                    <SheetTrigger onClick={deleteImage} className={cn(className, 'outline-none absolute right-4 top-4 bg-white rounded-full')}>
-                        <Trash2 className="text-red-600" />
-                    </SheetTrigger>
+                <SheetHeader className="">
+                    <SheetTitle className='pb-10 text-center'>{title}</SheetTitle>
                 </SheetHeader>
 
                 {/* ----- content ---- */}
