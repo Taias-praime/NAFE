@@ -546,15 +546,15 @@ const GridView = ({ title, date, image, id, onClick }: any) => {
     return (
         <div
             key={"id"}
-            className="relative rounded-lg border overflow-hidden grid grid-cols-2 h-40 bg-foreground/5"
+            className="relative rounded-lg border overflow-hidden flex h-40 bg-foreground/5 max-w-100"
         >
-            <img className='w-32 max-h-full min-h-full object-center object-cover' src={image} alt="" />
+            <img className='w-32 h-full object-center object-cover' src={image} alt="" />
 
-            <div className=" p-5 w-full flex flex-col justify-between">
-                <h1 className="text-lg line-clamp-2 mb-5"> {title} </h1>
+            <div className=" p-5">
+                <h1 className="text-lg line-clamp-2 mb-5 text-ellipsis overflow-hidden"> {title} </h1>
 
-                <div className="flex justify-between items-center border">
-                    <h1 className="text-sm opacity-50"> {date ? format(date, ' MMM dd, yyyy') : ''} </h1>
+                <div className="flex gap-3 justify-between items-center">
+                    <h1 className="text-sm opacity-50 text-ellipsis  "> {date ? format(date, ' MMM dd, yyyy') : ''} </h1>
 
                     <Button size={"sm"} className="flex gap-2" onClick={() => onClick(id)} >
                         <Pencil className="w-4 h-4" />
