@@ -23,10 +23,10 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
-import AddUser from './AddUser';
 import TimeInput from '../components/ui-custom/timeInput';
 import { useDashboardContext } from '../contexts/dashboard.context';
 import { useLocation } from 'react-router-dom';
+import AddKeynoteSpeaker from '../components/ui-custom/addKeynoteSpeaker';
 
 const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
 
@@ -40,6 +40,11 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
     const [eventDate, setEventDate] = useState<Date>();
     const [startTime, setStartTime] = useState<string>('');
     const [endTime, setEndTime] = useState<string>('');
+    const [speaker, setSpeaker] = useState<{ image: string, name: string, position: string, description: string } | null>(null);
+    const [moderator, setModerator] = useState<{ image: string, name: string, position: string, description: string } | null>(null);
+
+    const [speakerOpen, setSpeakerOpen] = useState(false);
+    const [moderatorOpen, setModeratorOpen] = useState(false);
 
     const [deps, setDeps] = useState([]);
     const [mods, setMods] = useState([]);
@@ -58,7 +63,7 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
     const handleNext = () => {
         if (step > MAX_STEPS) return;
         else if (step === MAX_STEPS) handleSubmit(); // submit logic
-        else setStep(step + 1); 
+        else setStep(step + 1);
     }
 
     const handleSubmit = () => {
@@ -211,6 +216,8 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
         if (featuredImg) formikForm.setFieldValue('image', featuredImg.split('data:image/jpeg;')[1]);
         if (mods) formikForm.setFieldValue('moderators', mods.map((m: { id: string }) => m.id));
         if (speakers) formikForm.setFieldValue('keynote_speakers', speakers.map((s: { id: string }) => s.id));
+        if (speaker) formikForm.setFieldValue('keynote_speakers', [...formikForm.values.keynote_speakers, speaker]);
+        if (moderator) formikForm.setFieldValue('moderators', [...formikForm.values.moderators, moderator]);
     }, [
         startTime,
         endTime,
@@ -218,6 +225,8 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
         featuredImg,
         mods.length,
         speakers.length,
+        speaker,
+        moderator,
         featuredImg
     ]);
 
@@ -379,11 +388,26 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
                                     </TabsList>
 
                                     <TabsContent className='p-5 overflow-x-auto' value="m">
-                                        <AddUser endpoint='/moderators/sa/' action='Add Moderator' setUsers={setMods} users={mods} />
+                                        <AddKeynoteSpeaker title="Add Moderator" label="Moderator name" openModal={() => { }} setModalOpen={setModeratorOpen} setUpdate={setModerator} open={moderatorOpen} />
+                                        <div className="flex gap-4 flex-wrap">
+                                            {
+                                                formikForm.values.moderators.map(item => (
+                                                    <DisplayImage item={item} />
+                                                ))
+                                            }
+                                        </div>
                                     </TabsContent>
 
                                     <TabsContent className='p-5' value="k">
-                                        <AddUser endpoint='/keynote-speakers/sa/' action='Add Speaker' setUsers={setSpeakers} users={speakers} />
+                                        <AddKeynoteSpeaker title="Add Speaker" label="Speaker name" openModal={() => { }} setModalOpen={setSpeakerOpen} setUpdate={setSpeaker} open={speakerOpen} />
+                                        <div className="flex gap-4 flex-wrap">
+                                            {
+                                                formikForm.values.keynote_speakers.map(item => (
+                                                    <DisplayImage item={item} />
+                                                ))
+                                            }
+                                        </div>
+
                                     </TabsContent>
 
                                     <TabsContent className='p-5' value="f">
@@ -476,5 +500,19 @@ const FeaturedImg = ({ setFeaturedImg }: { setFeaturedImg: (img: string) => void
         </div>
     );
 };
+
+const DisplayImage = ({ item }) => {
+    return (
+        <>
+            <div className="relative w-48 h-56 rounded">
+                <img src={item.image} alt={item.name} className="w-48 h-56 " />
+                <div className="p-1 absolute bottom-0 z-10 flex flex-col justify-center items-start w-full text-white">
+                    <div className="font-bold">{item.name} </div>
+                    <div className="font-thin"> {item.position} </div>
+                </div>
+            </div>
+        </>
+    )
+}
 
 export default CreateEvent;
