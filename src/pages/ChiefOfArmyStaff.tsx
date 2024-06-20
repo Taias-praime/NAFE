@@ -1,7 +1,7 @@
 import { Button } from "../components/ui/button";
 import { Skeleton } from "../components/ui/skeleton";
 import { FileItem, FilesList } from "../components/ui-custom/files";
-import { Paperclip, ImageUpIcon, Loader2, Pencil, PencilLine, Trash2 } from "lucide-react";
+import { Paperclip, Loader2, Pencil, PencilLine } from "lucide-react";
 import { HEADER_HEIGHT, local, USER_PLACEHOLDER_IMG_URL } from "../lib/utils";
 import { useEffect, useMemo, useState } from "react";
 
