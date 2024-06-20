@@ -105,3 +105,10 @@ export interface ISuggestions  {
     user_id: string | null;
     description:string;
 }
+
+export interface IEventSpeaker {
+    name: string;
+    position: string;
+    image: string;
+    description: string;
+}

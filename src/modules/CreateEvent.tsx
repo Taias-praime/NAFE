@@ -26,7 +26,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import TimeInput from '../components/ui-custom/timeInput';
 import { useDashboardContext } from '../contexts/dashboard.context';
 import { useLocation } from 'react-router-dom';
-import AddKeynoteSpeaker from '../components/ui-custom/addKeynoteSpeaker';
+import EventSpeaker from '../components/ui-custom/eventSpeaker';
+import { IEventSpeaker } from '../models/interfaces';
 
 const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
 
@@ -92,8 +93,8 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
             description: '',
             department: '',
             event_link: '',
-            moderators: [],
-            keynote_speakers: [],
+            moderators: [] as IEventSpeaker[],
+            keynote_speakers: [] as IEventSpeaker[],
             adminInstructionsTitle: '',
             adminInstructionsUrl: '',
             programmeUrl: '',
@@ -388,7 +389,7 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
                                     </TabsList>
 
                                     <TabsContent className='p-5 overflow-x-auto' value="m">
-                                        <AddKeynoteSpeaker title="Add Moderator" label="Moderator name" openModal={() => { }} setModalOpen={setModeratorOpen} setUpdate={setModerator} open={moderatorOpen} />
+                                        <EventSpeaker title="Add Moderator" label="Moderator name" openModal={() => { }} setModalOpen={setModeratorOpen} setUpdate={setModerator} open={moderatorOpen} />
                                         <div className="flex gap-4 flex-wrap">
                                             {
                                                 formikForm.values.moderators.map(item => (
@@ -399,10 +400,10 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
                                     </TabsContent>
 
                                     <TabsContent className='p-5' value="k">
-                                        <AddKeynoteSpeaker title="Add Speaker" label="Speaker name" openModal={() => { }} setModalOpen={setSpeakerOpen} setUpdate={setSpeaker} open={speakerOpen} />
+                                        <EventSpeaker title="Add Speaker" label="Speaker name" openModal={() => { }} setModalOpen={setSpeakerOpen} setUpdate={setSpeaker} open={speakerOpen} />
                                         <div className="flex gap-4 flex-wrap">
                                             {
-                                                formikForm.values.keynote_speakers.map(item => (
+                                                formikForm.values.keynote_speakers.map((item) => (
                                                     <DisplayImage item={item} />
                                                 ))
                                             }
@@ -501,7 +502,7 @@ const FeaturedImg = ({ setFeaturedImg }: { setFeaturedImg: (img: string) => void
     );
 };
 
-const DisplayImage = ({ item }) => {
+const DisplayImage = (item: IEventSpeaker) => {
     return (
         <>
             <div className="relative w-48 h-56 rounded">

@@ -10,9 +10,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { Calendar } from '../ui/calendar'
 import { format } from 'date-fns'
 import { cn, local } from '../../lib/utils'
-import { FeaturedImg } from '../../pages/ChiefOfArmyStaff'
 import useFetch from '../../hooks/useFetch'
 import { toast } from '../ui/use-toast'
+import ProfileImage from './ProfileImage'
 
 const token = local("token");
 
@@ -190,7 +190,7 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
             label="Upload Press Release"
         >
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                <FeaturedImg deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} setRawImg={setRawImg} featuredImg={featuredImg} />
+                <ProfileImage deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} setRawImg={setRawImg} featuredImg={featuredImg} />
                 <Input
                     value={formik.values.title}
                     onChange={formik.handleChange}

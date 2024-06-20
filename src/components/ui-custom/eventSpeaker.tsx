@@ -4,25 +4,25 @@ import { Button } from '../ui/button'
 import Modal from './modal'
 import { useState } from 'react'
 import { useFormik } from 'formik'
-import { FeaturedImg } from '../../pages/ChiefOfArmyStaff'
+import { IEventSpeaker } from '../../models/interfaces'
+import ProfileImage from './ProfileImage'
 
 interface AddKeynoteSpeakerProps {
     openModal: () => void;
-    setUpdate: (value) => void;
+    setUpdate: (speaker: IEventSpeaker) => void;
     setModalOpen: (value: boolean) => void;
     open: boolean;
     label: string;
     title: string;
 }
 
-const AddKeynoteSpeaker = ({ openModal, setUpdate, setModalOpen, open, label, title}: AddKeynoteSpeakerProps) => {
+const EventSpeaker = ({ openModal, setUpdate, setModalOpen, open, label, title}: AddKeynoteSpeakerProps) => {
 
     const [featuredImg, setFeaturedImg] = useState('');
     const [rawImg, setRawImg] = useState('');
 
     const formik = useFormik({
         initialValues: {
-            id: '',
             image: '',
             position: '',
             name: '',
@@ -57,7 +57,7 @@ const AddKeynoteSpeaker = ({ openModal, setUpdate, setModalOpen, open, label, ti
             label={title}
         >
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                <FeaturedImg deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} setRawImg={setRawImg} featuredImg={featuredImg} />
+                <ProfileImage deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} setRawImg={setRawImg} featuredImg={featuredImg} />
                 <Input
                     value={formik.values.name}
                     onChange={formik.handleChange}
@@ -97,4 +97,4 @@ const AddKeynoteSpeaker = ({ openModal, setUpdate, setModalOpen, open, label, ti
     )
 }
 
-export default AddKeynoteSpeaker;
+export default EventSpeaker;

@@ -9,9 +9,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { format } from 'date-fns'
 import { Calendar } from '../ui/calendar'
 import { cn, local } from '../../lib/utils'
-import { FeaturedImg } from '../../pages/ChiefOfArmyStaff'
 import { toast } from '../ui/use-toast'
 import useFetch from '../../hooks/useFetch'
+import ProfileImage from './ProfileImage'
 
 const token = local("token");
 
@@ -168,7 +168,7 @@ const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal, setIsLVEdit, LV
             label="Create Live Event"
         >
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                <FeaturedImg setFeaturedImg={setFeaturedImg} setRawImg={setRawImg} featuredImg={featuredImg} />
+                <ProfileImage setFeaturedImg={setFeaturedImg} setRawImg={setRawImg} featuredImg={featuredImg} />
                 <Input
                     value={formik.values.title}
                     onChange={formik.handleChange}
