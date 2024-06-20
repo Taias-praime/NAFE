@@ -1,7 +1,7 @@
 import { Button } from "../components/ui/button";
 import { Skeleton } from "../components/ui/skeleton";
 import { FileItem, FilesList } from "../components/ui-custom/files";
-import { ArrowUpToLine, ImageUpIcon, Loader2, Pencil, PencilLine, Trash2 } from "lucide-react";
+import { Paperclip, ImageUpIcon, Loader2, Pencil, PencilLine, Trash2 } from "lucide-react";
 import { HEADER_HEIGHT, local, USER_PLACEHOLDER_IMG_URL } from "../lib/utils";
 import { useEffect, useMemo, useState } from "react";
 
@@ -371,12 +371,12 @@ const ChiefOfArmyStaff = () => {
                                             )}
 
                                             <div className="flex items-start justify-between mt-6">
-                                                <Button variant="blue" type='submit' className="px-10">
-                                                    <label className="flex items-center justify-center gap-2 w-full h-full cursor-pointer text-white">
-                                                        <div className="bg-white rounded">
-                                                            <ArrowUpToLine className="text-blue" />
+                                                <Button variant="blue" className="px-10">
+                                                    <label className="flex items-center justify-center gap-2 w-full h-full cursor-pointer">
+                                                        <div className=" rounded">
+                                                            <Paperclip className="text-white" />
                                                         </div>
-                                                        Upload Files
+                                                        Attach File
                                                         <input type="file" accept="*/" onChange={handleFileChange} className="hidden" />
                                                     </label>
                                                 </Button>

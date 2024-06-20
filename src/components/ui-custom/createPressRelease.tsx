@@ -1,6 +1,6 @@
 import { Textarea } from '../ui/textarea'
 import { Input } from '../ui/input'
-import { ArrowUpToLine, Loader2 } from 'lucide-react'
+import { Paperclip, Loader2 } from 'lucide-react'
 import { Button } from '../ui/button'
 import Modal from './modal'
 import { useEffect, useState } from 'react'
@@ -105,26 +105,26 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
         }
     );
 
-        // upload file
-        const { onPost: uploadFile } = useFetch(
-            '/files/upload',
-            (data,) => {
-                console.log(data);
-                return data;
-            },
-            (error, status) => {
-                const { message, ...err } = error;
-                toast({
-                    title: `${message} (${status})`,
-                    description: err.errors.error_message,
-                    variant: 'destructive',
-                })
-            },
-            {},
-            {
-                'Content-Type': 'multipart/form-data'
-            }
-        );
+    // upload file
+    const { onPost: uploadFile } = useFetch(
+        '/files/upload',
+        (data,) => {
+            console.log(data);
+            return data;
+        },
+        (error, status) => {
+            const { message, ...err } = error;
+            toast({
+                title: `${message} (${status})`,
+                description: err.errors.error_message,
+                variant: 'destructive',
+            })
+        },
+        {},
+        {
+            'Content-Type': 'multipart/form-data'
+        }
+    );
 
     useEffect(() => {
         formik.setFieldValue("date", eventDate)
@@ -190,7 +190,7 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
             label="Upload Press Release"
         >
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                <FeaturedImg  deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} setRawImg={setRawImg} featuredImg={featuredImg} />
+                <FeaturedImg deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} setRawImg={setRawImg} featuredImg={featuredImg} />
                 <Input
                     value={formik.values.title}
                     onChange={formik.handleChange}
@@ -242,11 +242,11 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
 
                 <div className="flex items-start justify-between mt-6">
                     <Button variant="blue" className="px-10">
-                        <label className="flex items-center justify-center gap-2 w-full h-full cursor-pointer text-white">
-                            <div className="bg-white rounded">
-                                <ArrowUpToLine className="text-blue" />
+                        <label className="flex items-center justify-center gap-2 w-full h-full cursor-pointer">
+                            <div className=" rounded">
+                                <Paperclip className="text-white" />
                             </div>
-                            Upload Files
+                            Attach File
                             <input type="file" accept="*/" onChange={handleFileChange} className="hidden" />
                         </label>
                     </Button>
