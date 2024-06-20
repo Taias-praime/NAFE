@@ -19,7 +19,6 @@ interface AddKeynoteSpeakerProps {
 const EventSpeaker = ({ openModal, setUpdate, setModalOpen, open, label, title}: AddKeynoteSpeakerProps) => {
 
     const [featuredImg, setFeaturedImg] = useState('');
-    const [rawImg, setRawImg] = useState('');
 
     const formik = useFormik({
         initialValues: {
@@ -57,7 +56,7 @@ const EventSpeaker = ({ openModal, setUpdate, setModalOpen, open, label, title}:
             label={title}
         >
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                <ProfileImage deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} setRawImg={setRawImg} featuredImg={featuredImg} />
+                <ProfileImage deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} />
                 <Input
                     value={formik.values.name}
                     onChange={formik.handleChange}

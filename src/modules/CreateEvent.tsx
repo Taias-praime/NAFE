@@ -392,8 +392,8 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
                                         <EventSpeaker title="Add Moderator" label="Moderator name" openModal={() => { }} setModalOpen={setModeratorOpen} setUpdate={setModerator} open={moderatorOpen} />
                                         <div className="flex gap-4 flex-wrap">
                                             {
-                                                formikForm.values.moderators.map(item => (
-                                                    <DisplayImage item={item} />
+                                                formikForm.values.moderators.map((item) => (
+                                                    <DisplayImage name={item.name} image={item.image} position={item.position} />
                                                 ))
                                             }
                                         </div>
@@ -404,7 +404,7 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
                                         <div className="flex gap-4 flex-wrap">
                                             {
                                                 formikForm.values.keynote_speakers.map((item) => (
-                                                    <DisplayImage item={item} />
+                                                    <DisplayImage name={item.name} image={item.image} position={item.position} />
                                                 ))
                                             }
                                         </div>
@@ -502,14 +502,14 @@ const FeaturedImg = ({ setFeaturedImg }: { setFeaturedImg: (img: string) => void
     );
 };
 
-const DisplayImage = (item: IEventSpeaker) => {
+const DisplayImage = ({name, position, image}: {name: string, image: string, position: string}) => {
     return (
         <>
             <div className="relative w-48 h-56 rounded">
-                <img src={item.image} alt={item.name} className="w-48 h-56 " />
+                <img src={image} alt={name} className="w-48 h-56 " />
                 <div className="p-1 absolute bottom-0 z-10 flex flex-col justify-center items-start w-full text-white">
-                    <div className="font-bold">{item.name} </div>
-                    <div className="font-thin"> {item.position} </div>
+                    <div className="font-bold">{name} </div>
+                    <div className="font-thin"> {position} </div>
                 </div>
             </div>
         </>
@@ -517,3 +517,4 @@ const DisplayImage = (item: IEventSpeaker) => {
 }
 
 export default CreateEvent;
+ 
