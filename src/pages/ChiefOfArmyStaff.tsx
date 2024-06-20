@@ -71,8 +71,7 @@ const ChiefOfArmyStaff = () => {
             if (status === 200) {
                 const _data = data.data;
                 const results = _data.results;
-                setCOAS(results[0]);
-                // setCOAS(results.filter((coa: ArmyStaff) => coa.current)[0]);
+                setCOAS(results.filter((coa: ArmyStaff) => coa.current)[0]);
             }
         },
         (error, status) => {
