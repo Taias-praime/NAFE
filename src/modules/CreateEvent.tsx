@@ -58,7 +58,7 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
     const handleNext = () => {
         if (step > MAX_STEPS) return;
         else if (step === MAX_STEPS) handleSubmit(); // submit logic
-        else setStep(step + 1);
+        else setStep(step + 1); 
     }
 
     const handleSubmit = () => {
@@ -172,7 +172,7 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
     // File upload
     const { onPost: uploadFile } = useFetch(
         '/files/upload',
-        (data, ) => {
+        (data,) => {
             return data;
         },
         (error, status) => {
@@ -317,6 +317,10 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
                                     </div>
 
                                     <div className="col-span-1">
+                                        {/* <label>Start Time</label>
+                                        <div className="">
+                                            <input aria-label="Time" type="time" />
+                                        </div> */}
                                         <TimeInput
                                             label='Start Time'
                                             name='startTime'

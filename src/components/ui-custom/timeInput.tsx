@@ -11,22 +11,22 @@ const TimeInput = ({ label, name, value, onChange }: {
     const [error, setError] = useState('');
 
     const handleBlur = (e: any) => {
-        const value = e.target.value;
-        const regex = /^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
+        // const value = e.target.value;
+        // const regex = /^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/;
 
-        if (!regex.test(value)) {
-            setError('Time must be in HH:MM:SS format');
-        } else {
-            setError('');
-        }
+        // if (!regex.test(value)) {
+        //     setError('Time must be in HH:MM:SS format');
+        // } else {
+        //     setError('');
+        // }
     };
 
     return (
         <div className="time-input">
             <label className="block mb-2">{label}</label>
 
-            <Input 
-                type="text"
+            <Input
+                type="time"
                 name={name}
                 value={value}
                 onChange={onChange}
