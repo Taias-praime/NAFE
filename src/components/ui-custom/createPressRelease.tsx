@@ -29,7 +29,6 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
 
     const [eventDate, setEventDate] = useState<Date>();
     const [featuredImg, setFeaturedImg] = useState('');
-    const [rawImg, setRawImg] = useState('');
     const [id, setId] = useState('');
 
     const formik = useFormik({
@@ -42,20 +41,17 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
         },
         onSubmit: (obj) => {
             const date = format((eventDate as Date), "yyyy-MM-dd");
-            if (rawImg) {
-                handleFileUpload(rawImg)
-            }
+
             const data = {
                 ...obj,
-                date: date
+                date: date,
+                image: featuredImg
             }
             if (isPREdit) {
                 onPut(data);
             } else {
                 onPost(data);
             }
-            formik.resetForm();
-            setEditPRModal(false);
         }
     })
 
@@ -105,27 +101,6 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
         }
     );
 
-    // upload file
-    const { onPost: uploadFile } = useFetch(
-        '/files/upload',
-        (data,) => {
-            console.log(data);
-            return data;
-        },
-        (error, status) => {
-            const { message, ...err } = error;
-            toast({
-                title: `${message} (${status})`,
-                description: err.errors.error_message,
-                variant: 'destructive',
-            })
-        },
-        {},
-        {
-            'Content-Type': 'multipart/form-data'
-        }
-    );
-
     useEffect(() => {
         formik.setFieldValue("date", eventDate)
     }, [eventDate])
@@ -145,16 +120,6 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
             })
         }
     }, [isPREdit])
-
-    const handleFileUpload = async (file: string) => {
-        if (file) {
-            const formData = new FormData();
-            formData.append('file', file);
-            await uploadFile(formData).then((res: any) => {
-                console.log("AFTER UPLOAD", res);
-            });
-        }
-    };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -190,7 +155,7 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
             label="Upload Press Release"
         >
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                <ProfileImage deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} setRawImg={setRawImg} featuredImg={featuredImg} />
+                <ProfileImage deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} />
                 <Input
                     value={formik.values.title}
                     onChange={formik.handleChange}

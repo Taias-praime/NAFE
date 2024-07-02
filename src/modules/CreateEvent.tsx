@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import {
     Select,
     SelectContent,
@@ -6,7 +6,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '../components/ui/select';
-import { cn } from "../lib/utils";
+import { cn, removeLeadingString } from "../lib/utils";
 import { format } from "date-fns";
 import { Calendar } from "../components/ui/calendar";
 import {
@@ -26,30 +26,47 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import TimeInput from '../components/ui-custom/timeInput';
 import { useDashboardContext } from '../contexts/dashboard.context';
 import { useLocation } from 'react-router-dom';
-import EventSpeaker from '../components/ui-custom/eventSpeaker';
-import { IEventSpeaker } from '../models/interfaces';
+import { IEventSpeaker, ITenants } from '../models/interfaces';
+import AddUser from './AddUser';
+import MultiSelect from '../components/ui/multi-select';
+import { FileItem } from '../components/ui-custom/files';
 
-const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
+interface CreateEventProps {
+    onCancel: () => void;
+    currentStep: number;
+    isEditEvent: boolean;
+    eventId: string | null;
+}
+
+type File = {
+    name: string;
+    url: string;
+    document_type: string;
+    id: string;
+}
+
+const CreateEvent = ({ onCancel, currentStep, isEditEvent, eventId }: CreateEventProps) => {
 
     const MAX_STEPS = 2;
-    const DEFAULT_IMG = 'https://cdn.vectorstock.com/i/500p/07/19/planning-concept-entrepreneurship-and-calendar-vector-33900719.jpg';
 
     const { toast } = useToast();
     const [featuredImg, setFeaturedImg] = useState('');
     const [eventTypes, setEventTypes] = useState([]);
-    const [step, setStep] = useState<number>(1);
+    const [step, setStep] = useState<number>(currentStep);
     const [eventDate, setEventDate] = useState<Date>();
     const [startTime, setStartTime] = useState<string>('');
     const [endTime, setEndTime] = useState<string>('');
-    const [speaker, setSpeaker] = useState<{ image: string, name: string, position: string, description: string } | null>(null);
-    const [moderator, setModerator] = useState<{ image: string, name: string, position: string, description: string } | null>(null);
 
-    const [speakerOpen, setSpeakerOpen] = useState(false);
-    const [moderatorOpen, setModeratorOpen] = useState(false);
+    const [event, setEvent] = useState<any>(null);
 
-    const [deps, setDeps] = useState([]);
-    const [mods, setMods] = useState([]);
-    const [speakers, setSpeakers] = useState([]);
+    const [tenants, setTenants] = useState<ITenants[]>([]);
+    const [tenantsId, setEditTenantsId] = useState<ITenants[]>([]);
+    const [moderators, setModerators] = useState<{ id: string; image: string; name: string, position: string }[]>([]);
+    const [keynoteSpeakers, setKeynoteSpeakers] = useState<{ id: string; image: string; name: string; position: string }[]>([]);
+
+
+    const [mods, setMods] = useState<{ id: string; image: string; name: string, position: string }[]>([]);
+    const [speakers, setSpeakers] = useState<{ id: string; image: string; name: string, position: string }[]>([]);
 
     const handleEventTypeSelect = (eventType: string) => {
         formikForm.setFieldValue('type', eventType)
@@ -68,11 +85,10 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
     }
 
     const handleSubmit = () => {
-        const { department, ...data } = formikForm.values;
+        const data = formikForm.values;
         const body = {
             ...data,
-            tenants_ids: [department],
-            image: formikForm.values.image || DEFAULT_IMG,
+            image: formikForm.values.image
         };
         createEvent(body);
     }
@@ -83,6 +99,9 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
             image: '',
             title: '',
             venue: '',
+            access_code: '',
+            theme_description: "",
+            theme_title: "",
             slots: [
                 {
                     date: '',
@@ -93,11 +112,13 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
             description: '',
             department: '',
             event_link: '',
+            files: [] as File[] | [],
             moderators: [] as IEventSpeaker[],
             keynote_speakers: [] as IEventSpeaker[],
             adminInstructionsTitle: '',
             adminInstructionsUrl: '',
             programmeUrl: '',
+            participants: [],
         },
         onSubmit: handleSubmit,
     })
@@ -121,10 +142,55 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
         {} // options
     );
 
-    const { onFetch: getDeps } = useFetch(
+    // get single event
+    const { onFetch: getEvent, isFetching: isFetchingEvent } = useFetch(
+        `/events/sa/${eventId}/details`,
+        (data) => {
+            setEvent(data.data)
+
+        },
+        () => { },
+    );
+
+    // get tenants
+    const { onFetch: getTenants } = useFetch(
         '/tenants/sa/',
         (data) => {
-            setDeps(data.data.results)
+            setTenants(data.data.results)
+        },
+        (error, status) => {
+            const { message, ...err } = error;
+            // notify
+            toast({
+                title: `${message} (${status})`,
+                description: err.errors.error_message,
+                variant: 'destructive',
+            })
+        },
+    );
+
+    // get Moderators
+    const { onFetch: getMorderators } = useFetch(
+        '/moderators/sa/',
+        (data) => {
+            setModerators(data.data.results)
+        },
+        (error, status) => {
+            const { message, ...err } = error;
+            // notify
+            toast({
+                title: `${message} (${status})`,
+                description: err.errors.error_message,
+                variant: 'destructive',
+            })
+        },
+    );
+
+    // get Keynot speakers
+    const { onFetch: getSpeakers } = useFetch(
+        '/keynote-speakers/sa/',
+        (data) => {
+            setKeynoteSpeakers(data.data.results)
         },
         (error, status) => {
             const { message, ...err } = error;
@@ -175,26 +241,6 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
         },
     );
 
-    // File upload
-    const { onPost: uploadFile } = useFetch(
-        '/files/upload',
-        (data,) => {
-            return data;
-        },
-        (error, status) => {
-            const { message, ...err } = error;
-            toast({
-                title: `${message} (${status})`,
-                description: err.errors.error_message,
-                variant: 'destructive',
-            })
-        },
-        {},
-        {
-            'Content-Type': 'multipart/form-data'
-        }
-    );
-
     useEffect(() => {
         if (eventDate) {
             // set date
@@ -214,11 +260,11 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
             data[0].end_time = endTime;
             formikForm.setFieldValue('slots', data);
         }
+
+        // const matchedTenants = matchedItem(formikForm.values, tenants, "tenant_ids", "tenant_id");
         if (featuredImg) formikForm.setFieldValue('image', featuredImg.split('data:image/jpeg;')[1]);
         if (mods) formikForm.setFieldValue('moderators', mods.map((m: { id: string }) => m.id));
         if (speakers) formikForm.setFieldValue('keynote_speakers', speakers.map((s: { id: string }) => s.id));
-        if (speaker) formikForm.setFieldValue('keynote_speakers', [...formikForm.values.keynote_speakers, speaker]);
-        if (moderator) formikForm.setFieldValue('moderators', [...formikForm.values.moderators, moderator]);
     }, [
         startTime,
         endTime,
@@ -226,32 +272,96 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
         featuredImg,
         mods.length,
         speakers.length,
-        speaker,
-        moderator,
         featuredImg
     ]);
 
     useEffect(() => {
-        getDeps();
+        getTenants();
         onFetchEventTypes();
+        getMorderators();
+        getSpeakers();
+        if (eventId) {
+            getEvent();
+        }
     }, []);
 
-    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
-        const file = e.target.files?.[0];
+    const matchedItem = (event: any, moderators: any, value: string, Id: string) => {
+        const matched = []
+
+        if (event[value]) {
+            for (const id of event[value]) {
+                for (const mod of moderators) {
+                    if (mod[Id] === id) {
+                        matched.push(mod);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return matched;
+    }
+
+    useEffect(() => {
+        if (event) {
+            const matchedTenants = matchedItem(event, tenants, "tenant_ids", "tenant_id");
+            const matchedModerators = matchedItem(event, moderators, "moderators", "id");
+            const matchedSpeakers = matchedItem(event, keynoteSpeakers, "keynote_speakers", "id");
+
+            setMods(matchedModerators)
+            setSpeakers(matchedSpeakers)
+            setEditTenantsId(matchedTenants);
+            formikForm.setValues(event)
+            setEventDate(event.start_date)
+        }
+    }, [event])
+
+    const getIdsFromTenants = (tenant_ids: any) => {
+        const tenants = []
+        for (const department of tenant_ids) {
+            tenants.push(department.tenant_id);
+        }
+        return tenants;
+    }
+
+    const handleSelect = (tenant_ids: ITenants[]) => {
+        setEditTenantsId(tenant_ids)
+        const tenants = getIdsFromTenants(tenant_ids)
+        formikForm.setFieldValue('tenant_ids', tenants)
+    }
+
+    const removeFile = (e: { preventDefault: () => void }, name: string) => {
+        e.preventDefault();
+        const files = formikForm.values.files.filter((file) => file.name !== name);
+        formikForm.setFieldValue("files", files)
+    }
+
+    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+        const file = event.target.files?.[0];
+
+        // Extract filename without path
+        const cleanFilename = value.replace(/.*\\/g, ''); // remove path on Windows systems (backslashes)
+        const name = cleanFilename.replace(/^.*\/|\?/g, ''); // For other systems (forward slashes) or query strings
+
+        // Extract file extension (type)
+        const document_type = value.split('.').pop();
+        const data = {
+            name,
+            url: "",
+            document_type
+        }
 
         if (file) {
-            const formData = new FormData();
-            formData.append('file', file);
-
-            await uploadFile(formData).then((res: any) => {
-                console.log("AFTER UPLOAD", res);
-                console.log("FIELD VAL", field);
-                // if (res === 200) {
-                //     formikForm.setFieldValue(field, data.url);
-                // }
-            });
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                data.url = removeLeadingString(reader.result as string)
+            };
+            reader.readAsDataURL(file);
         }
-    };
+
+        formikForm.setFieldValue("files", [...formikForm.values.files, data])
+    }
 
     return (
         <>
@@ -284,176 +394,168 @@ const CreateEvent = ({ onCancel }: { onCancel: () => void }) => {
                 )}
 
                 {step === 2 && (
-                    <div className="h-full w-full">
-                        <div className="grid grid-cols-3 gap-5 h-full">
-                            <div className="col-span-1">
-                                <FeaturedImg setFeaturedImg={setFeaturedImg} />
-                            </div>
+                    isFetchingEvent ? <Loader2 className='animate-spin mx-8' /> :
+                        <div className="h-full w-full">
+                            <div className="grid grid-cols-3 gap-5 h-full">
+                                <div className="col-span-1">
+                                    <FeaturedImg setFeaturedImg={setFeaturedImg} />
+                                </div>
 
-                            <div className="col-span-2">
-                                <div className="grid grid-cols-2 gap-5 gap-y-10">
-                                    <div className="col-span-1">
-                                        <Input label='Event Title' name='title' onChange={formikForm.handleChange} placeholder='Title for the event' />
-                                    </div>
-                                    <div className="col-span-1">
-                                        <Input label='Venue' name='venue' onChange={formikForm.handleChange} placeholder='Location of the event' />
-                                    </div>
+                                <div className="col-span-2">
+                                    <div className="grid grid-cols-2 gap-5 gap-y-10">
+                                        <div className="col-span-1">
+                                            <Input label='Event Title' name='title' value={formikForm.values.title} onChange={formikForm.handleChange} placeholder='Title for the event' />
+                                        </div>
+                                        <div className="col-span-1">
+                                            <Input
+                                                label='Venue'
+                                                name='venue'
+                                                value={formikForm.values.venue}
+                                                onChange={formikForm.handleChange}
+                                                placeholder='Location of the event' />
+                                        </div>
 
-                                    <div className="col-span-1">
-                                        <label>Select Event Date</label>
-                                        <div className='mt-2'>
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                    <Button
-                                                        variant="outline"
-                                                        className={cn(
-                                                            "w-full rounded-none border-0 border-b border-black justify-start text-left font-normal",
-                                                            !eventDate && "text-muted-foreground"
-                                                        )}
-                                                    >
-                                                        {eventDate ? format(eventDate, "dd/MM/yyyy") : <span>dd/mm/yyyy</span>}
-                                                    </Button>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-auto p-0">
-                                                    <Calendar
-                                                        mode="single"
-                                                        selected={eventDate}
-                                                        onSelect={setEventDate}
-                                                        initialFocus
+                                        <div className="col-span-1">
+                                            <label>Select Event Date</label>
+                                            <div className='mt-2'>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <Button
+                                                            variant="outline"
+                                                            className={cn(
+                                                                "w-full rounded-none border-0 border-b border-black justify-start text-left font-normal",
+                                                                !eventDate && "text-muted-foreground"
+                                                            )}
+                                                        >
+                                                            {eventDate ? format(eventDate, "dd/MM/yyyy") : <span>dd/mm/yyyy</span>}
+                                                        </Button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-auto p-0">
+                                                        <Calendar
+                                                            mode="single"
+                                                            selected={eventDate}
+                                                            onSelect={setEventDate}
+                                                            initialFocus
+                                                        />
+                                                    </PopoverContent>
+                                                </Popover>
+                                            </div>
+                                        </div>
+
+                                        <div className="col-span-1">
+                                            <TimeInput
+                                                label='Start Time'
+                                                name='startTime'
+                                                onChange={(e) => setStartTime(e.target.value)}
+                                                value={formikForm.values.slots[0].start_time}
+                                            />
+                                        </div>
+
+                                        <div className="col-span-1">
+                                            <TimeInput
+                                                label='End Time'
+                                                name='endTime'
+                                                onChange={(e) => setEndTime(e.target.value)}
+                                                value={formikForm.values.slots[0].end_time}
+                                            />
+                                        </div>
+
+                                        <div className="col-span-2">
+                                            <Textarea label='About Event' name='description' onChange={formikForm.handleChange} value={formikForm.values.description} placeholder='Event details' />
+                                        </div>
+
+                                        <div className="col-span-1">
+                                            <MultiSelect
+                                                label="Select Department"
+                                                options={tenants}
+                                                handleSelect={handleSelect}
+                                                value={tenantsId}
+                                            />
+                                        </div>
+
+                                        <div className="col-span-1">
+                                            <Input
+                                                type='url'
+                                                label='Live link'
+                                                value={formikForm.values.event_link}
+                                                placeholder='eg: meet.google.com/abc-def-gh'
+                                                name='event_link'
+                                                onChange={formikForm.handleChange} />
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                {/* Moderator, Keynote Speaker, Upload Files */}
+
+                                <div className="col-span-3 max-h-full h-[300px] mt-5">
+                                    <Tabs defaultValue="m" className="bg-slate-50 rounded-md pb-5">
+                                        <TabsList>
+                                            <TabsTrigger value="m">Moderators</TabsTrigger>
+                                            <TabsTrigger value="k">Keynote Speakers</TabsTrigger>
+                                            <TabsTrigger value="f">Upload Files</TabsTrigger>
+                                        </TabsList>
+
+                                        <TabsContent className='p-5 overflow-x-auto' value="m">
+                                            <AddUser endpoint='/moderators/sa/' action='Add Moderator' setUsers={setMods} users={mods} />
+                                        </TabsContent>
+
+                                        <TabsContent className='p-5' value="k">
+                                            <AddUser endpoint='/keynote-speakers/sa/' action='Select Speaker' setUsers={setSpeakers} users={speakers} />
+                                        </TabsContent>
+
+                                        <TabsContent className='p-5' value="f">
+                                            <div className="flex gap-24">
+                                                <div className="">
+                                                    <Input
+                                                        label='Admin instructions title'
+                                                        placeholder='title here'
+                                                        name='adminInstructionsTitle'
+                                                        value={formikForm.values.adminInstructionsTitle}
+                                                        onChange={formikForm.handleChange}
+                                                        className='max-w-[350px] mb-10'
                                                     />
-                                                </PopoverContent>
-                                            </Popover>
-                                        </div>
+
+                                                    <Input
+                                                        type='file'
+                                                        label='Upload admin instructions'
+                                                        onChange={(e) => handleFileChange(e)}
+                                                        className='max-w-[350px] mb-10 rounded border border-gray-300 bg-gray-100 px-4'
+                                                    />
+
+                                                    <Input
+                                                        type='file'
+                                                        label='Upload Programme'
+                                                        onChange={(e) =>handleFileChange(e)}
+                                                        className='max-w-[350px] rounded border border-gray-300 bg-gray-100 px-4'
+                                                    />
+                                                </div>
+                                                <div className="max-w-[400px]">
+                                                    {formikForm.values.files && (
+                                                        <div className="flex flex-col gap-4 my-6">
+                                                            {formikForm.values.files.map((file) => (
+                                                                <FileItem showDelete={true} onClick={(e: { preventDefault: () => void; }) => removeFile(e, file.name)} file={`${file.name} - ${file.document_type}`} />
+                                                            ))}
+                                                        </div>
+                                                    )}</div>
+                                            </div>
+                                        </TabsContent>
+                                    </Tabs>
+
+                                    {/* ----- footer ---- */}
+                                    <div className="flex justify-between py-5">
+                                        <Button variant='ghost' onClick={handleCancel}>Cancel</Button>
+
+                                        {step === MAX_STEPS && (
+                                            <Button onClick={handleNext}>
+                                                {isCreatingEvent ? <Loader2 className='animate-spin mx-8' /> : (isEditEvent ? 'Update Event' : 'Create Event')}
+                                            </Button>
+                                        )}
                                     </div>
-
-                                    <div className="col-span-1">
-                                        {/* <label>Start Time</label>
-                                        <div className="">
-                                            <input aria-label="Time" type="time" />
-                                        </div> */}
-                                        <TimeInput
-                                            label='Start Time'
-                                            name='startTime'
-                                            onChange={(e) => setStartTime(e.target.value)}
-                                            value={formikForm.values.slots[0].start_time}
-                                        />
-                                    </div>
-
-                                    <div className="col-span-1">
-                                        <TimeInput
-                                            label='End Time'
-                                            name='endTime'
-                                            onChange={(e) => setEndTime(e.target.value)}
-                                            value={formikForm.values.slots[0].end_time}
-                                        />
-                                    </div>
-
-                                    <div className="col-span-2">
-                                        <Textarea label='About Event' name='description' onChange={formikForm.handleChange} value={formikForm.values.description} placeholder='Event details' />
-                                    </div>
-
-                                    <div className="col-span-1">
-                                        <label>Select Department</label>
-
-                                        <Select name='department' onValueChange={(selected: string) => formikForm.setFieldValue('department', selected)}>
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select Department" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {deps.map(
-                                                    (d: { tenant_id: string; code: string; name: string }) => (
-                                                        <SelectItem key={d.tenant_id} value={d.tenant_id}>
-                                                            {d.name} ({d.code})
-                                                        </SelectItem>
-                                                    )
-                                                )}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    <div className="col-span-1">
-                                        <Input type='url' label='Live link' placeholder='eg: meet.google.com/abc-def-gh' name='event_link' onChange={formikForm.handleChange} />
-                                    </div>
-
+                                    {/* ----- footer ---- */}
                                 </div>
-                            </div>
-
-                            {/* Moderator, Keynote Speaker, Upload Files */}
-
-                            <div className="col-span-3 max-h-full h-[300px] mt-5">
-                                <Tabs defaultValue="m" className="bg-slate-50 rounded-md pb-5">
-                                    <TabsList>
-                                        <TabsTrigger value="m">Moderators</TabsTrigger>
-                                        <TabsTrigger value="k">Keynote Speakers</TabsTrigger>
-                                        <TabsTrigger value="f">Upload Files</TabsTrigger>
-                                    </TabsList>
-
-                                    <TabsContent className='p-5 overflow-x-auto' value="m">
-                                        <EventSpeaker title="Add Moderator" label="Moderator name" openModal={() => { }} setModalOpen={setModeratorOpen} setUpdate={setModerator} open={moderatorOpen} />
-                                        <div className="flex gap-4 flex-wrap">
-                                            {
-                                                formikForm.values.moderators.map((item) => (
-                                                    <DisplayImage name={item.name} image={item.image} position={item.position} />
-                                                ))
-                                            }
-                                        </div>
-                                    </TabsContent>
-
-                                    <TabsContent className='p-5' value="k">
-                                        <EventSpeaker title="Add Speaker" label="Speaker name" openModal={() => { }} setModalOpen={setSpeakerOpen} setUpdate={setSpeaker} open={speakerOpen} />
-                                        <div className="flex gap-4 flex-wrap">
-                                            {
-                                                formikForm.values.keynote_speakers.map((item) => (
-                                                    <DisplayImage name={item.name} image={item.image} position={item.position} />
-                                                ))
-                                            }
-                                        </div>
-
-                                    </TabsContent>
-
-                                    <TabsContent className='p-5' value="f">
-                                        <Input
-                                            label='Admin instructions title'
-                                            placeholder='title here'
-                                            name='adminInstructionsTitle'
-                                            value={formikForm.values.adminInstructionsTitle}
-                                            onChange={formikForm.handleChange}
-                                            className='max-w-[350px] mb-10'
-                                        />
-
-                                        <Input
-                                            type='file'
-                                            // disabled
-                                            label='Upload admin instructions'
-                                            onChange={(e) => handleFileUpload(e, 'adminInstructionsUrl')}
-                                            className='max-w-[350px] mb-10 rounded border border-gray-300 bg-gray-100 px-4'
-                                        />
-
-                                        <Input
-                                            type='file'
-                                            // disabled
-                                            label='Upload Programme'
-                                            onChange={(e) => handleFileUpload(e, 'programmeUrl')}
-                                            className='max-w-[350px] rounded border border-gray-300 bg-gray-100 px-4'
-                                        />
-
-                                    </TabsContent>
-                                </Tabs>
-
-                                {/* ----- footer ---- */}
-                                <div className="flex justify-between py-5">
-                                    <Button variant='ghost' onClick={handleCancel}>Cancel</Button>
-
-                                    {step === MAX_STEPS && (
-                                        <Button onClick={handleNext}>
-                                            {isCreatingEvent ? <Loader2 className='animate-spin mx-8' /> : 'Create Event'}
-                                        </Button>
-                                    )}
-                                </div>
-                                {/* ----- footer ---- */}
                             </div>
                         </div>
-                    </div>
                 )}
             </div>
         </>
@@ -502,19 +604,18 @@ const FeaturedImg = ({ setFeaturedImg }: { setFeaturedImg: (img: string) => void
     );
 };
 
-const DisplayImage = ({name, position, image}: {name: string, image: string, position: string}) => {
-    return (
-        <>
-            <div className="relative w-48 h-56 rounded">
-                <img src={image} alt={name} className="w-48 h-56 " />
-                <div className="p-1 absolute bottom-0 z-10 flex flex-col justify-center items-start w-full text-white">
-                    <div className="font-bold">{name} </div>
-                    <div className="font-thin"> {position} </div>
-                </div>
-            </div>
-        </>
-    )
-}
+// const DisplayImage = ({ name, position, image }: { name: string, image: string, position: string }) => {
+//     return (
+//         <>
+//             <div className="relative w-48 h-56 rounded">
+//                 <img src={image} alt={name} className="w-48 h-56 " />
+//                 <div className="p-1 absolute bottom-0 z-10 flex flex-col justify-center items-start w-full text-white">
+//                     <div className="font-bold">{name} </div>
+//                     <div className="font-thin"> {position} </div>
+//                 </div>
+//             </div>
+//         </>
+//     )
+// }
 
 export default CreateEvent;
- 

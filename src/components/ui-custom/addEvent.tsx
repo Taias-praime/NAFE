@@ -4,18 +4,27 @@ import CreateEvent from '../../modules/CreateEvent';
 import {
 	Sheet,
 	SheetContent,
-	// SheetDescription,
 	SheetHeader,
 	SheetTitle,
 	SheetTrigger,
 } from '../ui/sheet';
 
-const AddEvent = ({ children, className }: { children: ReactNode, className: string }) => {
-    const [isOpen, setIsOpen] = useState<boolean>(false);
+interface AddEventProps {
+	children: ReactNode;
+	className: string;
+	eventId?: string;
+	currentStep?: number;
+	isEditEvent: boolean;
+	setIsEditEvent: (value: boolean) => void;
+}
 
-    const dismiss = () => {
-        setIsOpen(false);
-    }
+const AddEvent = ({ children, className, currentStep, isEditEvent, setIsEditEvent, eventId }: AddEventProps) => {
+	const [isOpen, setIsOpen] = useState<boolean>(false);
+
+	const dismiss = () => {
+		setIsOpen(false);
+		setIsEditEvent(false);
+	}
 
 	return (
 		<Sheet open={isOpen} onOpenChange={(newVal: boolean) => setIsOpen(newVal)}>
@@ -25,12 +34,11 @@ const AddEvent = ({ children, className }: { children: ReactNode, className: str
 
 			<SheetContent className="!max-w-full w-full md:w-[1200px] overflow-y-auto">
 				<SheetHeader>
-					<SheetTitle className='pb-10'> Create Event </SheetTitle>
-					{/* <SheetDescription></SheetDescription> */}
+					<SheetTitle className='pb-10'> {isEditEvent ? 'Edit Event' : 'Create Event'} </SheetTitle>
 				</SheetHeader>
 
 				{/* ----- content ---- */}
-                { <CreateEvent onCancel={dismiss} /> }
+				{<CreateEvent onCancel={dismiss} isEditEvent={isEditEvent} currentStep={currentStep ?? 1 } eventId={eventId ?? null} />}
 				{/* ----- oef content ---- */}
 			</SheetContent>
 		</Sheet>

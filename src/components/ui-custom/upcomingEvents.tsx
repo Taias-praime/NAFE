@@ -39,14 +39,14 @@ const UpcomingEvents = () => {
                         events.map((e, k: number) => (
                             <Event key={k} event={e} />
                         )) :
-                        <NoEvents />
+                        <NoEvents noEventsLabel="No upcoming  events" />
                 }
 			</ul>
 		</div>
 	);
 };
 
-const Event = ({event}: {event: any}) => {
+export const Event = ({event}: {event: any}) => {
 
     const rand = Math.random();
 
@@ -73,12 +73,12 @@ const Event = ({event}: {event: any}) => {
 }
 
 
-const NoEvents = () => {
+export const NoEvents = ({noEventsLabel} : {noEventsLabel: string}) => {
     return (
         <div className="flex justify-center items-center h-full">
             <div className="text-center">
                 <CalendarOff className="mb-4 mx-auto" />
-                <b> No upcoming  events </b>
+                <b> {noEventsLabel} </b>
             </div>
         </div>
     )

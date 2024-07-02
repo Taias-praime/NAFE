@@ -1,7 +1,7 @@
 import { ImageUpIcon, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const ProfileImage = ({ setFeaturedImg, setRawImg, featuredImg, deleteImage }: { setFeaturedImg: (img: string) => void, setRawImg?: (img: string) => void, featuredImg: string, deleteImage?: () => void }) => {
+const ProfileImage = ({ setFeaturedImg, featuredImg, deleteImage }: { setFeaturedImg: (img: string) => void, featuredImg: string, deleteImage?: () => void }) => {
 
     const [preview, setPreview] = useState<string | null>(null);
 
@@ -16,9 +16,8 @@ const ProfileImage = ({ setFeaturedImg, setRawImg, featuredImg, deleteImage }: {
             reader.onloadend = () => {
                 setPreview(reader.result as string);
                 setFeaturedImg(reader.result as string);
-                setRawImg?.(reader.result as string);
             };
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(file);            
         }
     };
 
@@ -33,7 +32,7 @@ const ProfileImage = ({ setFeaturedImg, setRawImg, featuredImg, deleteImage }: {
                     <ImageUpIcon className='mx-auto scale-125' />
                     <div className="">
                         {
-                            preview ? 'Change ProfileImage' : 'Upload ProfileImage'
+                            preview ? 'Change Profile Image' : 'Upload Profile Image'
                         }
                     </div>
                 </div>

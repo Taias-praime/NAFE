@@ -8,7 +8,7 @@ import { useFormik } from 'formik'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { format } from 'date-fns'
 import { Calendar } from '../ui/calendar'
-import { cn, local } from '../../lib/utils'
+import { cn, local, removeLeadingString } from '../../lib/utils'
 import { toast } from '../ui/use-toast'
 import useFetch from '../../hooks/useFetch'
 import ProfileImage from './ProfileImage'
@@ -27,7 +27,6 @@ interface CreateLiveEventsProps {
 const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal, setIsLVEdit, LV, open }: CreateLiveEventsProps) => {
     const [eventDate, setEventDate] = useState<Date>();
     const [featuredImg, setFeaturedImg] = useState('');
-    const [rawImg, setRawImg] = useState('');
     const [id, setId] = useState('');
 
     const formik = useFormik({
@@ -41,12 +40,13 @@ const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal, setIsLVEdit, LV
         },
         onSubmit: (obj) => {
             const date = format((eventDate as Date), "yyyy-MM-dd");
-            if (rawImg) {
-                handleFileUpload(rawImg)
-            }
+
             const data = {
                 ...obj,
-                date: date
+                date: date,
+                image: removeLeadingString(featuredImg),
+                start_time: "01:50:00",
+                end_time: "02:50:00",
             }
 
             if (isLVEdit) {
@@ -103,27 +103,6 @@ const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal, setIsLVEdit, LV
         }
     );
 
-    // upload file
-    const { onPost: uploadFile } = useFetch(
-        '/files/upload',
-        (data,) => {
-            console.log(data);
-            return data;
-        },
-        (error, status) => {
-            const { message, ...err } = error;
-            toast({
-                title: `${message} (${status})`,
-                description: err.errors.error_message,
-                variant: 'destructive',
-            })
-        },
-        {},
-        {
-            'Content-Type': 'multipart/form-data'
-        }
-    );
-
     useEffect(() => {
         if (LV.length !== 0) {
             const liveEvent = LV[0]
@@ -140,16 +119,6 @@ const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal, setIsLVEdit, LV
             })
         }
     }, [isLVEdit, LV])
-
-    const handleFileUpload = async (file: string) => {
-        if (file) {
-            const formData = new FormData();
-            formData.append('file', file);
-            await uploadFile(formData).then((res: any) => {
-                console.log("AFTER UPLOAD", res);
-            });
-        }
-    };
 
     useEffect(() => {
         formik.setFieldValue("date", eventDate)
@@ -168,7 +137,7 @@ const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal, setIsLVEdit, LV
             label="Create Live Event"
         >
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                <ProfileImage setFeaturedImg={setFeaturedImg} setRawImg={setRawImg} featuredImg={featuredImg} />
+                <ProfileImage setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} />
                 <Input
                     value={formik.values.title}
                     onChange={formik.handleChange}

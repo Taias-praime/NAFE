@@ -2,7 +2,7 @@ import { Button } from "../components/ui/button";
 import { Skeleton } from "../components/ui/skeleton";
 import { FileItem, FilesList } from "../components/ui-custom/files";
 import { Paperclip, Loader2, Pencil, PencilLine } from "lucide-react";
-import { HEADER_HEIGHT, local, USER_PLACEHOLDER_IMG_URL } from "../lib/utils";
+import { HEADER_HEIGHT, local, removeLeadingString, USER_PLACEHOLDER_IMG_URL } from "../lib/utils";
 import { useEffect, useMemo, useState } from "react";
 
 import {
@@ -42,7 +42,6 @@ const ChiefOfArmyStaff = () => {
     const [editPRModal, setEditPRModal] = useState(false);
     const [tab, setTab] = useState("press release");
     const [featuredImg, setFeaturedImg] = useState('');
-    const [rawImg, setRawImg] = useState('');
     const [prId, setPrId] = useState('');
     const [lvId, setLvId] = useState('');
 
@@ -57,11 +56,13 @@ const ChiefOfArmyStaff = () => {
             files: [] as string[]
         },
         onSubmit: (obj) => {
-            onPut(obj)
-            if (rawImg) {
-                handleFileUpload(rawImg)
-            }
 
+            const data = {
+                ...obj,
+                image: removeLeadingString(featuredImg),
+            }
+            
+            onPut(data)
         }
     })
 
@@ -159,27 +160,6 @@ const ChiefOfArmyStaff = () => {
         {} // options
     );
 
-    // upload file
-    const { onPost: uploadFile } = useFetch(
-        '/files/upload',
-        (data,) => {
-            console.log(data);
-            return data;
-        },
-        (error, status) => {
-            const { message, ...err } = error;
-            toast({
-                title: `${message} (${status})`,
-                description: err.errors.error_message,
-                variant: 'destructive',
-            })
-        },
-        {},
-        {
-            'Content-Type': 'multipart/form-data'
-        }
-    );
-
     // edit COAS
     const { onPut, isFetching: isLoadingEdit } = useFetch(
         `/army-staffs/sa/${COAS?.id}/edit`,
@@ -239,16 +219,6 @@ const ChiefOfArmyStaff = () => {
         })
         setFeaturedImg(COAS.image)
     }
-
-    const handleFileUpload = async (file: string) => {
-        if (file) {
-            const formData = new FormData();
-            formData.append('file', file);
-            await uploadFile(formData).then((res: any) => {
-                console.log("AFTER UPLOAD", res);
-            });
-        }
-    };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -337,7 +307,7 @@ const ChiefOfArmyStaff = () => {
                                         }
                                     >
                                         <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                                            <ProfileImage setFeaturedImg={setFeaturedImg} deleteImage={deleteImage} setRawImg={setRawImg} featuredImg={featuredImg} />
+                                            <ProfileImage setFeaturedImg={setFeaturedImg} deleteImage={deleteImage} featuredImg={featuredImg} />
                                             <Input
                                                 value={formik.values.fullname}
                                                 onChange={formik.handleChange}

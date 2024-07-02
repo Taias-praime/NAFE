@@ -12,24 +12,22 @@ import { Search } from 'lucide-react';
 
 interface IUser {
 	id: string;
-	rank: string;
-	email: string;
+	position: string;
 	name: string;
 	image: string;
 }
 
 const AddUser = ({
-    users,
+	users,
 	action,
 	endpoint,
-    setUsers,
+	setUsers,
 }: {
-    users: IUser[];
+	users: IUser[];
 	action: string;
 	endpoint: string;
-    setUsers: any;
+	setUsers: any;
 }) => {
-    // const [selectedUsers, setSelectedUsers] = useState<IUser[]>([]);
 
 	const updateSelectedUsers = (user: IUser) => {
 		setUsers((prevSelected: IUser[]) => {
@@ -41,13 +39,13 @@ const AddUser = ({
 
 	return (
 		<div className="flex gap-5">
-            <User
-                action={action}
-                endpoint={endpoint}
-                selectedUsers={users}
-                updateSelectedUsers={updateSelectedUsers}
-            />
-            {users.slice().reverse().map((u: IUser) => (
+			<User
+				action={action}
+				endpoint={endpoint}
+				selectedUsers={users}
+				updateSelectedUsers={updateSelectedUsers}
+			/>
+			{users.slice().reverse().map((u: IUser) => (
 				<User
 					key={u.id}
 					user={u}
@@ -67,7 +65,7 @@ const User = ({
 	endpoint,
 }: {
 	setSelected?: (users: IUser[]) => void;
-    user?: IUser;
+	user?: IUser;
 	action?: string;
 	endpoint?: string;
 	selectedUsers: IUser[];
@@ -87,7 +85,7 @@ const User = ({
 					<div className="">
 						<div className="text-md">{user.name}</div>
 						<div className="text-xs uppercase">
-							{/* {user.rank || 'no-rank-set'} */}
+							{/* {user.position || 'no-position-set'} */}
 						</div>
 					</div>
 				</div>
@@ -105,8 +103,8 @@ const User = ({
 
 				<AddUserActionSheet
 					action={action as string}
-                    endpoint={endpoint as string}
-                    selectedUsers={selectedUsers}
+					endpoint={endpoint as string}
+					selectedUsers={selectedUsers}
 					handleCheckboxClick={handleCheckboxClick}
 				/>
 			</Sheet>
@@ -123,32 +121,36 @@ const AddUserActionSheet = ({
 	action: string;
 	endpoint: string;
 	selectedUsers: IUser[];
-    handleCheckboxClick: (user: IUser) => void;
+	handleCheckboxClick: (user: IUser) => void;
 }) => {
 
-    const [userList, setUserList] = useState<IUser[]>([]);
-    const { onFetch: fetchUsers, isFetching } = useFetch(
-        endpoint,
-        (data) => {
-            setUserList(data.data.results);
-        },
-        (error, status) => {
-            const { message, ...err } = error;
-            toast({
-                title: `${message} (${status})`,
-                description: err.errors.error_message,
-                variant: "destructive",
-            });
-        }
-    );
+	const [userList, setUserList] = useState<IUser[]>([]);
+	const [filterList, setFilterList] = useState<IUser[]>([])
+	const [search, setSearch] = useState('')
+	const { onFetch: fetchUsers, isFetching } = useFetch(
+		endpoint,
+		(data) => {
+			setUserList(data.data.results);
+			setFilterList(data.data.results)
+		},
+		(error, status) => {
+			const { message, ...err } = error;
+			toast({
+				title: `${message} (${status})`,
+				description: err.errors.error_message,
+				variant: "destructive",
+			});
+		}
+	);
 
-    const handleSearch = (e: any) => {
-        console.log(e);
-    }
+	useEffect(() => {
+		if (endpoint) fetchUsers(); // get user list
+	}, []);
 
-    useEffect(() => {
-        if (endpoint) fetchUsers(); // get user list
-    }, []);
+	useEffect(() => {
+		const filter = userList.filter((item) => item.name.includes(search))
+		setFilterList(filter)
+	}, [search])
 
 
 	return (
@@ -158,8 +160,8 @@ const AddUserActionSheet = ({
 
 				<div className="w-full flex justify-end">
 					<div className="relative flex items-center w-fit">
-						<Input className="p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[400px] max-w-full" />
-						<Search className="absolute right-5 opacity-30" onKeyDown={handleSearch} />
+						<Input value={search} onChange={(e) => setSearch(e.target.value)} className="p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[400px] max-w-full" />
+						<Search className="absolute right-5 opacity-30" />
 					</div>
 				</div>
 
@@ -174,17 +176,17 @@ const AddUserActionSheet = ({
 						</TableHeader>
 						<TableBody>
 							{!isFetching &&
-                                userList.map((user: IUser) => (
+								filterList.map((user: IUser) => (
 									<TableRow key={user.id}>
 										<TableCell className="">
 											<div className="flex items-center">
 												<ProfileImg
 													url={
-                                                        user.image || 
+														user.image ||
 														USER_PLACEHOLDER_IMG_URL
 													}
 												/>
-                                                <span className='ms-2'> {user.name} </span>
+												<span className='ms-2'> {user.name} </span>
 											</div>
 										</TableCell>
 										{/* <TableCell>{user.email}</TableCell> */}

@@ -16,12 +16,14 @@ const Events = () => {
     const [events, setEvents] = useState<IEvent[]>([]);
     const [eventsCount, setEventsCount] = useState<number>(0);
     const [filteredEvents, setFilteredEvents] = useState<IEvent[]>([]);
-    const [isList, setIsList] = useState<boolean>(false);
-    const [tab, setTab] = useState<string>('all');
 
+    const [isList, setIsList] = useState<boolean>(false);
     const [showNormalEvent, setShowNormalEvent] = useState<boolean>(false);
     const [showRestrictedEvent, setShowRestrictedEvent] = useState<boolean>(false);
     const [showSecretEvent, setShowSecretEvent] = useState<boolean>(false);
+    const [isEditEvent, setIsEditEvent] = useState(false)
+
+    const [tab, setTab] = useState<string>('all');
     const [searchTerm, setSearchTerm] = useState<string>('');
 
     const count = (): number => {
@@ -42,8 +44,8 @@ const Events = () => {
         () => { },
     );
 
-    const { 
-        onFetch: getLiveEvents, 
+    const {
+        onFetch: getLiveEvents,
         // isFetching: isFetchingLE 
     } = useFetch(
         '/events/sa/',
@@ -55,8 +57,8 @@ const Events = () => {
         () => { },
     );
 
-    const { 
-        onFetch: getOngoingEvents, 
+    const {
+        onFetch: getOngoingEvents,
         // isFetching: isFetchingOE 
     } = useFetch(
         '/events/sa/',
@@ -68,8 +70,8 @@ const Events = () => {
         () => { },
     );
 
-    const { 
-        onFetch: getPastEvents, 
+    const {
+        onFetch: getPastEvents,
         // isFetching: isFetchingPE 
     } = useFetch(
         '/events/sa/',
@@ -87,8 +89,6 @@ const Events = () => {
 
     useEffect(() => {
         getEvents();
-
-        
     }, []);
 
     useEffect(() => {
@@ -127,7 +127,8 @@ const Events = () => {
             <div className="flex justify-between">
                 <div className=""></div>
                 <Button className="lg:absolute top-5 right-10 p-0">
-                    <AddEvent className="flex items-center gap-3 p-3">
+                    <AddEvent currentStep={1} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent}
+                        className="flex items-center gap-3 p-3">
                         <PlusCircle />
                         Create Event
                     </AddEvent>
@@ -139,10 +140,10 @@ const Events = () => {
                     <div className="">
                         <Tabs defaultValue={tab} onValueChange={(e) => setTab(e)} className="w-[400px]">
                             <TabsList>
-                                <TabsTrigger value="all">All</TabsTrigger>
-                                <TabsTrigger value="ongoing">Ongoing</TabsTrigger>
-                                <TabsTrigger value="live">Live</TabsTrigger>
-                                <TabsTrigger value="past">Past</TabsTrigger>
+                                <TabsTrigger value="all">All Events</TabsTrigger>
+                                <TabsTrigger value="ongoing">Ongoing Events</TabsTrigger>
+                                <TabsTrigger value="live">Live Events</TabsTrigger>
+                                <TabsTrigger value="past">Past Events</TabsTrigger>
                             </TabsList>
                         </Tabs>
                     </div>
@@ -219,8 +220,9 @@ const Events = () => {
 
                 {
                     isList ?
-                        <TableView events={filteredEvents} /> :
-                        <GridView events={filteredEvents} />
+                        <TableView events={filteredEvents} />
+                        :
+                        <GridView events={filteredEvents} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} />
                 }
 
             </div>
@@ -257,7 +259,13 @@ const TableView = ({ events }: { events: IEvent[] }) => {
     )
 }
 
-const GridView = ({ events }: { events: IEvent[] }) => {
+interface GridViewProps {
+    events: IEvent[];
+    setIsEditEvent: (value: boolean) => void;
+    isEditEvent: boolean;
+}
+
+const GridView = ({ events, setIsEditEvent, isEditEvent }: GridViewProps) => {
     return (
         <div className='grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-10'>
             {
@@ -271,9 +279,11 @@ const GridView = ({ events }: { events: IEvent[] }) => {
                             <div className="flex justify-between items-center">
                                 <h1 className='text-sm opacity-50'> {format(event.start_date, 'do MMMM yyyy')}  </h1>
 
-                                <Button size={'sm'} className="flex gap-3">
-                                    <Pencil />
-                                    Edit
+                                <Button onClick={() => { setIsEditEvent(true) }} size={'sm'} className="flex gap-3">
+                                    <AddEvent currentStep={2} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} eventId={event.id} className="flex items-center gap-3 p-3">
+                                        <Pencil />
+                                        Edit
+                                    </AddEvent>
                                 </Button>
                             </div>
                         </div>

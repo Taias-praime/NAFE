@@ -21,7 +21,6 @@ const Users = () => {
         const _data = data.data;
         const results = _data.results;
         setUsers(results)
-        console.log(results)
       }
     },
     (error, status) => { // on error

@@ -26,6 +26,7 @@ export interface ICard {
     img?: string | ReactNode;
     className?: string;
     stat?: number;
+    currentStep?: number;
 }
 
 export interface IEvent {

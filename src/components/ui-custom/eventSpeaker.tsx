@@ -34,7 +34,6 @@ const EventSpeaker = ({ openModal, setUpdate, setModalOpen, open, label, title}:
                 id: name
             }
             setUpdate(data)
-            console.log(data);
 
             formik.resetForm();
             setModalOpen(false);
