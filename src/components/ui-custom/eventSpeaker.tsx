@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { useFormik } from 'formik'
 import { IEventSpeaker } from '../../models/interfaces'
 import ProfileImage from './ProfileImage'
+import { removeBase64 } from '../../lib/utils'
 
 interface AddKeynoteSpeakerProps {
     openModal: () => void;
@@ -30,7 +31,7 @@ const EventSpeaker = ({ openModal, setUpdate, setModalOpen, open, label, title}:
         onSubmit: (obj) => {
             const data = {
                 ...obj,
-                image: featuredImg,
+                image: removeBase64(featuredImg),
                 id: name
             }
             setUpdate(data)

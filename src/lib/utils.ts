@@ -35,7 +35,7 @@ export const local = (name: string, val?: string): any | void => {
 
 export const local_clear = () => localStorage.clear();
 
-export const removeLeadingString = (data: string) => {
+export const removeBase64 = (data: string) => {
   const base64Regex = /^data:[^;]*;base64,/i;
   const match = base64Regex.exec(data);
 
@@ -45,14 +45,3 @@ export const removeLeadingString = (data: string) => {
     return data; 
   }
 }
-
-// export const removeLeadingString = (value: string) => {
-//   const base64 = "base64,"
-//   const jpeg = "data:image/jpeg;base64,"
-//   if (value.startsWith(jpeg)) {
-//     return value.slice(jpeg.length);
-//   } else if (value.startsWith(base64)) {
-//     return value.slice(base64.length);
-//   }
-//   return value;
-// }

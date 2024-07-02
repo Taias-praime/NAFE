@@ -6,7 +6,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '../components/ui/select';
-import { cn, removeLeadingString } from "../lib/utils";
+import { cn, removeBase64 } from "../lib/utils";
 import { format } from "date-fns";
 import { Calendar } from "../components/ui/calendar";
 import {
@@ -88,9 +88,14 @@ const CreateEvent = ({ onCancel, currentStep, isEditEvent, eventId }: CreateEven
         const data = formikForm.values;
         const body = {
             ...data,
-            image: formikForm.values.image
+            image: removeBase64(formikForm.values.image)
         };
-        createEvent(body);
+        if (isEditEvent) {
+            editEvent(body)
+        } else {
+            createEvent(body);
+        }
+
     }
 
     const formikForm = useFormik({
@@ -241,6 +246,44 @@ const CreateEvent = ({ onCancel, currentStep, isEditEvent, eventId }: CreateEven
         },
     );
 
+    // add event 
+    const { onPut: editEvent, isFetching: isUpdatingEvent } = useFetch(
+        `/events/sa/${eventId}/edit`,
+        (data, status) => {
+            if (status === 200) {
+                const notification = toast({
+                    title: 'Success!',
+                    description: data.message,
+                    variant: 'default',
+                });
+
+                // Reset form and states
+                formikForm.resetForm();
+                setFeaturedImg('');
+                setEventDate(undefined);
+                setStartTime('');
+                setEndTime('');
+                setMods([]);
+                setSpeakers([]);
+
+                // refetch events data for dashboard
+                reload();
+
+                // self delete notification after 5 seconds
+                setTimeout(() => notification.dismiss(), 5_000)
+            }
+        },
+        (error, status) => {
+            const { message } = error;
+            // notify
+            toast({
+                title: `Error: Failed to submit (${status})`,
+                description: message || '',
+                variant: 'destructive',
+            });
+        },
+    );
+
     useEffect(() => {
         if (eventDate) {
             // set date
@@ -262,7 +305,7 @@ const CreateEvent = ({ onCancel, currentStep, isEditEvent, eventId }: CreateEven
         }
 
         // const matchedTenants = matchedItem(formikForm.values, tenants, "tenant_ids", "tenant_id");
-        if (featuredImg) formikForm.setFieldValue('image', featuredImg.split('data:image/jpeg;')[1]);
+        if (featuredImg) formikForm.setFieldValue('image', featuredImg);
         if (mods) formikForm.setFieldValue('moderators', mods.map((m: { id: string }) => m.id));
         if (speakers) formikForm.setFieldValue('keynote_speakers', speakers.map((s: { id: string }) => s.id));
     }, [
@@ -336,7 +379,7 @@ const CreateEvent = ({ onCancel, currentStep, isEditEvent, eventId }: CreateEven
         formikForm.setFieldValue("files", files)
     }
 
-    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (event: ChangeEvent<HTMLInputElement>, document_type: string) => {
         const value = event.target.value;
         const file = event.target.files?.[0];
 
@@ -345,7 +388,6 @@ const CreateEvent = ({ onCancel, currentStep, isEditEvent, eventId }: CreateEven
         const name = cleanFilename.replace(/^.*\/|\?/g, ''); // For other systems (forward slashes) or query strings
 
         // Extract file extension (type)
-        const document_type = value.split('.').pop();
         const data = {
             name,
             url: "",
@@ -355,7 +397,7 @@ const CreateEvent = ({ onCancel, currentStep, isEditEvent, eventId }: CreateEven
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                data.url = removeLeadingString(reader.result as string)
+                data.url = removeBase64(reader.result as string)
             };
             reader.readAsDataURL(file);
         }
@@ -519,14 +561,16 @@ const CreateEvent = ({ onCancel, currentStep, isEditEvent, eventId }: CreateEven
                                                     <Input
                                                         type='file'
                                                         label='Upload admin instructions'
-                                                        onChange={(e) => handleFileChange(e)}
+                                                        accept="application/pdf"
+                                                        onChange={(e) => handleFileChange(e, "instruction")}
                                                         className='max-w-[350px] mb-10 rounded border border-gray-300 bg-gray-100 px-4'
                                                     />
 
                                                     <Input
                                                         type='file'
                                                         label='Upload Programme'
-                                                        onChange={(e) =>handleFileChange(e)}
+                                                        accept="application/pdf"
+                                                        onChange={(e) => handleFileChange(e, "program")}
                                                         className='max-w-[350px] rounded border border-gray-300 bg-gray-100 px-4'
                                                     />
                                                 </div>
@@ -548,7 +592,7 @@ const CreateEvent = ({ onCancel, currentStep, isEditEvent, eventId }: CreateEven
 
                                         {step === MAX_STEPS && (
                                             <Button onClick={handleNext}>
-                                                {isCreatingEvent ? <Loader2 className='animate-spin mx-8' /> : (isEditEvent ? 'Update Event' : 'Create Event')}
+                                                {isCreatingEvent || isUpdatingEvent ? <Loader2 className='animate-spin mx-8' /> : (isEditEvent ? 'Update Event' : 'Create Event')}
                                             </Button>
                                         )}
                                     </div>
@@ -571,8 +615,9 @@ const FeaturedImg = ({ setFeaturedImg }: { setFeaturedImg: (img: string) => void
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setPreview(reader.result as string);
-                setFeaturedImg(reader.result as string);
+                const image = reader.result as string;
+                setPreview(image);
+                setFeaturedImg(image);
             };
             reader.readAsDataURL(file);
         }
@@ -603,19 +648,5 @@ const FeaturedImg = ({ setFeaturedImg }: { setFeaturedImg: (img: string) => void
         </div>
     );
 };
-
-// const DisplayImage = ({ name, position, image }: { name: string, image: string, position: string }) => {
-//     return (
-//         <>
-//             <div className="relative w-48 h-56 rounded">
-//                 <img src={image} alt={name} className="w-48 h-56 " />
-//                 <div className="p-1 absolute bottom-0 z-10 flex flex-col justify-center items-start w-full text-white">
-//                     <div className="font-bold">{name} </div>
-//                     <div className="font-thin"> {position} </div>
-//                 </div>
-//             </div>
-//         </>
-//     )
-// }
 
 export default CreateEvent;

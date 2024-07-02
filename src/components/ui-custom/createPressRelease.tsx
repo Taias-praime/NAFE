@@ -9,7 +9,7 @@ import { useFormik } from 'formik'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { Calendar } from '../ui/calendar'
 import { format } from 'date-fns'
-import { cn, local } from '../../lib/utils'
+import { cn, local, removeBase64 } from '../../lib/utils'
 import useFetch from '../../hooks/useFetch'
 import { toast } from '../ui/use-toast'
 import ProfileImage from './ProfileImage'
@@ -45,7 +45,7 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
             const data = {
                 ...obj,
                 date: date,
-                image: featuredImg
+                image: removeBase64(featuredImg),
             }
             if (isPREdit) {
                 onPut(data);

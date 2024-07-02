@@ -8,7 +8,7 @@ import { useFormik } from 'formik'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { format } from 'date-fns'
 import { Calendar } from '../ui/calendar'
-import { cn, local, removeLeadingString } from '../../lib/utils'
+import { cn, local, removeBase64 } from '../../lib/utils'
 import { toast } from '../ui/use-toast'
 import useFetch from '../../hooks/useFetch'
 import ProfileImage from './ProfileImage'
@@ -44,7 +44,7 @@ const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal, setIsLVEdit, LV
             const data = {
                 ...obj,
                 date: date,
-                image: removeLeadingString(featuredImg),
+                image: removeBase64(featuredImg),
                 start_time: "01:50:00",
                 end_time: "02:50:00",
             }
