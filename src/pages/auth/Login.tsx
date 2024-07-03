@@ -38,7 +38,6 @@ const Login = () => {
 
 	
 	useEffect(() => {
-		
 		if (isLoggedIn) nav('/dashboard');
 	}, [isLoggedIn])
 

@@ -141,7 +141,7 @@ const Dashboard = () => {
 
                                                     <TableCell className="flex justify-center items-center gap-3">
                                                         <span> {d.webinars} </span>
-                                                        <Badge variant={"destructive"}> Live </Badge>
+                                                        <Badge variant={d.webinars > 0 ? "destructive" : "disabled" }> Live </Badge>
                                                     </TableCell>
 
                                                 </TableRow>

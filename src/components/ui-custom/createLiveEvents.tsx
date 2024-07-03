@@ -20,11 +20,12 @@ interface CreateLiveEventsProps {
     openModal: () => void;
     setEditLVModal: (value: boolean) => void;
     setIsLVEdit: (value: boolean) => void;
+    setReload: (value: boolean) => void;
     LV: any;
     open: boolean;
 }
 
-const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal, setIsLVEdit, LV, open }: CreateLiveEventsProps) => {
+const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal,  setReload, setIsLVEdit, LV, open }: CreateLiveEventsProps) => {
     const [eventDate, setEventDate] = useState<Date>();
     const [featuredImg, setFeaturedImg] = useState('');
     const [id, setId] = useState('');
@@ -64,6 +65,7 @@ const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal, setIsLVEdit, LV
             toast({ description: data.message });
             formik.resetForm();
             setEditLVModal(false);
+            setReload(true);
         },
         (e) => {
             const { message, ...err } = e;
@@ -87,6 +89,7 @@ const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal, setIsLVEdit, LV
             toast({ description: data.message });
             formik.resetForm();
             setEditLVModal(false);
+            setReload(true);
         },
         (e) => {
             const { message, ...err } = e;

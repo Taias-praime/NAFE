@@ -20,12 +20,13 @@ interface CreatePressReleaseProps {
     isPREdit: boolean;
     openModal: () => void;
     setEditPRModal: (value: boolean) => void;
+    setReload: (value: boolean) => void;
     setIsPREdit: (value: boolean) => void;
     PR: any;
     open: boolean;
 }
 
-const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, PR, open, }: CreatePressReleaseProps) => {
+const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setReload, setIsPREdit, PR, open, }: CreatePressReleaseProps) => {
 
     const [eventDate, setEventDate] = useState<Date>();
     const [featuredImg, setFeaturedImg] = useState('');
@@ -47,21 +48,23 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
                 date: date,
                 image: removeBase64(featuredImg),
             }
+
             if (isPREdit) {
                 onPut(data);
             } else {
                 onPost(data);
             }
-        }
+        }, 
     })
 
-    // edit
+    // add
     const { onPost, isFetching: isLoadingPost } = useFetch(
         `/press-releases/sa/add`,
         (data) => {
             toast({ description: data.message });
             formik.resetForm();
             setEditPRModal(false);
+            setReload(true);
         },
         (e) => {
             const { message, ...err } = e;
@@ -85,6 +88,7 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
             toast({ description: data.message });
             formik.resetForm();
             setEditPRModal(false);
+            setReload(true);
         },
         (e) => {
             const { message, ...err } = e;
@@ -100,6 +104,30 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
             "Authorization": `Bearer ${token}`,
         }
     );
+
+    // // delete
+    // const { onDelete, isFetching: isDeleteLoading } = useFetch(
+    //     `/press-releases/sa/${id}/delete`,
+    //     (data) => {
+    //         toast({ description: data.message });
+    //         formik.resetForm();
+    //         setEditPRModal(false);
+    //         setReload(true);
+    //     },
+    //     (e) => {
+    //         const { message, ...err } = e;
+    //         // notify
+    //         toast({
+    //             title: `${message} (${status})`,
+    //             description: err.errors.error_message,
+    //             variant: 'destructive',
+    //         });
+    //     },
+    //     {},
+    //     {
+    //         "Authorization": `Bearer ${token}`,
+    //     }
+    // );
 
     useEffect(() => {
         formik.setFieldValue("date", eventDate)
@@ -206,7 +234,7 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
                 )}
 
                 <div className="flex items-start justify-between mt-6">
-                    <Button variant="blue" className="px-10">
+                    <div onClick={(event) => event.stopPropagation()} className="px-10 bg-blue p-2 rounded text-white">
                         <label className="flex items-center justify-center gap-2 w-full h-full cursor-pointer">
                             <div className=" rounded">
                                 <Paperclip className="text-white" />
@@ -214,7 +242,7 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setIsPREdit, 
                             Attach File
                             <input type="file" accept="*/" onChange={handleFileChange} className="hidden" />
                         </label>
-                    </Button>
+                    </div>
                     <Button variant="default" type='submit' className="px-10">
                         {
                             isLoadingPut || isLoadingPost ? <Loader2 className='animate-spin' /> : (isPREdit ? 'Update' : 'Create')

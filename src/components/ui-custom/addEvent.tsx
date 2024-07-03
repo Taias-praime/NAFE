@@ -38,7 +38,7 @@ const AddEvent = ({ children, className, currentStep, isEditEvent, setIsEditEven
 				</SheetHeader>
 
 				{/* ----- content ---- */}
-				{<CreateEvent onCancel={dismiss} isEditEvent={isEditEvent} currentStep={currentStep ?? 1 } eventId={eventId ?? null} />}
+				{<CreateEvent onCancel={dismiss} setIsOpen={setIsOpen} isEditEvent={isEditEvent} currentStep={currentStep ?? 1 } eventId={eventId ?? null} />}
 				{/* ----- oef content ---- */}
 			</SheetContent>
 		</Sheet>

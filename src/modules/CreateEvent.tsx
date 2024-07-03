@@ -33,6 +33,7 @@ import { FileItem } from '../components/ui-custom/files';
 
 interface CreateEventProps {
     onCancel: () => void;
+    setIsOpen: (value: boolean) => void;
     currentStep: number;
     isEditEvent: boolean;
     eventId: string | null;
@@ -45,7 +46,7 @@ type File = {
     id: string;
 }
 
-const CreateEvent = ({ onCancel, currentStep, isEditEvent, eventId }: CreateEventProps) => {
+const CreateEvent = ({ onCancel, setIsOpen, currentStep, isEditEvent, eventId }: CreateEventProps) => {
 
     const MAX_STEPS = 2;
 
@@ -95,7 +96,6 @@ const CreateEvent = ({ onCancel, currentStep, isEditEvent, eventId }: CreateEven
         } else {
             createEvent(body);
         }
-
     }
 
     const formikForm = useFormik({
@@ -220,6 +220,7 @@ const CreateEvent = ({ onCancel, currentStep, isEditEvent, eventId }: CreateEven
                 });
 
                 // Reset form and states
+                setIsOpen(false);
                 formikForm.resetForm();
                 setFeaturedImg('');
                 setEventDate(undefined);
@@ -227,6 +228,7 @@ const CreateEvent = ({ onCancel, currentStep, isEditEvent, eventId }: CreateEven
                 setEndTime('');
                 setMods([]);
                 setSpeakers([]);
+                setEditTenantsId([]);
 
                 // refetch events data for dashboard
                 if (pathname === '/dashboard') reload();
@@ -246,7 +248,7 @@ const CreateEvent = ({ onCancel, currentStep, isEditEvent, eventId }: CreateEven
         },
     );
 
-    // add event 
+    // edit event 
     const { onPut: editEvent, isFetching: isUpdatingEvent } = useFetch(
         `/events/sa/${eventId}/edit`,
         (data, status) => {
@@ -258,6 +260,7 @@ const CreateEvent = ({ onCancel, currentStep, isEditEvent, eventId }: CreateEven
                 });
 
                 // Reset form and states
+                setIsOpen(false);
                 formikForm.resetForm();
                 setFeaturedImg('');
                 setEventDate(undefined);
@@ -265,6 +268,7 @@ const CreateEvent = ({ onCancel, currentStep, isEditEvent, eventId }: CreateEven
                 setEndTime('');
                 setMods([]);
                 setSpeakers([]);
+                setEditTenantsId([]);
 
                 // refetch events data for dashboard
                 reload();

@@ -44,6 +44,7 @@ const ChiefOfArmyStaff = () => {
     const [featuredImg, setFeaturedImg] = useState('');
     const [prId, setPrId] = useState('');
     const [lvId, setLvId] = useState('');
+    const [reload, setReload] = useState(false);
 
     const { toast } = useToast();
 
@@ -72,7 +73,7 @@ const ChiefOfArmyStaff = () => {
             if (status === 200) {
                 const _data = data.data;
                 const results = _data.results;
-                setCOAS(results.filter((coa: ArmyStaff) => coa.current)[0]);
+                setCOAS(results.filter((coa: ArmyStaff) => coa.current)[0]);                
             }
         },
         (error, status) => {
@@ -199,7 +200,8 @@ const ChiefOfArmyStaff = () => {
         onFetchPR();
         onFetchLV();
         onFetchSuggestion();
-    }, []);
+        setReload(false);
+    }, [reload]);
 
     useEffect(() => {
         if (featuredImg) formik.setFieldValue('image', featuredImg.split('data:image/jpeg;')[1]);
@@ -396,7 +398,7 @@ const ChiefOfArmyStaff = () => {
                             tab === "press release" && (
                                 <>
                                     <SubHeader title="Press Release" number={`${numOfPR} Release`}>
-                                        <CreatePressRelease isPREdit={isPREdit} setIsPREdit={setIsPREdit} PR={PR} open={editPRModal} openModal={togglePRModal} setEditPRModal={setEditPRModal} />
+                                        <CreatePressRelease setReload={setReload} isPREdit={isPREdit} setIsPREdit={setIsPREdit} PR={PR} open={editPRModal} openModal={togglePRModal} setEditPRModal={setEditPRModal} />
                                     </SubHeader>
                                     <div className="grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-5">
                                         {
@@ -416,7 +418,7 @@ const ChiefOfArmyStaff = () => {
                             tab === "live events" && (
                                 <>
                                     <SubHeader title="Live Events" number={`${numOfLV} Events`} >
-                                        <CreateLiveEvents isLVEdit={isLVEdit} setIsLVEdit={setIsLVEdit} LV={LV} open={editLVModal} openModal={toggleLVModal} setEditLVModal={setEditLVModal} />
+                                        <CreateLiveEvents setReload={setReload} isLVEdit={isLVEdit} setIsLVEdit={setIsLVEdit} LV={LV} open={editLVModal} openModal={toggleLVModal} setEditLVModal={setEditLVModal} />
                                     </SubHeader>
                                     <div className="grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-5">
                                         {
