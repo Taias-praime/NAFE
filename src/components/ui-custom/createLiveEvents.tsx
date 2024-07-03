@@ -21,20 +21,19 @@ interface CreateLiveEventsProps {
     setEditLVModal: (value: boolean) => void;
     setIsLVEdit: (value: boolean) => void;
     setReload: (value: boolean) => void;
-    LV: any;
     open: boolean;
+    lvId: string | null;
 }
 
-const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal,  setReload, setIsLVEdit, LV, open }: CreateLiveEventsProps) => {
+const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal, setReload, setIsLVEdit, open, lvId }: CreateLiveEventsProps) => {
     const [eventDate, setEventDate] = useState<Date>();
     const [featuredImg, setFeaturedImg] = useState('');
-    const [id, setId] = useState('');
 
     const formik = useFormik({
         initialValues: {
             image: '',
             date: '',
-            link: '',
+            event_link: '',
             title: '',
             description: '',
             files: [] as string[]
@@ -84,7 +83,7 @@ const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal,  setReload, set
 
     // edit
     const { onPut, isFetching: isLoadingEdit } = useFetch(
-        `/army-staffs/sa/${id}/edit-live-event`,
+        `/army-staffs/sa/${lvId}/edit-live-event`,
         (data) => {
             toast({ description: data.message });
             formik.resetForm();
@@ -106,22 +105,43 @@ const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal,  setReload, set
         }
     );
 
+    const { onFetch, isFetching } = useFetch(
+        `/army-staffs/sa/${lvId}/live-event-detail`,
+        (data, status) => {
+            if (status === 200) {
+                const _data = data.data;
+                console.log(_data.id);
+                setEventDate(_data.date)
+                setFeaturedImg(_data.image)
+                formik.setValues({
+                    image: _data.image,
+                    date: _data.date,
+                    event_link: _data.event_link,
+                    title: _data.title,
+                    description: _data.description,
+                    files: _data.files,
+                })
+
+            }
+        },
+        (error, status) => {
+            // on error
+            const { message, ...err } = error;
+            // notify
+            toast({
+                title: `${message} (${status})`,
+                description: err.errors.error_message,
+                variant: "destructive",
+            });
+        },
+        {} // options
+    );
+
     useEffect(() => {
-        if (LV.length !== 0) {
-            const liveEvent = LV[0]
-            setId(liveEvent.id)
-            setEventDate(liveEvent.date)
-            setFeaturedImg(liveEvent.image)
-            formik.setValues({
-                image: liveEvent.image,
-                date: liveEvent.date,
-                link: liveEvent.event_link,
-                title: liveEvent.title,
-                description: liveEvent.theme_description,
-                files: liveEvent.files,
-            })
+        if (lvId) {
+            onFetch()
         }
-    }, [isLVEdit, LV])
+    }, [lvId])
 
     useEffect(() => {
         formik.setFieldValue("date", eventDate)
@@ -139,66 +159,71 @@ const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal,  setReload, set
         <Modal open={open} openModal={openModal} onOpenChange={(value) => lvModal(value)} className="flex items-center gap-3 p-3"
             label="Create Live Event"
         >
-            <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                <ProfileImage setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} />
-                <Input
-                    value={formik.values.title}
-                    onChange={formik.handleChange}
-                    name="title"
-                    placeholder="title here"
-                    className=""
-                    label="Event Title"
-                />
-                <div className="">
-                    <label>Select Event Date</label>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className={cn(
-                                    "w-full rounded-none border-0 border-b border-black justify-start text-left font-normal my-2 px-0",
-                                    !eventDate && "text-muted-foreground"
-                                )}
-                            >
-                                {eventDate ? format(eventDate, "dd/MM/yyyy") : <span>dd/mm/yyyy</span>}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                            <Calendar
-                                mode="single"
-                                selected={eventDate}
-                                onSelect={setEventDate}
-                                initialFocus
-                            />
-                        </PopoverContent>
-                    </Popover>
-                </div>
-                <Input
-                    value={formik.values.link}
-                    onChange={formik.handleChange}
-                    name="link"
-                    placeholder="paste your link here"
-                    className=""
-                    label="Live Link"
-                />
-                <Textarea
-                    rows={4}
-                    value={formik.values.description}
-                    onChange={formik.handleChange}
-                    name="description"
-                    placeholder="description here"
-                    className="mb-10"
-                    label="Description"
-                />
+            {
+                isFetching ? <Loader2 className='animate-spin m-auto' /> : (
+                    <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
+                        <ProfileImage setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} />
+                        <Input
+                            value={formik.values.title}
+                            onChange={formik.handleChange}
+                            name="title"
+                            placeholder="title here"
+                            className=""
+                            label="Event Title"
+                        />
+                        <div className="">
+                            <label>Select Event Date</label>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className={cn(
+                                            "w-full rounded-none border-0 border-b border-black justify-start text-left font-normal my-2 px-0",
+                                            !eventDate && "text-muted-foreground"
+                                        )}
+                                    >
+                                        {eventDate ? format(eventDate, "dd/MM/yyyy") : <span>dd/mm/yyyy</span>}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0">
+                                    <Calendar
+                                        mode="single"
+                                        selected={eventDate}
+                                        onSelect={setEventDate}
+                                        initialFocus
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+                        <Input
+                            value={formik.values.event_link}
+                            onChange={formik.handleChange}
+                            name="event_link"
+                            placeholder="paste your event_link here"
+                            className=""
+                            label="Live Link"
+                        />
+                        <Textarea
+                            rows={4}
+                            value={formik.values.description}
+                            onChange={formik.handleChange}
+                            name="description"
+                            placeholder="description here"
+                            className="mb-10"
+                            label="Description"
+                        />
 
-                <div className="flex items-start justify-end mt-6">
-                    <Button variant="default" type='submit' className="px-10">
-                        {
-                            isLoadingEdit || isLoadingCreate ? <Loader2 className='animate-spin' /> : (isLVEdit ? 'Update' : 'Create')
-                        }
-                    </Button>
-                </div>
-            </form>
+                        <div className="flex items-start justify-end mt-6">
+                            <Button variant="default" type='submit' className="px-10">
+                                {
+                                    isLoadingEdit || isLoadingCreate ? <Loader2 className='animate-spin' /> : (isLVEdit ? 'Update' : 'Create')
+                                }
+                            </Button>
+                        </div>
+                    </form>
+                )
+            }
+
         </Modal>
     )
 }

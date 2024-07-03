@@ -43,7 +43,7 @@ const ChiefOfArmyStaff = () => {
     const [tab, setTab] = useState("press release");
     const [featuredImg, setFeaturedImg] = useState('');
     const [prId, setPrId] = useState('');
-    const [lvId, setLvId] = useState('');
+    const [lvId, setLvId] = useState<string | null>(null);
     const [reload, setReload] = useState(false);
 
     const { toast } = useToast();
@@ -188,19 +188,13 @@ const ChiefOfArmyStaff = () => {
         return PR;
     }, [prId])
 
-    const LV = useMemo(() => {
-        const LV = liveEvents.filter((item: any) => {
-            return item.id === lvId
-        })
-        return LV;
-    }, [lvId])
-
     useEffect(() => {
         onFetchCOAS();
         onFetchPR();
         onFetchLV();
         onFetchSuggestion();
         setReload(false);
+        setLvId(null);
     }, [reload]);
 
     useEffect(() => {
@@ -418,7 +412,7 @@ const ChiefOfArmyStaff = () => {
                             tab === "live events" && (
                                 <>
                                     <SubHeader title="Live Events" number={`${numOfLV} Events`} >
-                                        <CreateLiveEvents setReload={setReload} isLVEdit={isLVEdit} setIsLVEdit={setIsLVEdit} LV={LV} open={editLVModal} openModal={toggleLVModal} setEditLVModal={setEditLVModal} />
+                                        <CreateLiveEvents lvId={lvId} setReload={setReload} isLVEdit={isLVEdit} setIsLVEdit={setIsLVEdit} open={editLVModal} openModal={toggleLVModal} setEditLVModal={setEditLVModal} />
                                     </SubHeader>
                                     <div className="grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-5">
                                         {
