@@ -17,7 +17,7 @@ interface DepartmentDashboard {
 
 const DepartmentDashboard = ({ tenantId }: DepartmentDashboard) => {
 
-    const [members, setMembers] = useState([]);
+    const [members, setMembers] = useState<any>([]);
     const [ongoingEvents, setOngoingEvents] = useState([]);
     const [upcomingEvents, setUpcomingEvents] = useState([]);
     const [filterMembers, setFilterMembers] = useState([]);
@@ -42,7 +42,7 @@ const DepartmentDashboard = ({ tenantId }: DepartmentDashboard) => {
     }, []);
 
     useEffect(() => {
-        const filter = members.filter((item) => item.full_name.includes(search))
+        const filter = members.filter((item: any) => item.full_name.includes(search))
         setFilterMembers(filter)
     }, [search])
 
@@ -159,7 +159,7 @@ const EventType = ({ events, label, noEventsLabel }: any) => {
 
 
                 {events.length ?
-                    events.map((e, k: number) => (
+                    events.map((e: any, k: number) => (
                         <Event key={k} event={e} />
                     )) :
                     <NoEvents noEventsLabel={noEventsLabel} />
