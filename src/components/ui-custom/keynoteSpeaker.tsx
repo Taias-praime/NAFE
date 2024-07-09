@@ -4,20 +4,22 @@ import { Button } from '../ui/button'
 import Modal from './modal'
 import { useState } from 'react'
 import { useFormik } from 'formik'
-import { IEventSpeaker } from '../../models/interfaces'
 import ProfileImage from './ProfileImage'
 import { removeBase64 } from '../../lib/utils'
+import useFetch from '../../hooks/useFetch'
+import { toast } from '../ui/use-toast'
+import { Loader2 } from 'lucide-react'
 
 interface AddKeynoteSpeakerProps {
     openModal: () => void;
-    setUpdate: (speaker: IEventSpeaker) => void;
     setModalOpen: (value: boolean) => void;
+    setReload: (value: boolean) => void;
     open: boolean;
     label: string;
     title: string;
 }
 
-const EventSpeaker = ({ openModal, setUpdate, setModalOpen, open, label, title}: AddKeynoteSpeakerProps) => {
+const KeynoteSpeaker = ({ openModal, setReload, setModalOpen, open, label, title }: AddKeynoteSpeakerProps) => {
 
     const [featuredImg, setFeaturedImg] = useState('');
 
@@ -32,14 +34,41 @@ const EventSpeaker = ({ openModal, setUpdate, setModalOpen, open, label, title}:
             const data = {
                 ...obj,
                 image: removeBase64(featuredImg),
-                id: name
             }
-            setUpdate(data)
-
-            formik.resetForm();
-            setModalOpen(false);
+            addSpeaker(data)
         }
     })
+
+    // add event 
+    const { onPost: addSpeaker, isFetching: isCreateLoading } = useFetch(
+        '/keynote-speakers/sa/add',
+        (data, status) => {
+            if (status === 200) {
+
+                toast({
+                    title: 'Success!',
+                    description: data.message,
+                    variant: 'default',
+                });
+
+                formik.resetForm();
+                setReload(true)
+                setModalOpen(false);
+                setFeaturedImg('');
+
+            }
+        },
+        (error, status) => {
+            const { message } = error;
+            // notify
+            toast({
+                title: `Error: Failed to submit (${status})`,
+                description: message || '',
+                variant: 'destructive',
+            });
+        },
+    );
+
 
     const prModal = (value: boolean) => {
         setModalOpen(value);
@@ -52,7 +81,7 @@ const EventSpeaker = ({ openModal, setUpdate, setModalOpen, open, label, title}:
     }
 
     return (
-        <Modal open={open} openModal={openModal} onOpenChange={(value) => prModal(value)} className="flex items-center gap-3 p-3 border mb-4 bg-gray-300 text-gray-700 rounded py-2"
+        <Modal open={open} openModal={openModal} onOpenChange={(value) => prModal(value)} className="flex items-center gap-3 px-1 border bg-gray-300 text-sm text-gray-700 rounded "
             label={title}
         >
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
@@ -87,8 +116,9 @@ const EventSpeaker = ({ openModal, setUpdate, setModalOpen, open, label, title}:
 
                 <div className="flex justify-end mt-6">
                     <Button variant="default" type='submit' className="px-10">
-                        {/* <Loader2 className='animate-spin' /> */}
-                        Create
+                        {
+                            isCreateLoading ? <Loader2 className='animate-spin' /> : 'Create'
+                        }
                     </Button>
                 </div>
             </form>
@@ -96,4 +126,4 @@ const EventSpeaker = ({ openModal, setUpdate, setModalOpen, open, label, title}:
     )
 }
 
-export default EventSpeaker;
+export default KeynoteSpeaker;

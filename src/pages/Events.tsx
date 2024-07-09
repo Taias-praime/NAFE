@@ -11,10 +11,14 @@ import useFetch from '../hooks/useFetch';
 import AddEvent from '../components/ui-custom/addEvent';
 import { IEvent } from '../models/interfaces';
 import { format } from 'date-fns';
+import Paginate from '../components/ui/paginate';
 
 const Events = () => {
-    const [events, setEvents] = useState<IEvent[]>([]);
     const [eventsCount, setEventsCount] = useState<number>(0);
+    const [currentPage, setCurrentPage] = useState(2);
+    const [numOfPages, setNumOfPages] = useState(0);
+
+    const [events, setEvents] = useState<IEvent[]>([]);
     const [filteredEvents, setFilteredEvents] = useState<IEvent[]>([]);
 
     const [isList, setIsList] = useState<boolean>(false);
@@ -48,11 +52,12 @@ const Events = () => {
         onFetch: getLiveEvents,
         // isFetching: isFetchingLE 
     } = useFetch(
-        '/events/sa/',
+        `/events/sa/?page=${currentPage}&items_per_page=3`,
         (data) => {
             setEvents(data.data.results)
             setFilteredEvents(data.data.results);
             setEventsCount(data.data.number_of_items);
+            setNumOfPages(data.data.number_of_pages);
         },
         () => { },
     );
@@ -89,7 +94,7 @@ const Events = () => {
 
     useEffect(() => {
         getEvents();
-    }, []);
+    }, [currentPage]);
 
     useEffect(() => {
         let filtered = events;
@@ -118,6 +123,10 @@ const Events = () => {
         if (tab === 'live') getLiveEvents();
         if (tab === 'past') getPastEvents();
     }, [tab])
+
+    const handlePageClick = (event: { selected: number; }) => {
+        setCurrentPage(event.selected + 1);
+    };
 
 
     return (
@@ -224,8 +233,11 @@ const Events = () => {
                         :
                         <GridView events={filteredEvents} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} />
                 }
-
             </div>
+            <Paginate
+                handlePageClick={handlePageClick}
+                numOfPages={numOfPages}
+            />
         </div>
     );
 };

@@ -178,7 +178,7 @@ const CreateEvent = ({ onCancel, setIsOpen, currentStep, isEditEvent, eventId }:
     const { onFetch: getMorderators } = useFetch(
         '/moderators/sa/',
         (data) => {
-            setModerators(data.data.results)
+            setModerators(data.data.results) 
         },
         (error, status) => {
             const { message, ...err } = error;
@@ -191,7 +191,7 @@ const CreateEvent = ({ onCancel, setIsOpen, currentStep, isEditEvent, eventId }:
         },
     );
 
-    // get Keynot speakers
+    // get Keynote speakers
     const { onFetch: getSpeakers } = useFetch(
         '/keynote-speakers/sa/',
         (data) => {
@@ -543,11 +543,11 @@ const CreateEvent = ({ onCancel, setIsOpen, currentStep, isEditEvent, eventId }:
                                         </TabsList>
 
                                         <TabsContent className='p-5 overflow-x-auto' value="m">
-                                            <AddUser endpoint='/moderators/sa/' action='Add Moderator' setUsers={setMods} users={mods} />
+                                            <AddUser endpoint='/moderators/sa/' action='Moderator' setUsers={setMods} users={mods} />
                                         </TabsContent>
 
                                         <TabsContent className='p-5' value="k">
-                                            <AddUser endpoint='/keynote-speakers/sa/' action='Select Speaker' setUsers={setSpeakers} users={speakers} />
+                                            <AddUser endpoint='/keynote-speakers/sa/' action='Speaker' setUsers={setSpeakers} users={speakers} />
                                         </TabsContent>
 
                                         <TabsContent className='p-5' value="f">

@@ -9,6 +9,8 @@ import ProfileImg from '../components/ui-custom/profileImg';
 import { Checkbox } from '../components/ui/checkbox';
 import { Input } from '../components/ui/input';
 import { Search } from 'lucide-react';
+import Moderator from '../components/ui-custom/moderator';
+import KeynoteSpeaker from '../components/ui-custom/keynoteSpeaker';
 
 interface IUser {
 	id: string;
@@ -127,6 +129,9 @@ const AddUserActionSheet = ({
 	const [userList, setUserList] = useState<IUser[]>([]);
 	const [filterList, setFilterList] = useState<IUser[]>([])
 	const [search, setSearch] = useState('')
+	const [moderatorOpen, setModeratorOpen] = useState(false);
+	const [reload, setReload] = useState(false);
+
 	const { onFetch: fetchUsers, isFetching } = useFetch(
 		endpoint,
 		(data) => {
@@ -145,20 +150,26 @@ const AddUserActionSheet = ({
 
 	useEffect(() => {
 		if (endpoint) fetchUsers(); // get user list
-	}, []);
+	}, [reload]);
 
 	useEffect(() => {
 		const filter = userList.filter((item) => item.name.includes(search))
 		setFilterList(filter)
+		setReload(false);
 	}, [search])
 
 
 	return (
 		<SheetContent className="!max-w-full w-[600px]">
 			<SheetHeader>
-				<SheetTitle>Select {action?.split(' ')[1]}</SheetTitle>
+				<SheetTitle>Select {action}</SheetTitle>
 
-				<div className="w-full flex justify-end">
+				<div className="w-full flex align-center justify-between gap-4">
+					{
+						action === 'Moderator' ?
+							<Moderator title="Add Moderator" label="Speaker name" openModal={() => { }} setReload={setReload} setModalOpen={setModeratorOpen} open={moderatorOpen} />
+							: <KeynoteSpeaker title="Add Keynote Speaker" label="Speaker name" openModal={() => { }} setReload={setReload} setModalOpen={setModeratorOpen} open={moderatorOpen} />
+					}
 					<div className="relative flex items-center w-fit">
 						<Input value={search} onChange={(e) => setSearch(e.target.value)} className="p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[400px] max-w-full" />
 						<Search className="absolute right-5 opacity-30" />
