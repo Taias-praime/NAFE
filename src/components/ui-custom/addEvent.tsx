@@ -16,9 +16,10 @@ interface AddEventProps {
 	currentStep?: number;
 	isEditEvent: boolean;
 	setIsEditEvent: (value: boolean) => void;
+	setReload: (value: boolean) => void;
 }
 
-const AddEvent = ({ children, className, currentStep, isEditEvent, setIsEditEvent, eventId }: AddEventProps) => {
+const AddEvent = ({ children, className, currentStep, isEditEvent, setIsEditEvent, setReload, eventId }: AddEventProps) => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 
 	const dismiss = () => {
@@ -38,7 +39,7 @@ const AddEvent = ({ children, className, currentStep, isEditEvent, setIsEditEven
 				</SheetHeader>
 
 				{/* ----- content ---- */}
-				{<CreateEvent onCancel={dismiss} setIsOpen={setIsOpen} isEditEvent={isEditEvent} currentStep={currentStep ?? 1 } eventId={eventId ?? null} />}
+				{<CreateEvent setReload={setReload} onCancel={dismiss} setIsOpen={setIsOpen} isEditEvent={isEditEvent} currentStep={currentStep ?? 1 } eventId={eventId ?? null} />}
 				{/* ----- oef content ---- */}
 			</SheetContent>
 		</Sheet>

@@ -34,6 +34,7 @@ import { FileItem } from '../components/ui-custom/files';
 interface CreateEventProps {
     onCancel: () => void;
     setIsOpen: (value: boolean) => void;
+    setReload: (value: boolean) => void;
     currentStep: number;
     isEditEvent: boolean;
     eventId: string | null;
@@ -46,7 +47,7 @@ type File = {
     id: string;
 }
 
-const CreateEvent = ({ onCancel, setIsOpen, currentStep, isEditEvent, eventId }: CreateEventProps) => {
+const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent, eventId }: CreateEventProps) => {
 
     const MAX_STEPS = 2;
 
@@ -221,6 +222,7 @@ const CreateEvent = ({ onCancel, setIsOpen, currentStep, isEditEvent, eventId }:
 
                 // Reset form and states
                 setIsOpen(false);
+                setReload(true);
                 formikForm.resetForm();
                 setFeaturedImg('');
                 setEventDate(undefined);
@@ -260,6 +262,7 @@ const CreateEvent = ({ onCancel, setIsOpen, currentStep, isEditEvent, eventId }:
                 });
 
                 // Reset form and states
+                setReload(true);
                 setIsOpen(false);
                 formikForm.resetForm();
                 setFeaturedImg('');

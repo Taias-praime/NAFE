@@ -26,6 +26,7 @@ const Events = () => {
     const [showRestrictedEvent, setShowRestrictedEvent] = useState<boolean>(false);
     const [showSecretEvent, setShowSecretEvent] = useState<boolean>(false);
     const [isEditEvent, setIsEditEvent] = useState(false)
+    const [reload, setReload] = useState(false);
 
     const [tab, setTab] = useState<string>('all');
     const [searchTerm, setSearchTerm] = useState<string>('');
@@ -94,7 +95,8 @@ const Events = () => {
 
     useEffect(() => {
         getEvents();
-    }, [currentPage]);
+        setReload(false);
+    }, [reload, currentPage]);
 
     useEffect(() => {
         let filtered = events;
@@ -136,7 +138,7 @@ const Events = () => {
             <div className="flex justify-between">
                 <div className=""></div>
                 <Button className="lg:absolute top-5 right-10 p-0">
-                    <AddEvent currentStep={1} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent}
+                    <AddEvent currentStep={1} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} setReload={setReload}
                         className="flex items-center gap-3 p-3">
                         <PlusCircle />
                         Create Event
@@ -231,7 +233,7 @@ const Events = () => {
                     isList ?
                         <TableView events={filteredEvents} />
                         :
-                        <GridView events={filteredEvents} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} />
+                        <GridView setReload={setReload} events={filteredEvents} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} />
                 }
             </div>
             <Paginate
@@ -274,10 +276,11 @@ const TableView = ({ events }: { events: IEvent[] }) => {
 interface GridViewProps {
     events: IEvent[];
     setIsEditEvent: (value: boolean) => void;
+    setReload: (value: boolean) => void;
     isEditEvent: boolean;
 }
 
-const GridView = ({ events, setIsEditEvent, isEditEvent }: GridViewProps) => {
+const GridView = ({ events, setIsEditEvent, setReload,isEditEvent }: GridViewProps) => {
     return (
         <div className='grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-10'>
             {
@@ -292,7 +295,7 @@ const GridView = ({ events, setIsEditEvent, isEditEvent }: GridViewProps) => {
                                 <h1 className='text-sm opacity-50'> {format(event.start_date, 'do MMMM yyyy')}  </h1>
 
                                 <Button onClick={() => { setIsEditEvent(true) }} size={'sm'} className="flex gap-3">
-                                    <AddEvent currentStep={2} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} eventId={event.id} className="flex items-center gap-3 p-3">
+                                    <AddEvent currentStep={2} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} eventId={event.id} setReload={setReload} className="flex items-center gap-3 p-3">
                                         <Pencil />
                                         Edit
                                     </AddEvent>
