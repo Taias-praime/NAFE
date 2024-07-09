@@ -20,7 +20,7 @@ interface ModalProps {
 const Modal = ({ open, label, title, className, children, openModal, onOpenChange, setIsDelete}: ModalProps) => {
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetTrigger onClick={openModal} className={cn(className, 'outline-none border')}>
+            <SheetTrigger onClick={openModal} className={cn(className, 'outline-none')}>
                 {label}
             </SheetTrigger>
 
