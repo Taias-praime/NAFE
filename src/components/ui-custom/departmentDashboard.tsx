@@ -23,6 +23,7 @@ const DepartmentDashboard = ({ tenantId }: DepartmentDashboard) => {
     const [filterMembers, setFilterMembers] = useState([]);
     const [search, setSearch] = useState('');
     const [open, setOpen] = useState(false);
+    const [reload, setReload] = useState(false);
 
     const { onFetch: getTenant, isFetching: isLoadingEvents } = useFetch(
         `/tenants/sa/${tenantId}/details`,
@@ -39,7 +40,8 @@ const DepartmentDashboard = ({ tenantId }: DepartmentDashboard) => {
     // on component mount
     useEffect(() => {
         getTenant();
-    }, []);
+        setReload(false);
+    }, [reload]);
 
     useEffect(() => {
         const filter = members.filter((item: any) => item.full_name.includes(search))
@@ -57,7 +59,7 @@ const DepartmentDashboard = ({ tenantId }: DepartmentDashboard) => {
 
                             <div className="flex flex-col lg:grid grid-cols-1 lg:grid-cols-2 gap-4">
                                 <div className="col-span-1">
-                                    <Card currentStep={1} img={CalImg} cta="Create Event" ctaIcon={<PlusCircle size={18} />} />
+                                    <Card setReload={setReload} currentStep={1} img={CalImg} cta="Create Event" ctaIcon={<PlusCircle size={18} />} />
                                 </div>
                                 <div className="col-span-1">
                                     <AddDepartmentMember tenantId={tenantId} open={open} openModal={() => setOpen(!open)} setOpen={setOpen}
