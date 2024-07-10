@@ -282,16 +282,13 @@ const ChiefOfArmyStaff = () => {
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <object
-                                            className="rounded-lg w-full"
-                                            data={COAS.image || USER_PLACEHOLDER_IMG_URL}
-                                            type="image/png"
+                                        <div
                                         >
                                             <img
-                                                className="rounded-lg w-full"
+                                                className="rounded-lg w-full h-72"
                                                 src={COAS.image || USER_PLACEHOLDER_IMG_URL}
                                             />
-                                        </object>
+                                        </div>
                                     </TooltipTrigger>
                                     <TooltipContent>
                                         <p>{COAS.fullname}</p>

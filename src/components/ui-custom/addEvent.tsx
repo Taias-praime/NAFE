@@ -16,15 +16,16 @@ interface AddEventProps {
 	currentStep?: number;
 	isEditEvent: boolean;
 	setIsEditEvent: (value: boolean) => void;
-	setReload: (value: boolean) => void;
 }
 
-const AddEvent = ({ children, className, currentStep, isEditEvent, setIsEditEvent, setReload, eventId }: AddEventProps) => {
+const AddEvent = ({ children, className, currentStep, isEditEvent, setIsEditEvent, eventId }: AddEventProps) => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
+	const [, setReload] = useState<boolean>(false);
 
 	const dismiss = () => {
 		setIsOpen(false);
 		setIsEditEvent(false);
+		setReload(true);
 	}
 
 	return (
