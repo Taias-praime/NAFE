@@ -15,6 +15,8 @@ import { Link } from "react-router-dom";
 import { DashboardProvider } from "../contexts/dashboard.context";
 
 const Dashboard = () => {
+    const [reload, setReload] = useState(false);
+    
     const { onFetch: getEvents, isFetching: isLoadingEvents } = useFetch(
         '/events/sa/',
         (data) => {
@@ -55,10 +57,11 @@ const Dashboard = () => {
         getDeps();
         getEvents();
         getWebinars();
+        setReload(false);
     }
 
     // on component mount
-    useEffect(fetchStats, []);
+    useEffect(fetchStats, [reload]);
 
     return (
         <DashboardProvider reload={fetchStats}>
@@ -71,27 +74,27 @@ const Dashboard = () => {
 
                         <div className="flex flex-col lg:grid grid-cols-1 lg:grid-cols-2 gap-4">
                             <div className="col-span-1">
-                                <Card img={CalImg} cta="Create Event" ctaIcon={<PlusCircle size={18} />} />
+                                <Card setReload={setReload} img={CalImg} cta="Create Event" ctaIcon={<PlusCircle size={18} />} />
                             </div>
                             <div className="col-span-1">
                                 {
                                     isLoadingEvents ? 
                                     <CardSkeleton /> :
-                                    <Card title="Events" stat={eventsCount} img={<CalendarDays size={40} />} />
+                                    <Card setReload={setReload} title="Events" stat={eventsCount} img={<CalendarDays size={40} />} />
                                 }
                             </div>
                             <div className="col-span-1">
                                 {
                                     isLoadingWebinars ?
                                     <CardSkeleton /> :
-                                    <Card title="Live Webinars" stat={webinarsCount} img={<RadioTower size={40} color="red" />} />
+                                    <Card setReload={setReload} title="Live Webinars" stat={webinarsCount} img={<RadioTower size={40} color="red" />} />
                                 }
                             </div>
                             <div className="col-span-1">
                                 {
                                     isLoadingDeps ?
                                     <CardSkeleton /> :
-                                    <Card title="Departments" stat={depsCount} img={<Building2 size={40} />} />
+                                    <Card setReload={setReload} title="Departments" stat={depsCount} img={<Building2 size={40} />} />
                                 }
                             </div>
 
