@@ -27,6 +27,7 @@ export interface ICard {
     className?: string;
     stat?: number;
     currentStep?: number;
+    setReload: (value: boolean) => void;
 }
 
 export interface IEvent {
