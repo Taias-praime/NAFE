@@ -15,7 +15,7 @@ import Paginate from '../components/ui/paginate';
 
 const Events = () => {
     const [eventsCount, setEventsCount] = useState<number>(0);
-    const [currentPage, setCurrentPage] = useState(2);
+    const [currentPage, setCurrentPage] = useState(1);
     const [numOfPages, setNumOfPages] = useState(0);
 
     const [events, setEvents] = useState<IEvent[]>([]);
@@ -40,11 +40,13 @@ const Events = () => {
     }
 
     const { onFetch: getEvents, isFetching } = useFetch(
-        '/events/sa/',
+       `/events/sa/?page=${currentPage}&items_per_page=10`,
         (data) => {
             setEvents(data.data.results)
             setFilteredEvents(data.data.results);
             setEventsCount(data.data.number_of_items);
+            console.log(data.data);
+            
         },
         () => { },
     );
@@ -53,7 +55,7 @@ const Events = () => {
         onFetch: getLiveEvents,
         // isFetching: isFetchingLE 
     } = useFetch(
-        `/events/sa/?page=${currentPage}&items_per_page=3`,
+        `/events/sa/`,
         (data) => {
             setEvents(data.data.results)
             setFilteredEvents(data.data.results);

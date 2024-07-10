@@ -57,12 +57,18 @@ const ChiefOfArmyStaff = () => {
             files: [] as string[]
         },
         onSubmit: (obj) => {
-
-            const data = {
-                ...obj,
-                image: removeBase64(featuredImg),
-            }
-            onPut(data)
+            const baseData = {
+                description: obj.description,
+                files: obj.files,
+                fullname: obj.fullname,
+                title: obj.title,
+            };
+        
+            const data = featuredImg.startsWith('http')
+                ? baseData
+                : { ...baseData, image: removeBase64(featuredImg) };
+        
+            onPut(data);
         }
     })
 
@@ -73,7 +79,7 @@ const ChiefOfArmyStaff = () => {
             if (status === 200) {
                 const _data = data.data;
                 const results = _data.results;
-                setCOAS(results.filter((coa: ArmyStaff) => coa.current)[0]);                
+                setCOAS(results.filter((coa: ArmyStaff) => coa.current)[0]);
             }
         },
         (error, status) => {
@@ -165,6 +171,7 @@ const ChiefOfArmyStaff = () => {
         `/army-staffs/sa/${COAS?.id}/edit`,
         (data) => {
             toast({ description: data.message });
+            setEditCOASModal(!editCOASModal)
         },
         (e) => {
             const { message, ...err } = e;
