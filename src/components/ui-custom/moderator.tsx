@@ -2,13 +2,20 @@ import { Textarea } from '../ui/textarea'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import Modal from './modal'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import ProfileImage from './ProfileImage'
 import { removeBase64 } from '../../lib/utils'
 import useFetch from '../../hooks/useFetch'
 import { toast } from '../ui/use-toast'
 import { Loader2 } from 'lucide-react'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '../../components/ui/select';
 
 interface ModeratorProps {
     openModal: () => void;
@@ -22,6 +29,7 @@ interface ModeratorProps {
 const Moderator = ({ openModal, setModalOpen, setReload, open, label, title }: ModeratorProps) => {
 
     const [featuredImg, setFeaturedImg] = useState('');
+    const [rank, setRank] = useState([]);
 
     const formik = useFormik({
         initialValues: {
@@ -69,6 +77,32 @@ const Moderator = ({ openModal, setModalOpen, setReload, open, label, title }: M
         },
     );
 
+    // fetch Rank
+    const { onFetch: fetchRank } = useFetch(
+        '/moderators/sa/ranks',
+        (data, status) => {
+            if (status === 200) {
+                setRank(data.data.ranks)
+            }
+        },
+        (error, status) => {
+            const { message } = error;
+            // notify
+            toast({
+                title: `Error: Failed to submit (${status})`,
+                description: message || '',
+                variant: 'destructive',
+            });
+        },
+    );
+
+    useEffect(() => {
+        fetchRank();
+    }, [])
+
+    const handleEventTypeSelect = (eventType: string) => {
+        formik.setFieldValue('rank', eventType)
+    }
 
     const prModal = (value: boolean) => {
         setModalOpen(value);
@@ -94,15 +128,24 @@ const Moderator = ({ openModal, setModalOpen, setReload, open, label, title }: M
                     className=""
                     label={label}
                 />
+                <div className="w-full">
+                    <Select onValueChange={handleEventTypeSelect}>
+                        <label className="block pb-3">Rank</label>
 
-                <Input
-                    value={formik.values.rank}
-                    onChange={formik.handleChange}
-                    name="rank"
-                    placeholder="rank here"
-                    className=""
-                    label="Rank"
-                />
+                        <SelectTrigger className="w-[330px]">
+                            <SelectValue placeholder="Select Rank" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {rank.map(
+                                (e: { name: string; value: string }) => (
+                                    <SelectItem key={e.value} value={e.value}>
+                                        {e.name}
+                                    </SelectItem>
+                                )
+                            )}
+                        </SelectContent>
+                    </Select>
+                </div>
 
                 <Textarea
                     rows={4}
@@ -117,7 +160,7 @@ const Moderator = ({ openModal, setModalOpen, setReload, open, label, title }: M
                 <div className="flex justify-end mt-6">
                     <Button variant="default" type='submit' className="px-10">
                         {
-                            isCreateLoading ?  <Loader2 className='animate-spin' /> : 'Create'
+                            isCreateLoading ? <Loader2 className='animate-spin' /> : 'Create'
                         }
                     </Button>
                 </div>
