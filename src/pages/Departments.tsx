@@ -12,35 +12,32 @@ import {
 } from "../components/ui/table";
 import { Badge } from "../components/ui/badge";
 import { HEADER_HEIGHT, USER_PLACEHOLDER_IMG_URL } from "../lib/utils";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "../components/ui/pagination";
 import { useEffect, useState } from "react";
 import { useToast } from "../components/ui/use-toast";
 import useFetch from "../hooks/useFetch";
 import EditDepartment from "../components/ui-custom/editDepartment";
+import Paginate from "../components/ui/paginate";
 
 const Departments = () => {
   const PAGINATION_HEIGHT = 40;
 
   const [deps, setDeps] = useState([]);
   const [depsCount, setDepsCount] = useState(0);
+  const [numOfPages, setNumOfPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [tenantId, setTenantId] = useState('');
   const [tenant, setTenant] = useState('');
 
   const { toast } = useToast();
 
   const { onFetch: getDeps, isFetching } = useFetch(
-    "/tenants/sa/",
+    `/tenants/sa/?page=${currentPage}&items_per_page=10`,
     (data) => {
       setDeps(data.data.results);
       setDepsCount(data.data.number_of_items);
+      setNumOfPages(data.data.number_of_pages);
+      console.log(data.data);
+      
     },
     (error, status) => {
       const { message, ...err } = error;
@@ -55,12 +52,16 @@ const Departments = () => {
 
   useEffect(() => {
     getDeps();
-  }, []);
+  }, [currentPage]);
 
   const updateTenantId = (id: string, code: string) => {
     setTenantId(id);
     setTenant(code)
   }
+
+  const handlePageClick = (event: { selected: number; }) => {
+    setCurrentPage(event.selected + 1);
+  };
 
   return (
     <div
@@ -94,68 +95,56 @@ const Departments = () => {
                     <Search className="absolute right-5 opacity-30" />
                   </div>
                 </div>
-                  <Table>
-                    {/* <TableCaption className="py-5">A list of your recent invoices.</TableCaption> */}
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Departments</TableHead>
-                        <TableHead>No. of Users</TableHead>
-                        <TableHead>Events</TableHead>
-                        <TableHead className="text-center">Live Webinars</TableHead>
+                <Table>
+                  {/* <TableCaption className="py-5">A list of your recent invoices.</TableCaption> */}
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Departments</TableHead>
+                      <TableHead>No. of Users</TableHead>
+                      <TableHead>Events</TableHead>
+                      <TableHead className="text-center">Live Webinars</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody >
+                    {deps.map((d: any) => (
+                      <TableRow onClick={() => updateTenantId(d.tenant_id, d.code)} key={d.tenant_id} className="text-start" >
+                        <EditDepartment label={`Department/${tenant}`} tenantId={tenantId} >
+                          <TableCell className="font-medium">{d.code}</TableCell>
+                        </EditDepartment>
+                        <TableCell>
+                          <div className="flex items-center">
+                            {[...Array(d.total_members).keys()]
+                              .map((_, i) => (
+                                <ProfileImg
+                                  className={i ? "-ml-4" : ""}
+                                  url={USER_PLACEHOLDER_IMG_URL}
+                                />
+                              ))
+                              .slice(0, 3)}
+                            <span className="ms-2">
+                              {d.total_members > 3
+                                ? "+ " + (d.total_members - 3)
+                                : ""}
+                            </span>
+                          </div>
+                        </TableCell>
+
+                        <TableCell> {d.total_events} </TableCell>
+
+                        <TableCell className="flex justify-center items-center gap-3">
+                          <span> {d.webinars} </span>
+                          <Badge variant={"destructive"}> Live </Badge>
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody >
-                      {deps.map((d: any) => (
-                        <TableRow onClick={() => updateTenantId(d.tenant_id, d.code)} key={d.tenant_id} className="text-start" >
-                          <EditDepartment label={`Department/${tenant}`} tenantId={tenantId} >
-                            <TableCell className="font-medium">{d.code}</TableCell>
-                          </EditDepartment>
-                          <TableCell>
-                            <div className="flex items-center">
-                              {[...Array(d.total_members).keys()]
-                                .map((_, i) => (
-                                  <ProfileImg
-                                    className={i ? "-ml-4" : ""}
-                                    url={USER_PLACEHOLDER_IMG_URL}
-                                  />
-                                ))
-                                .slice(0, 3)}
-                              <span className="ms-2">
-                                {d.total_members > 3
-                                  ? "+ " + (d.total_members - 3)
-                                  : ""}
-                              </span>
-                            </div>
-                          </TableCell>
-
-                          <TableCell> {d.total_events} </TableCell>
-
-                          <TableCell className="flex justify-center items-center gap-3">
-                            <span> {d.webinars} </span>
-                            <Badge variant={"destructive"}> Live </Badge>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             </div>
-            <Pagination className={`!h-[${PAGINATION_HEIGHT}px]`}>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious href="#" />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="#">1</PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationNext href="#" />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+            <Paginate
+              handlePageClick={handlePageClick}
+              numOfPages={numOfPages}
+            />
           </>
 
         )
