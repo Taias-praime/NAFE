@@ -94,7 +94,6 @@ const Departments = () => {
                     <Search className="absolute right-5 opacity-30" />
                   </div>
                 </div>
-                <EditDepartment label={`Department/${tenant}`} tenantId={tenantId} >
                   <Table>
                     {/* <TableCaption className="py-5">A list of your recent invoices.</TableCaption> */}
                     <TableHeader>
@@ -108,8 +107,9 @@ const Departments = () => {
                     <TableBody >
                       {deps.map((d: any) => (
                         <TableRow onClick={() => updateTenantId(d.tenant_id, d.code)} key={d.tenant_id} className="text-start" >
-                          <TableCell className="font-medium">{d.code}</TableCell>
-
+                          <EditDepartment label={`Department/${tenant}`} tenantId={tenantId} >
+                            <TableCell className="font-medium">{d.code}</TableCell>
+                          </EditDepartment>
                           <TableCell>
                             <div className="flex items-center">
                               {[...Array(d.total_members).keys()]
@@ -138,7 +138,6 @@ const Departments = () => {
                       ))}
                     </TableBody>
                   </Table>
-                </EditDepartment>
               </div>
             </div>
             <Pagination className={`!h-[${PAGINATION_HEIGHT}px]`}>
