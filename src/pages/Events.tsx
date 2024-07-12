@@ -6,7 +6,7 @@ import { Badge } from '../components/ui/badge';
 import { Input } from '../components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuSeparator, DropdownMenuTrigger } from '../components/ui/dropdown-menu';
-import { HEADER_HEIGHT } from '../lib/utils';
+import { HEADER_HEIGHT, PLACEHOLDER_IMG_URL } from '../lib/utils';
 import useFetch from '../hooks/useFetch';
 import AddEvent from '../components/ui-custom/addEvent';
 import { IEvent } from '../models/interfaces';
@@ -40,13 +40,13 @@ const Events = () => {
     }
 
     const { onFetch: getEvents, isFetching } = useFetch(
-       `/events/sa/?page=${currentPage}&items_per_page=10`,
+        `/events/sa/?page=${currentPage}&items_per_page=10`,
         (data) => {
             setEvents(data.data.results)
             setFilteredEvents(data.data.results);
             setEventsCount(data.data.number_of_items);
-            console.log(data.data);
-            
+            console.log(data.data.results);
+
         },
         () => { },
     );
@@ -134,7 +134,7 @@ const Events = () => {
 
 
     return (
-        <div className="overflow-y-auto pb-5 pt-10 px-10" style={{
+        <div className="overflow-y-auto pb-5 pt-10 px-10 relative" style={{
             height: `calc(100vh - ${HEADER_HEIGHT}px)`
         }}>
             <div className="flex justify-between">
@@ -238,10 +238,10 @@ const Events = () => {
                         <GridView setReload={setReload} events={filteredEvents} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} />
                 }
             </div>
-            <Paginate
-                handlePageClick={handlePageClick}
-                numOfPages={numOfPages}
-            />
+                <Paginate
+                    handlePageClick={handlePageClick}
+                    numOfPages={numOfPages}
+                />
         </div>
     );
 };
@@ -282,19 +282,19 @@ interface GridViewProps {
     isEditEvent: boolean;
 }
 
-const GridView = ({ events, setIsEditEvent, setReload,isEditEvent }: GridViewProps) => {
+const GridView = ({ events, setIsEditEvent, setReload, isEditEvent }: GridViewProps) => {
     return (
         <div className='grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-10'>
             {
                 events.map((event: IEvent) => // (e,k)
                     <div key={event.id} className='relative col-span-1 rounded-lg border overflow-hidden grid grid-cols-[160px_1fr] h-40 bg-foreground/5'>
-                        <img className='w-full max-h-full min-h-full object-center object-cover' src={event.image} alt="" />
+                        <img className='w-full max-h-full min-h-full object-center object-cover' src={event.image || PLACEHOLDER_IMG_URL} alt="" />
 
                         <div className="overflow-hidden p-5 flex flex-col justify-between ">
                             <h1 className='text-lg line-clamp-2 mb-5'> {event.title} </h1>
 
                             <div className="flex justify-between items-center">
-                                <h1 className='text-sm opacity-50'> {format(event.start_date, 'do MMMM yyyy')}  </h1>
+                                <p className='text-sm opacity-50'> {format(event.start_date, 'do MMMM yyyy')}  </p>
 
                                 <Button onClick={() => { setIsEditEvent(true) }} size={'sm'} className="flex gap-3">
                                     <AddEvent currentStep={2} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} eventId={event.id} setReload={setReload} className="flex items-center gap-3 p-3">

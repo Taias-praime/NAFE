@@ -18,6 +18,7 @@ export const setBG = (url: string) => {
 
 export const HEADER_HEIGHT = 80;
 export const USER_PLACEHOLDER_IMG_URL = '/images/placeholder.svg';
+export const PLACEHOLDER_IMG_URL = '/images/placeholder2.png';
 
 
 // localstorage getter
