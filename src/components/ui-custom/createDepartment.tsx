@@ -31,6 +31,7 @@ const CreateDepartment = ({ open, openModal, label, setOpen, tenantId }: CreateD
             description: '',
             service: '',
             tenant_name: '',
+            tenant_type: "dept_admin"
         },
         onSubmit: (obj) => {
             onPost(obj);
@@ -39,7 +40,7 @@ const CreateDepartment = ({ open, openModal, label, setOpen, tenantId }: CreateD
 
     // add
     const { onPost, isFetching: isLoadingPost } = useFetch(
-        `/users/sa/add`,
+        `/tenants/sa/add`,
         (data) => {
             formik.resetForm();
             setOpen(false);
