@@ -18,7 +18,6 @@ const token = local("token");
 
 interface CreatePressReleaseProps {
     isPREdit: boolean;
-    openModal: () => void;
     setEditPRModal: (value: boolean) => void;
     setReload: (value: boolean) => void;
     setIsPREdit: (value: boolean) => void;
@@ -26,7 +25,7 @@ interface CreatePressReleaseProps {
     open: boolean;
 }
 
-const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setReload, setIsPREdit, PR, open, }: CreatePressReleaseProps) => {
+const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, PR, open, }: CreatePressReleaseProps) => {
 
     const [eventDate, setEventDate] = useState<Date>();
     const [featuredImg, setFeaturedImg] = useState('');
@@ -179,7 +178,7 @@ const CreatePressRelease = ({ isPREdit, openModal, setEditPRModal, setReload, se
     }
 
     return (
-        <Modal open={open} openModal={openModal} onOpenChange={(value) => prModal(value)} className="flex items-center gap-3 p-3"
+        <Modal open={open} onOpenChange={(value) => prModal(value)} className="flex items-center gap-3 p-3"
             label="Upload Press Release"
         >
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">

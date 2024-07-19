@@ -11,7 +11,6 @@ import { toast } from '../ui/use-toast'
 import { Loader2 } from 'lucide-react'
 
 interface AddKeynoteSpeakerProps {
-    openModal: () => void;
     setModalOpen: (value: boolean) => void;
     setReload: (value: boolean) => void;
     open: boolean;
@@ -19,7 +18,7 @@ interface AddKeynoteSpeakerProps {
     title: string;
 }
 
-const KeynoteSpeaker = ({ openModal, setReload, setModalOpen, open, label, title }: AddKeynoteSpeakerProps) => {
+const KeynoteSpeaker = ({ setReload, setModalOpen, open, label, title }: AddKeynoteSpeakerProps) => {
 
     const [featuredImg, setFeaturedImg] = useState('');
 
@@ -81,7 +80,7 @@ const KeynoteSpeaker = ({ openModal, setReload, setModalOpen, open, label, title
     }
 
     return (
-        <Modal open={open} openModal={openModal} onOpenChange={(value) => prModal(value)} className="flex items-center gap-3 px-1 border bg-gray-300 text-sm text-gray-700 rounded "
+        <Modal open={open} onOpenChange={(value) => prModal(value)} className="flex items-center gap-3 px-1 border bg-gray-300 text-sm text-gray-700 rounded "
             label={title}
         >
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">

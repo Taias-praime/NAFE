@@ -80,7 +80,7 @@ const DepartmentDashboard = ({ tenantId }: DepartmentDashboard) => {
                                     <Card setReload={setReload} currentStep={1} img={CalImg} cta="Create Event" ctaIcon={<PlusCircle size={18} />} />
                                 </div>
                                 <div className="col-span-1">
-                                    <AddDepartmentMember tenantId={tenantId} open={open} openModal={() => setOpen(!open)} setOpen={setOpen}
+                                    <AddDepartmentMember tenantId={tenantId} open={open} setOpen={setOpen}
                                         label={
                                             <div className=" bg-background/70 min-h-[200px] w-full px-5 2xl:px-10 py-5 flex items-center justify-between overflow-hidden rounded">
                                                 <div className="flex">

@@ -17,7 +17,6 @@ const token = local("token");
 
 interface CreateLiveEventsProps {
     isLVEdit: boolean;
-    openModal: () => void;
     setEditLVModal: (value: boolean) => void;
     setIsLVEdit: (value: boolean) => void;
     setReload: (value: boolean) => void;
@@ -25,7 +24,7 @@ interface CreateLiveEventsProps {
     lvId: string | null;
 }
 
-const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal, setReload, setIsLVEdit, open, lvId }: CreateLiveEventsProps) => {
+const CreateLiveEvents = ({ isLVEdit, setEditLVModal, setReload, setIsLVEdit, open, lvId }: CreateLiveEventsProps) => {
     const [eventDate, setEventDate] = useState<Date>();
     const [featuredImg, setFeaturedImg] = useState('');
 
@@ -155,7 +154,7 @@ const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal, setReload, setI
     }
 
     return (
-        <Modal open={open} openModal={openModal} onOpenChange={(value) => lvModal(value)} className="flex items-center gap-3 p-3"
+        <Modal open={open} onOpenChange={(value) => lvModal(value)} className="flex items-center gap-3 p-3"
             label="Create Live Event"
         >
             {

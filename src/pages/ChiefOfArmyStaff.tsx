@@ -63,11 +63,11 @@ const ChiefOfArmyStaff = () => {
                 fullname: obj.fullname,
                 title: obj.title,
             };
-        
+
             const data = featuredImg.startsWith('http')
                 ? baseData
                 : { ...baseData, image: removeBase64(featuredImg) };
-        
+
             onPut(data);
         }
     })
@@ -250,13 +250,6 @@ const ChiefOfArmyStaff = () => {
         const files = formik.values.files.filter((file) => file !== id);
         formik.setFieldValue("files", files)
     }
-    const togglePRModal = () => {
-        setEditPRModal(!editPRModal)
-    }
-
-    const toggleLVModal = () => {
-        setEditLVModal(!editLVModal)
-    }
 
     const viewSuggestion = (suggestion: ISuggestions) => {
         setSuggest(suggestion)
@@ -298,7 +291,10 @@ const ChiefOfArmyStaff = () => {
 
                             <div className="">
                                 <Button size={"sm"} className="flex gap-3 px-5">
-                                    <Modal open={editCOASModal} openModal={editCOAS} title="Chief of Army Staff" onOpenChange={(value) => setEditCOASModal(value)} className="flex items-center gap-3 p-3"
+                                    <Modal open={editCOASModal} title="Chief of Army Staff" onOpenChange={(value) => {
+                                        if (value) editCOAS();
+                                        setEditCOASModal(value)
+                                    }} className="flex items-center gap-3 p-3"
                                         label={
                                             <>
                                                 <PencilLine /> Edit
@@ -396,7 +392,7 @@ const ChiefOfArmyStaff = () => {
                             tab === "press release" && (
                                 <>
                                     <SubHeader title="Press Release" number={`${numOfPR} Release`}>
-                                        <CreatePressRelease setReload={setReload} isPREdit={isPREdit} setIsPREdit={setIsPREdit} PR={PR} open={editPRModal} openModal={togglePRModal} setEditPRModal={setEditPRModal} />
+                                        <CreatePressRelease setReload={setReload} isPREdit={isPREdit} setIsPREdit={setIsPREdit} PR={PR} open={editPRModal} setEditPRModal={setEditPRModal} />
                                     </SubHeader>
                                     <div className="grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-5">
                                         {
@@ -416,7 +412,7 @@ const ChiefOfArmyStaff = () => {
                             tab === "live events" && (
                                 <>
                                     <SubHeader title="Live Events" number={`${numOfLV} Events`} >
-                                        <CreateLiveEvents lvId={lvId} setReload={setReload} isLVEdit={isLVEdit} setIsLVEdit={setIsLVEdit} open={editLVModal} openModal={toggleLVModal} setEditLVModal={setEditLVModal} />
+                                        <CreateLiveEvents lvId={lvId} setReload={setReload} isLVEdit={isLVEdit} setIsLVEdit={setIsLVEdit} open={editLVModal} setEditLVModal={setEditLVModal} />
                                     </SubHeader>
                                     <div className="grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-5">
                                         {

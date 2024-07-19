@@ -18,7 +18,6 @@ import {
 } from '../../components/ui/select';
 
 interface ModeratorProps {
-    openModal: () => void;
     setModalOpen: (value: boolean) => void;
     setReload: (value: boolean) => void;
     open: boolean;
@@ -26,7 +25,7 @@ interface ModeratorProps {
     title: string;
 }
 
-const Moderator = ({ openModal, setModalOpen, setReload, open, label, title }: ModeratorProps) => {
+const Moderator = ({ setModalOpen, setReload, open, label, title }: ModeratorProps) => {
 
     const [featuredImg, setFeaturedImg] = useState('');
     const [rank, setRank] = useState([]);
@@ -115,7 +114,7 @@ const Moderator = ({ openModal, setModalOpen, setReload, open, label, title }: M
     }
 
     return (
-        <Modal open={open} openModal={openModal} onOpenChange={(value) => prModal(value)} className="flex items-center gap-3 px-2 border bg-gray-300 text-sm text-gray-700 rounded"
+        <Modal open={open} onOpenChange={(value) => prModal(value)} className="flex items-center gap-3 px-2 border bg-gray-300 text-sm text-gray-700 rounded"
             label={title}
         >
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">

@@ -167,8 +167,8 @@ const AddUserActionSheet = ({
 				<div className="w-full flex align-center justify-between gap-4">
 					{
 						action === 'Moderator' ?
-							<Moderator title="Add Moderator" label="Speaker name" openModal={() => { }} setReload={setReload} setModalOpen={setModeratorOpen} open={moderatorOpen} />
-							: <KeynoteSpeaker title="Add Keynote Speaker" label="Speaker name" openModal={() => { }} setReload={setReload} setModalOpen={setModeratorOpen} open={moderatorOpen} />
+							<Moderator title="Add Moderator" label="Speaker name" setReload={setReload} setModalOpen={setModeratorOpen} open={moderatorOpen} />
+							: <KeynoteSpeaker title="Add Keynote Speaker" label="Speaker name" setReload={setReload} setModalOpen={setModeratorOpen} open={moderatorOpen} />
 					}
 					<div className="relative flex items-center w-fit">
 						<Input value={search} onChange={(e) => setSearch(e.target.value)} className="p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[400px] max-w-full" />

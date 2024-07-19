@@ -76,7 +76,7 @@ const Departments = () => {
             <div className="h-full overflow-y-auto">
               <div className="flex justify-between">
                 <CreateDepartment
-                  tenantId={''} open={open} openModal={() => setOpen(!open)} setOpen={setOpen}
+                  tenantId={''} open={open} setOpen={setOpen}
                   label={
                     <Button className="lg:absolute top-5 right-10 flex gap-3">
                       <PlusCircle />

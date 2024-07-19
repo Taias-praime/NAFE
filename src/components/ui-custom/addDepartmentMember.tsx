@@ -13,14 +13,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 const token = local("token");
 
 interface AddDepartmentMemberProps {
-    openModal: () => void;
     setOpen: (value: boolean) => void;
     open: boolean;
     label: ReactNode;
     tenantId: string;
 }
 
-const AddDepartmentMember = ({ open, openModal, label, setOpen, tenantId }: AddDepartmentMemberProps) => {
+const AddDepartmentMember = ({ open, label, setOpen, tenantId }: AddDepartmentMemberProps) => {
     const [featuredImg, setFeaturedImg] = useState('');
     const [departments, setDepartments] = useState([]);
     const [rank, setRank] = useState([]);
@@ -121,7 +120,7 @@ const AddDepartmentMember = ({ open, openModal, label, setOpen, tenantId }: AddD
     }
 
     return (
-        <Modal open={open} openModal={openModal} onOpenChange={(value) => setOpen(value)} className="flex items-center gap-3"
+        <Modal open={open} onOpenChange={(value) => setOpen(value)} className="flex items-center gap-3"
             label={label}
         >
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">

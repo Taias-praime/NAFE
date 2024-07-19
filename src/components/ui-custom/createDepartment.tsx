@@ -11,14 +11,13 @@ import { toast } from '../ui/use-toast'
 const token = local("token");
 
 interface CreateDepartmentProps {
-    openModal: () => void;
     setOpen: (value: boolean) => void;
     open: boolean;
     label: ReactNode;
     tenantId: string;
 }
 
-const CreateDepartment = ({ open, openModal, label, setOpen, tenantId }: CreateDepartmentProps) => {
+const CreateDepartment = ({ open, label, setOpen, tenantId }: CreateDepartmentProps) => {
 
     const formik = useFormik({
         initialValues: {
@@ -62,7 +61,7 @@ const CreateDepartment = ({ open, openModal, label, setOpen, tenantId }: CreateD
     );
 
     return (
-        <Modal open={open} openModal={openModal} onOpenChange={(value) => setOpen(value)} className="flex items-center gap-3"
+        <Modal open={open} onOpenChange={(value) => setOpen(value)} className="flex items-center gap-3"
             label={label}
         >
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
