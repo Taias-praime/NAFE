@@ -17,6 +17,7 @@ import { useToast } from "../components/ui/use-toast";
 import useFetch from "../hooks/useFetch";
 import EditDepartment from "../components/ui-custom/editDepartment";
 import Paginate from "../components/ui/paginate";
+import CreateDepartment from "../components/ui-custom/createDepartment";
 
 const Departments = () => {
   const PAGINATION_HEIGHT = 40;
@@ -27,6 +28,7 @@ const Departments = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [tenantId, setTenantId] = useState('');
   const [tenant, setTenant] = useState('');
+  const [open, setOpen] = useState(false);
 
   const { toast } = useToast();
 
@@ -73,17 +75,21 @@ const Departments = () => {
           <>
             <div className="h-full overflow-y-auto">
               <div className="flex justify-between">
-                <div className=""></div>
-                <Button className="lg:absolute top-5 right-10 flex gap-3">
-                  <PlusCircle />
-                  Create Department
-                </Button>
+                <CreateDepartment
+                  tenantId={''} open={open} openModal={() => setOpen(!open)} setOpen={setOpen}
+                  label={
+                    <Button className="lg:absolute top-5 right-10 flex gap-3">
+                      <PlusCircle />
+                      Create Department
+                    </Button>
+                  }
+                />
               </div>
 
               <div className="">
                 <div className="lg:flex justify-between items-center p-5 space-y-5">
                   <div className="">
-                    <h5 className="text-xl "> List of Users </h5>
+                    <h5 className="text-xl "> List of Departments </h5>
                     <small className="text-muted-foreground">
                       {depsCount} Departments
                     </small>

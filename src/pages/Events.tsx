@@ -236,7 +236,6 @@ interface GridViewProps {
 }
 
 const GridView = ({ events, setIsEditEvent, setReload, isEditEvent, eventType }: GridViewProps) => {
-    console.log(eventType)
     return (
         <div className='grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-10'>
             {
