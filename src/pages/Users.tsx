@@ -8,7 +8,7 @@ import useFetch from "../hooks/useFetch";
 import { toast } from "../components/ui/use-toast";
 import { IUser } from "../models/interfaces";
 import Paginate from "../components/ui/paginate";
-import EditUser from "../components/ui-custom/editUser";
+import AddDepartmentMember from "../components/ui-custom/addDepartmentMember";
 
 const Users = () => {
   const PAGINATION_HEIGHT = 40;
@@ -16,6 +16,7 @@ const Users = () => {
   const [, setUserCount] = useState(0);
   const [numOfPages, setNumOfPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [open, setOpen] = useState(false);
 
   // get users
   const { onFetch: onFetchUsers, isFetching } = useFetch(
@@ -55,11 +56,14 @@ const Users = () => {
     }}>
       <div className="h-full overflow-y-auto">
         <div className="flex justify-between">
-          <div className=""></div>
-          <Button className="lg:absolute top-5 right-10 flex gap-3">
-            <PlusCircle />
-            Create Users
-          </Button>
+          <AddDepartmentMember tenantId={''} open={open} openModal={() => setOpen(!open)} setOpen={setOpen}
+            label={
+              <Button className="lg:absolute top-5 right-10 flex gap-3">
+                <PlusCircle />
+                Create Users
+              </Button>
+            }
+          />
         </div>
         {
           isFetching ? <Loader2 className='animate-spin m-auto' /> : (
@@ -90,16 +94,17 @@ const Users = () => {
                 <TableBody>
                   {users.map((user: IUser) => (
                     <TableRow key={user.id}>
-                      <EditUser userId={user.id} >
-                        <TableCell className="font-medium">
+                      <AddDepartmentMember tenantId={''} open={open} openModal={() => setOpen(!open)} setOpen={setOpen}
+                        label={
+                          <TableCell className="font-medium">
                           <div className="flex items-center">
                             <span className="ms-2">
-                              {user.full_name}
+                              {user.full_name || 'N/A'}
                             </span>
                           </div>
                         </TableCell>
-                      </EditUser>
-
+                        }
+                      />
                       <TableCell>
                         <div className="flex items-center">
                           <span className=""> {user.department_name} </span>

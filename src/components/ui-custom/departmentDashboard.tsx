@@ -24,6 +24,7 @@ const DepartmentDashboard = ({ tenantId }: DepartmentDashboard) => {
     const [search, setSearch] = useState('');
     const [open, setOpen] = useState(false);
     const [reload, setReload] = useState(false);
+    const [currentPage,] = useState(1);
 
     const { onFetch: getTenant, isFetching: isLoadingEvents } = useFetch(
         `/tenants/sa/${tenantId}/details`,
@@ -36,10 +37,27 @@ const DepartmentDashboard = ({ tenantId }: DepartmentDashboard) => {
         () => { },
     );
 
+    const { onFetch: getTodayEvents } = useFetch(
+        `/events/sa/?event_type=todal&page=${currentPage}&items_per_page=10`,
+        (data) => {
+            setOngoingEvents(data.data.results);
+        },
+        () => { },
+    );
+
+    const { onFetch: getUpcomingEvents } = useFetch(
+        `/events/sa/?event_type=upcoming&page=${currentPage}&items_per_page=10`,
+        (data) => {
+            setUpcomingEvents(data.data.results);
+        },
+        () => { },
+    );
 
     // on component mount
     useEffect(() => {
         getTenant();
+        getTodayEvents();
+        getUpcomingEvents();
         setReload(false);
     }, [reload]);
 

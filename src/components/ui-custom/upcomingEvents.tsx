@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import { CalendarOff, Loader2 } from "lucide-react";
 import useFetch from "../../hooks/useFetch";
+import { format } from "date-fns";
 
 const UpcomingEvents = () => {
 
@@ -61,12 +62,12 @@ export const Event = ({event}: {event: any}) => {
 
             <div className="overflow-hidden">
                 <h5 className="text-md m-0 text-ellipsis line-clamp-2">
-                    {event.description || `[check description attribute]`}
+                    {event.title}
                 </h5>
                 <small className="opacity-50 text-xs">
-                    {event.location || '[check location attribute]'}
+                    {event.venue}
                 </small>
-                <p className="text-sm mt-2"> {event.date || `[check date attribute]`} </p>
+                <p className="text-sm mt-2"> {format(event.start_date, 'do MMMM yyyy')} </p>
             </div>
         </li>
     )

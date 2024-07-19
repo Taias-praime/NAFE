@@ -100,8 +100,8 @@ const Moderator = ({ openModal, setModalOpen, setReload, open, label, title }: M
         fetchRank();
     }, [])
 
-    const handleEventTypeSelect = (eventType: string) => {
-        formik.setFieldValue('rank', eventType)
+    const handleRank = (rank: string) => {
+        formik.setFieldValue('rank', rank)
     }
 
     const prModal = (value: boolean) => {
@@ -129,7 +129,7 @@ const Moderator = ({ openModal, setModalOpen, setReload, open, label, title }: M
                     label={label}
                 />
                 <div className="w-full">
-                    <Select onValueChange={handleEventTypeSelect}>
+                    <Select onValueChange={handleRank}>
                         <label className="block pb-3">Rank</label>
 
                         <SelectTrigger className="w-[330px]">

@@ -29,7 +29,7 @@ const Events = () => {
     const [reload, setReload] = useState(false);
     const [eventType, setEventType] = useState('today');
 
-    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [, setSearchTerm] = useState<string>('');
 
     const count = (): number => {
         let num = 0;
@@ -105,7 +105,7 @@ const Events = () => {
                     <div className="">
                         <Tabs defaultValue={eventType} onValueChange={(e) =>  updateEventType(e)} className="w-[400px]">
                             <TabsList>
-                                <TabsTrigger value="today">Today Events</TabsTrigger>
+                                <TabsTrigger value="today">Ongoing Events</TabsTrigger>
                                 <TabsTrigger value="upcoming">Upcoming Events</TabsTrigger>
                                 <TabsTrigger value="live">Live Events</TabsTrigger>
                                 <TabsTrigger value="past">Past Events</TabsTrigger>
@@ -249,7 +249,7 @@ const GridView = ({ events, setIsEditEvent, setReload, isEditEvent, eventType }:
 
                             <div className="flex justify-between items-center">
                                 {
-                                    eventType === 'live' ? null :  <p className='text-sm opacity-50'> {format(event.start_date, 'do MMMM yyyy')}  </p>
+                                    eventType === 'live' ? null :  <p className='text-sm opacity-50'> {format(event.start_date, 'do MMMM yyyy')} </p>
                                 }
                                 <Button onClick={() => { setIsEditEvent(true) }} size={'sm'} className="flex gap-3">
                                     <AddEvent currentStep={2} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} eventId={event.id} setReload={setReload} className="flex items-center gap-3 p-3">

@@ -36,8 +36,6 @@ const Departments = () => {
       setDeps(data.data.results);
       setDepsCount(data.data.number_of_items);
       setNumOfPages(data.data.number_of_pages);
-      console.log(data.data);
-      
     },
     (error, status) => {
       const { message, ...err } = error;
