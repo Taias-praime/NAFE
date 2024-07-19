@@ -8,6 +8,7 @@ import useFetch from "../hooks/useFetch";
 import { toast } from "../components/ui/use-toast";
 import { IUser } from "../models/interfaces";
 import Paginate from "../components/ui/paginate";
+import EditUser from "../components/ui-custom/editUser";
 
 const Users = () => {
   const PAGINATION_HEIGHT = 40;
@@ -25,8 +26,6 @@ const Users = () => {
         const results = _data.results;
         setUserCount(_data.number_of_items);
         setNumOfPages(_data.number_of_pages);
-        console.log(_data);
-
         setUsers(results)
       }
     },
@@ -91,14 +90,16 @@ const Users = () => {
                 <TableBody>
                   {users.map((user: IUser) => (
                     <TableRow key={user.id}>
-                      <TableCell className="font-medium">
-                        <div className="flex items-center">
-                          {/* <ProfileImg url={user.image || ''}/> */}
-                          <span className="ms-2">
-                            {user.full_name}
-                          </span>
-                        </div>
-                      </TableCell>
+                      <EditUser userId={user.id} >
+                        <TableCell className="font-medium">
+                          <div className="flex items-center">
+                            <span className="ms-2">
+                              {user.full_name}
+                            </span>
+                          </div>
+                        </TableCell>
+                      </EditUser>
+
                       <TableCell>
                         <div className="flex items-center">
                           <span className=""> {user.department_name} </span>

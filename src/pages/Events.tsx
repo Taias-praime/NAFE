@@ -27,8 +27,8 @@ const Events = () => {
     const [showSecretEvent, setShowSecretEvent] = useState<boolean>(false);
     const [isEditEvent, setIsEditEvent] = useState(false)
     const [reload, setReload] = useState(false);
+    const [eventType, setEventType] = useState('today');
 
-    const [tab, setTab] = useState<string>('all');
     const [searchTerm, setSearchTerm] = useState<string>('');
 
     const count = (): number => {
@@ -40,12 +40,11 @@ const Events = () => {
     }
 
     const { onFetch: getEvents, isFetching } = useFetch(
-        `/events/sa/?page=${currentPage}&items_per_page=10`,
+        `/events/sa/?event_type=${eventType}&page=${currentPage}&items_per_page=10`,
         (data) => {
             setEvents(data.data.results)
             setFilteredEvents(data.data.results);
             setEventsCount(data.data.number_of_items);
-            console.log(data.data.results);
 
         },
         () => { },
@@ -55,7 +54,7 @@ const Events = () => {
         onFetch: getLiveEvents,
         // isFetching: isFetchingLE 
     } = useFetch(
-        `/events/sa/`,
+        `/events/sa/list-live-webinars`,
         (data) => {
             setEvents(data.data.results)
             setFilteredEvents(data.data.results);
@@ -65,80 +64,33 @@ const Events = () => {
         () => { },
     );
 
-    const {
-        onFetch: getOngoingEvents,
-        // isFetching: isFetchingOE 
-    } = useFetch(
-        '/events/sa/',
-        (data) => {
-            setEvents(data.data.results)
-            setFilteredEvents(data.data.results);
-            setEventsCount(data.data.number_of_items);
-        },
-        () => { },
-    );
-
-    const {
-        onFetch: getPastEvents,
-        // isFetching: isFetchingPE 
-    } = useFetch(
-        '/events/sa/',
-        (data) => {
-            setEvents(data.data.results)
-            setFilteredEvents(data.data.results);
-            setEventsCount(data.data.number_of_items);
-        },
-        () => { },
-    );
-
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
     }
 
     useEffect(() => {
+        if (eventType === 'live') return;
         getEvents();
         setReload(false);
-    }, [reload, currentPage]);
-
-    useEffect(() => {
-        let filtered = events;
-
-        if (tab !== 'all') filtered = tab === 'live' ? filtered.filter(e => e.event_link) : [];
-
-        if (showNormalEvent || showRestrictedEvent || showSecretEvent) {
-            filtered = filtered.filter(e => {
-                if (showNormalEvent && e.type === 'general') return true;
-                if (showRestrictedEvent && e.type === 'restricted') return true;
-                if (showSecretEvent && e.type === 'registered') return true;
-                return false;
-            });
-        }
-
-        if (searchTerm) filtered = filtered.filter(e => e.title.toLowerCase().includes(searchTerm.toLowerCase()));
-
-        setFilteredEvents(filtered);
-    }, [tab, showNormalEvent, showRestrictedEvent, showSecretEvent, searchTerm, events]);
-
-
-    // tabs
-    useEffect(() => {
-        if (tab === 'all') getEvents();
-        if (tab === 'ongoing') getOngoingEvents();
-        if (tab === 'live') getLiveEvents();
-        if (tab === 'past') getPastEvents();
-    }, [tab])
+    }, [reload, currentPage, eventType]);
 
     const handlePageClick = (event: { selected: number; }) => {
         setCurrentPage(event.selected + 1);
     };
+
+    const updateEventType = (value: string) => {
+        if (value === 'live') {
+            getLiveEvents();
+        }
+        setEventType(value);        
+    }
 
 
     return (
         <div className="overflow-y-auto pb-5 pt-10 px-10 relative" style={{
             height: `calc(100vh - ${HEADER_HEIGHT}px)`
         }}>
-            <div className="flex justify-between">
-                <div className=""></div>
+            <div className="flex justify-between py-5 ">
                 <Button className="lg:absolute top-5 right-10 p-0">
                     <AddEvent currentStep={1} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} setReload={setReload}
                         className="flex items-center gap-3 p-3">
@@ -151,10 +103,10 @@ const Events = () => {
             <div className="space-y-10">
                 <div className="xl:flex justify-between items-center space-y-3">
                     <div className="">
-                        <Tabs defaultValue={tab} onValueChange={(e) => setTab(e)} className="w-[400px]">
+                        <Tabs defaultValue={eventType} onValueChange={(e) =>  updateEventType(e)} className="w-[400px]">
                             <TabsList>
-                                <TabsTrigger value="all">All Events</TabsTrigger>
-                                <TabsTrigger value="ongoing">Ongoing Events</TabsTrigger>
+                                <TabsTrigger value="today">Today Events</TabsTrigger>
+                                <TabsTrigger value="upcoming">Upcoming Events</TabsTrigger>
                                 <TabsTrigger value="live">Live Events</TabsTrigger>
                                 <TabsTrigger value="past">Past Events</TabsTrigger>
                             </TabsList>
@@ -219,13 +171,13 @@ const Events = () => {
                 </div>
 
                 <div className="">
-                    <h5 className="text-xl">
-                        All Events {`(${eventsCount})`}
+                    <h5 className="text-xl capitalize">
+                        {eventType} Events {`(${eventsCount})`}
                     </h5>
                 </div>
 
                 {
-                    isFetching && !events.length &&
+                    isFetching  && !events.length &&
                     <div className='w-full h-[400px] flex justify-center items-center'>
                         <Loader2 className='animate-spin mx-auto' />
                     </div>
@@ -235,7 +187,7 @@ const Events = () => {
                     isList ?
                         <TableView events={filteredEvents} />
                         :
-                        <GridView setReload={setReload} events={filteredEvents} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} />
+                        <GridView setReload={setReload} events={filteredEvents} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} eventType={ eventType} />
                 }
             </div>
                 <Paginate
@@ -280,9 +232,11 @@ interface GridViewProps {
     setIsEditEvent: (value: boolean) => void;
     setReload: (value: boolean) => void;
     isEditEvent: boolean;
+    eventType: string;
 }
 
-const GridView = ({ events, setIsEditEvent, setReload, isEditEvent }: GridViewProps) => {
+const GridView = ({ events, setIsEditEvent, setReload, isEditEvent, eventType }: GridViewProps) => {
+    console.log(eventType)
     return (
         <div className='grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-10'>
             {
@@ -294,8 +248,9 @@ const GridView = ({ events, setIsEditEvent, setReload, isEditEvent }: GridViewPr
                             <h1 className='text-lg line-clamp-2 mb-5'> {event.title} </h1>
 
                             <div className="flex justify-between items-center">
-                                <p className='text-sm opacity-50'> {format(event.start_date, 'do MMMM yyyy')}  </p>
-
+                                {
+                                    eventType === 'live' ? null :  <p className='text-sm opacity-50'> {format(event.start_date, 'do MMMM yyyy')}  </p>
+                                }
                                 <Button onClick={() => { setIsEditEvent(true) }} size={'sm'} className="flex gap-3">
                                     <AddEvent currentStep={2} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} eventId={event.id} setReload={setReload} className="flex items-center gap-3 p-3">
                                         <Pencil />

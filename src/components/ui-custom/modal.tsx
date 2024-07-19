@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { cn } from '../../lib/utils';
 import {
     SheetContent,
@@ -12,15 +12,15 @@ interface ModalProps {
     className: string
     label: ReactNode | string,
     children: ReactNode,
-    openModal: () => void;
     onOpenChange: (value: boolean) => void;
     setIsDelete?: (value: boolean) => void;
 }
 
-const Modal = ({ open, label, title, className, children, openModal, onOpenChange, setIsDelete}: ModalProps) => {
+const Modal = ({ open, label, title, className, children, onOpenChange, setIsDelete}: ModalProps) => {
+    const [isOpen, setIsOpen] = useState(false);
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetTrigger onClick={openModal} className={cn(className, 'outline-none')}>
+            <SheetTrigger onClick={() => setIsOpen(!isOpen)}  className={cn(className, 'outline-none')}>
                 {label}
             </SheetTrigger>
 

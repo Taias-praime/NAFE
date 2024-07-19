@@ -110,7 +110,6 @@ const CreateLiveEvents = ({ isLVEdit, openModal, setEditLVModal, setReload, setI
         (data, status) => {
             if (status === 200) {
                 const _data = data.data;
-                console.log(_data.id);
                 setEventDate(_data.date)
                 setFeaturedImg(_data.image)
                 formik.setValues({
