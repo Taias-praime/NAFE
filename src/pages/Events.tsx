@@ -56,6 +56,9 @@ const Events = () => {
     } = useFetch(
         `/events/sa/list-live-webinars`,
         (data) => {
+            data.data.results.forEach((event: IEvent) => {
+                event.start_date = event.date;
+            });
             setEvents(data.data.results)
             setFilteredEvents(data.data.results);
             setEventsCount(data.data.number_of_items);
@@ -79,10 +82,10 @@ const Events = () => {
     };
 
     const updateEventType = (value: string) => {
+        setEventType(value);
         if (value === 'live') {
             getLiveEvents();
         }
-        setEventType(value);        
     }
 
 
@@ -101,9 +104,9 @@ const Events = () => {
             </div>
 
             <div className="space-y-10">
-                <div className="xl:flex justify-between items-center space-y-3">
+                <div className="xl:flex justify-between items-end space-y-3">
                     <div className="">
-                        <Tabs defaultValue={eventType} onValueChange={(e) =>  updateEventType(e)} className="w-[400px]">
+                        <Tabs defaultValue={eventType} onValueChange={(e) => updateEventType(e)} className="w-[400px]">
                             <TabsList>
                                 <TabsTrigger value="today">Ongoing Events</TabsTrigger>
                                 <TabsTrigger value="upcoming">Upcoming Events</TabsTrigger>
@@ -114,7 +117,7 @@ const Events = () => {
                     </div>
                     <div className="flex gap-5 items-center">
                         <div className="relative flex items-center w-fit">
-                            <Input className='p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[300px]' onChange={handleSearch} />
+                            <Input className='p-6 border-transparent rounded-full bg-foreground/5 2xl:w-[300px]' onChange={handleSearch} />
                             <Search className='absolute right-5 opacity-30' />
                         </div>
 
@@ -177,23 +180,23 @@ const Events = () => {
                 </div>
 
                 {
-                    isFetching  && !events.length &&
-                    <div className='w-full h-[400px] flex justify-center items-center'>
-                        <Loader2 className='animate-spin mx-auto' />
-                    </div>
-                }
-
-                {
-                    isList ?
-                        <TableView events={filteredEvents} />
-                        :
-                        <GridView setReload={setReload} events={filteredEvents} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} eventType={ eventType} />
+                    isFetching && !events.length ?
+                        <div className='w-full h-[400px] flex justify-center items-center'>
+                            <Loader2 className='animate-spin mx-auto' />
+                        </div> : (
+                            isList ?
+                                <TableView events={filteredEvents} />
+                                :
+                                <GridView setReload={setReload} events={filteredEvents} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} eventType={eventType} />
+                        )
                 }
             </div>
-                <Paginate
+            {
+                eventsCount > 0 && <Paginate
                     handlePageClick={handlePageClick}
                     numOfPages={numOfPages}
                 />
+            }
         </div>
     );
 };
@@ -214,8 +217,8 @@ const TableView = ({ events }: { events: IEvent[] }) => {
                         <TableCell className="font-medium">
                             {event.title}
                         </TableCell>
-                        <TableCell>
-                            {event.type}
+                        <TableCell className='capitalize' >
+                            {event.type ?? '-'}
                         </TableCell>
                         <TableCell>
                             {new Date(event.start_date).toDateString()}
@@ -247,9 +250,9 @@ const GridView = ({ events, setIsEditEvent, setReload, isEditEvent, eventType }:
                             <h1 className='text-lg line-clamp-2 mb-5'> {event.title} </h1>
 
                             <div className="flex justify-between items-center">
-                                {
-                                    eventType === 'live' ? null :  <p className='text-sm opacity-50'> {format(event.start_date, 'do MMMM yyyy')} </p>
-                                }
+                                <p className='text-sm opacity-50'>
+                                    {format(event.start_date, 'do MMMM yyyy')}
+                                </p>
                                 <Button onClick={() => { setIsEditEvent(true) }} size={'sm'} className="flex gap-3">
                                     <AddEvent currentStep={2} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} eventId={event.id} setReload={setReload} className="flex items-center gap-3 p-3">
                                         <Pencil />
@@ -264,20 +267,5 @@ const GridView = ({ events, setIsEditEvent, setReload, isEditEvent, eventType }:
         </div>
     )
 }
-
-
-// const CheckboxWithLabel = ({ label }: { label: string }) => {
-//     return (
-//         <div className = "flex items-center space-x-2" >
-//         <Checkbox id={label.replaceAll(' ', '')} />
-//         <label
-//             htmlFor={label.replaceAll(' ', '')}
-//             className="text-sm font-medium leading-none"
-//         >
-//             {label}
-//         </label>
-//         </div >
-//     )
-// }
 
 export default Events;
