@@ -42,6 +42,7 @@ export interface IEvent {
     start_date: string;
     end_date: string;
     event_link: string;
+    date?: string;
 }
 
 export interface ITenants {

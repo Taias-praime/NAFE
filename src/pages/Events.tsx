@@ -57,7 +57,7 @@ const Events = () => {
         `/events/sa/list-live-webinars`,
         (data) => {
             data.data.results.forEach((event: IEvent) => {
-                event.start_date = event.date;
+                event.start_date = event.date as string;
             });
             setEvents(data.data.results)
             setFilteredEvents(data.data.results);
@@ -238,7 +238,7 @@ interface GridViewProps {
     eventType: string;
 }
 
-const GridView = ({ events, setIsEditEvent, setReload, isEditEvent, eventType }: GridViewProps) => {
+const GridView = ({ events, setIsEditEvent, setReload, isEditEvent}: GridViewProps) => {
     return (
         <div className='grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-10'>
             {
