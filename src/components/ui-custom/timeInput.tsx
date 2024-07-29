@@ -5,14 +5,13 @@ import { Input } from '../ui/input';
 const TimeInput = ({ label, name, value, onChange }: {
     label: string,
     name: string,
-    value?: string,
-    onChange?: (e: ChangeEvent<HTMLInputElement>) => void
+    value: string,
+    onChange: (e: ChangeEvent<HTMLInputElement>) => void
 }) => {
 
     return (
         <div className="time-input">
             <label className="block mb-2">{label}</label>
-
             <Input
                 type="time"
                 name={name}

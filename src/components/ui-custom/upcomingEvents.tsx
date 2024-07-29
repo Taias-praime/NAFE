@@ -79,7 +79,7 @@ export const NoEvents = ({noEventsLabel} : {noEventsLabel: string}) => {
         <div className="flex justify-center items-center h-full">
             <div className="text-center">
                 <CalendarOff className="mb-4 mx-auto" />
-                <b> {noEventsLabel} </b>
+                <p> {noEventsLabel} </p>
             </div>
         </div>
     )
