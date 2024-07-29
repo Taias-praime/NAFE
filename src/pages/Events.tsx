@@ -12,6 +12,7 @@ import AddEvent from '../components/ui-custom/addEvent';
 import { IEvent } from '../models/interfaces';
 import { format } from 'date-fns';
 import Paginate from '../components/ui/paginate';
+import { NoEvents } from '../components/ui-custom/upcomingEvents';
 
 const Events = () => {
     const [eventsCount, setEventsCount] = useState<number>(0);
@@ -180,14 +181,17 @@ const Events = () => {
                 </div>
 
                 {
-                    isFetching && !events.length ?
+                    isFetching ?
                         <div className='w-full h-[400px] flex justify-center items-center'>
                             <Loader2 className='animate-spin mx-auto' />
                         </div> : (
-                            isList ?
-                                <TableView events={filteredEvents} />
-                                :
-                                <GridView setReload={setReload} events={filteredEvents} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} eventType={eventType} />
+                            events.length > 0 ?
+                                (
+                                    isList ?
+                                        <TableView events={filteredEvents} />
+                                        :
+                                        <GridView setReload={setReload} events={filteredEvents} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} eventType={eventType} />
+                                ) :  <NoEvents noEventsLabel={`No ${eventType === 'today' ? 'ongoing' : eventType} event`} />
                         )
                 }
             </div>
@@ -238,7 +242,7 @@ interface GridViewProps {
     eventType: string;
 }
 
-const GridView = ({ events, setIsEditEvent, setReload, isEditEvent}: GridViewProps) => {
+const GridView = ({ events, setIsEditEvent, setReload, isEditEvent }: GridViewProps) => {
     return (
         <div className='grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-10'>
             {
