@@ -46,11 +46,10 @@ const CreateDepartment = ({ open, label, setOpen, tenantId }: CreateDepartmentPr
             toast({ description: data.message });
         },
         (e) => {
-            const { message, ...err } = e;
+            const { message } = e;
             // notify
             toast({
                 title: `${message} (${status})`,
-                description: err.errors.error_message,
                 variant: 'destructive',
             });
         },

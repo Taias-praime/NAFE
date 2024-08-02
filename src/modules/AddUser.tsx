@@ -139,10 +139,9 @@ const AddUserActionSheet = ({
 			setFilterList(data.data.results)
 		},
 		(error, status) => {
-			const { message, ...err } = error;
+			const { message} = error;
 			toast({
 				title: `${message} (${status})`,
-				description: err.errors.error_message,
 				variant: "destructive",
 			});
 		}

@@ -21,11 +21,10 @@ const ResetPassword = () => {
 			if (status === 200) nav('./new');
 		}, // on success
 		(e) => {
-			const { message, ...err } = e;
+			const { message} = e;
 			// notify
 			toast({
 				title: `${message} (${status})`,
-				description: err.errors.error_message,
 				variant: 'destructive',
 			});
 		}, // on error

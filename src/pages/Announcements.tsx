@@ -49,11 +49,10 @@ const Announcements = () => {
       toast({ description: data.message });
     }, // on success
     (e) => {
-      const { message, ...err } = e;
+      const { message } = e;
       // notify
       toast({
         title: `${message} (${status})`,
-        description: err.errors.error_message,
         variant: 'destructive',
       });
     },
@@ -69,11 +68,10 @@ const Announcements = () => {
       toast({ description: data.message });
     },
     (e) => {
-      const { message, ...err } = e;
+      const { message } = e;
       // notify
       toast({
         title: `${message} (${status})`,
-        description: err.errors.error_message,
         variant: 'destructive',
       });
     },

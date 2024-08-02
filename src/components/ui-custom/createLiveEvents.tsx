@@ -66,11 +66,10 @@ const CreateLiveEvents = ({ isLVEdit, setEditLVModal, setReload, setIsLVEdit, op
             setReload(true);
         },
         (e) => {
-            const { message, ...err } = e;
+            const { message,} = e;
             // notify
             toast({
                 title: `${message} (${status})`,
-                description: err.errors.error_message,
                 variant: 'destructive',
             });
         },
@@ -90,11 +89,10 @@ const CreateLiveEvents = ({ isLVEdit, setEditLVModal, setReload, setIsLVEdit, op
             setReload(true);
         },
         (e) => {
-            const { message, ...err } = e;
+            const { message, } = e;
             // notify
             toast({
                 title: `${message} (${status})`,
-                description: err.errors.error_message,
                 variant: 'destructive',
             });
         },
@@ -124,11 +122,10 @@ const CreateLiveEvents = ({ isLVEdit, setEditLVModal, setReload, setIsLVEdit, op
         },
         (error, status) => {
             // on error
-            const { message, ...err } = error;
+            const { message } = error;
             // notify
             toast({
                 title: `${message} (${status})`,
-                description: err.errors.error_message,
                 variant: "destructive",
             });
         },
