@@ -8,7 +8,7 @@ import useFetch from "../hooks/useFetch";
 import { toast } from "../components/ui/use-toast";
 import { IUser } from "../models/interfaces";
 import Paginate from "../components/ui/paginate";
-import AddDepartmentMember from "../components/ui-custom/addDepartmentMember";
+import CreateUser from "../components/ui-custom/createUser";
 
 const Users = () => {
   const PAGINATION_HEIGHT = 40;
@@ -56,7 +56,7 @@ const Users = () => {
     }}>
       <div className="h-full overflow-y-auto">
         <div className="flex justify-between">
-          <AddDepartmentMember tenantId={''} open={open} setOpen={setOpen}
+          <CreateUser tenantId={''} open={open} setOpen={setOpen}
             label={
               <Button className="lg:absolute top-5 right-10 flex gap-3">
                 <PlusCircle />
@@ -94,7 +94,7 @@ const Users = () => {
                 <TableBody>
                   {users.map((user: IUser) => (
                     <TableRow key={user.id}>
-                      <AddDepartmentMember tenantId={''} open={open} setOpen={setOpen}
+                      <CreateUser tenantId={''} open={open} setOpen={setOpen}
                         label={
                           <TableCell className="font-medium">
                           <div className="flex items-center">

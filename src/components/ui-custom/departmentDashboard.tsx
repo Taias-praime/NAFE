@@ -8,7 +8,7 @@ import { HEADER_HEIGHT } from "../../lib/utils";
 import useFetch from "../../hooks/useFetch";
 import { Input } from "../ui/input";
 import { NoEvents, Event } from "./upcomingEvents";
-import AddDepartmentMember from "./addDepartmentMember";
+import CreateUser from "./createUser";
 import { Button } from "../ui/button";
 
 interface DepartmentDashboard {
@@ -80,7 +80,7 @@ const DepartmentDashboard = ({ tenantId }: DepartmentDashboard) => {
                                     <Card setReload={setReload} currentStep={1} img={CalImg} cta="Create Event" ctaIcon={<PlusCircle size={18} />} />
                                 </div>
                                 <div className="col-span-1">
-                                    <AddDepartmentMember tenantId={tenantId} open={open} setOpen={setOpen}
+                                    <CreateUser tenantId={tenantId} open={open} setOpen={setOpen}
                                         label={
                                             <div className=" bg-background/70 min-h-[200px] w-full px-5 2xl:px-10 py-5 flex items-center justify-between overflow-hidden rounded">
                                                 <div className="flex">

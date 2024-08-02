@@ -12,14 +12,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 
 const token = local("token");
 
-interface AddDepartmentMemberProps {
+interface CreateUserProps {
     setOpen: (value: boolean) => void;
     open: boolean;
     label: ReactNode;
     tenantId: string;
 }
 
-const AddDepartmentMember = ({ open, label, setOpen, tenantId }: AddDepartmentMemberProps) => {
+const CreateUser = ({ open, label, setOpen, tenantId }: CreateUserProps) => {
     const [featuredImg, setFeaturedImg] = useState('');
     const [departments, setDepartments] = useState([]);
     const [rank, setRank] = useState([]);
@@ -206,4 +206,4 @@ const AddDepartmentMember = ({ open, label, setOpen, tenantId }: AddDepartmentMe
     )
 }
 
-export default AddDepartmentMember;
+export default CreateUser;
