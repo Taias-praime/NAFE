@@ -103,11 +103,11 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
             setDepartments(data.data.results);
         },
         (error, status) => {
-            const { message, ...err } = error;
+            const { message} = error;
             // notify
             toast({
                 title: `${message} (${status})`,
-                description: err.errors.error_message,
+               
                 variant: "destructive",
             });
         }

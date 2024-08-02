@@ -137,11 +137,11 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
         },
         (error, status) => {
             // on error
-            const { message, ...err } = error;
+            const { message} = error;
             // notify
             toast({
                 title: `${message} (${status})`,
-                description: err.errors.error_message,
+               
                 variant: 'destructive',
             });
         },
@@ -165,11 +165,11 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
             setTenants(data.data.results)
         },
         (error, status) => {
-            const { message, ...err } = error;
+            const { message} = error;
             // notify
             toast({
                 title: `${message} (${status})`,
-                description: err.errors.error_message,
+               
                 variant: 'destructive',
             })
         },
@@ -182,11 +182,11 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
             setModerators(data.data.results) 
         },
         (error, status) => {
-            const { message, ...err } = error;
+            const { message} = error;
             // notify
             toast({
                 title: `${message} (${status})`,
-                description: err.errors.error_message,
+               
                 variant: 'destructive',
             })
         },
@@ -199,11 +199,11 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
             setKeynoteSpeakers(data.data.results)
         },
         (error, status) => {
-            const { message, ...err } = error;
+            const { message} = error;
             // notify
             toast({
                 title: `${message} (${status})`,
-                description: err.errors.error_message,
+               
                 variant: 'destructive',
             })
         },

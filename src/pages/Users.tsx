@@ -30,11 +30,11 @@ const Users = () => {
       }
     },
     (error, status) => { // on error
-      const { message, ...err } = error;
+      const { message} = error;
       // notify
       toast({
         title: `${message} (${status})`,
-        description: err.errors.error_message,
+       
         variant: 'destructive',
       })
     },
