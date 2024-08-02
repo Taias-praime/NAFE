@@ -22,7 +22,6 @@ const DepartmentDashboard = ({ tenantId }: DepartmentDashboard) => {
     const [upcomingEvents, setUpcomingEvents] = useState([]);
     const [filterMembers, setFilterMembers] = useState([]);
     const [search, setSearch] = useState('');
-    const [open, setOpen] = useState(false);
     const [reload, setReload] = useState(false);
     const [currentPage,] = useState(1);
 
@@ -80,7 +79,7 @@ const DepartmentDashboard = ({ tenantId }: DepartmentDashboard) => {
                                     <Card setReload={setReload} currentStep={1} img={CalImg} cta="Create Event" ctaIcon={<PlusCircle size={18} />} />
                                 </div>
                                 <div className="col-span-1">
-                                    <CreateUser tenantId={tenantId} open={open} setOpen={setOpen}
+                                    <CreateUser tenantId={tenantId}
                                         label={
                                             <div className=" bg-background/70 min-h-[200px] w-full px-5 2xl:px-10 py-5 flex items-center justify-between overflow-hidden rounded">
                                                 <div className="flex">

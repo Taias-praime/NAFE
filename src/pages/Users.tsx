@@ -16,7 +16,6 @@ const Users = () => {
   const [, setUserCount] = useState(0);
   const [numOfPages, setNumOfPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [open, setOpen] = useState(false);
 
   // get users
   const { onFetch: onFetchUsers, isFetching } = useFetch(
@@ -56,7 +55,7 @@ const Users = () => {
     }}>
       <div className="h-full overflow-y-auto">
         <div className="flex justify-between">
-          <CreateUser tenantId={''} open={open} setOpen={setOpen}
+          <CreateUser tenantId={''}
             label={
               <Button className="lg:absolute top-5 right-10 flex gap-3">
                 <PlusCircle />
@@ -94,15 +93,15 @@ const Users = () => {
                 <TableBody>
                   {users.map((user: IUser) => (
                     <TableRow key={user.id}>
-                      <CreateUser tenantId={''} open={open} setOpen={setOpen}
+                      <CreateUser tenantId={user.id}
                         label={
                           <TableCell className="font-medium">
-                          <div className="flex items-center">
-                            <span className="ms-2">
-                              {user.full_name || 'N/A'}
-                            </span>
-                          </div>
-                        </TableCell>
+                            <div className="flex items-center">
+                              <span className="ms-2">
+                                {user.full_name || 'N/A'}
+                              </span>
+                            </div>
+                          </TableCell>
                         }
                       />
                       <TableCell>

@@ -13,16 +13,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 const token = local("token");
 
 interface CreateUserProps {
-    setOpen: (value: boolean) => void;
-    open: boolean;
     label: ReactNode;
     tenantId: string;
 }
 
-const CreateUser = ({ open, label, setOpen, tenantId }: CreateUserProps) => {
+const CreateUser = ({ label, tenantId }: CreateUserProps) => {
     const [featuredImg, setFeaturedImg] = useState('');
     const [departments, setDepartments] = useState([]);
     const [rank, setRank] = useState([]);
+    const [open, setOpen] = useState(false);
 
     const formik = useFormik({
         initialValues: {
@@ -55,8 +54,7 @@ const CreateUser = ({ open, label, setOpen, tenantId }: CreateUserProps) => {
             const { message, ...err } = e;
             // notify
             toast({
-                title: `${message} (${status})`,
-                description: err.errors.error_message,
+                title: `${message}`,
                 variant: 'destructive',
             });
         },
