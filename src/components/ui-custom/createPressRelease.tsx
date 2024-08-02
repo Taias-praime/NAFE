@@ -66,11 +66,10 @@ const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, 
             setReload(true);
         },
         (e) => {
-            const { message, ...err } = e;
+            const { message, } = e;
             // notify
             toast({
                 title: `${message} (${status})`,
-                description: err.errors.error_message,
                 variant: 'destructive',
             });
         },
@@ -90,11 +89,10 @@ const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, 
             setReload(true);
         },
         (e) => {
-            const { message, ...err } = e;
+            const { message } = e;
             // notify
             toast({
                 title: `${message} (${status})`,
-                description: err.errors.error_message,
                 variant: 'destructive',
             });
         },
@@ -103,30 +101,6 @@ const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, 
             "Authorization": `Bearer ${token}`,
         }
     );
-
-    // // delete
-    // const { onDelete, isFetching: isDeleteLoading } = useFetch(
-    //     `/press-releases/sa/${id}/delete`,
-    //     (data) => {
-    //         toast({ description: data.message });
-    //         formik.resetForm();
-    //         setEditPRModal(false);
-    //         setReload(true);
-    //     },
-    //     (e) => {
-    //         const { message, ...err } = e;
-    //         // notify
-    //         toast({
-    //             title: `${message} (${status})`,
-    //             description: err.errors.error_message,
-    //             variant: 'destructive',
-    //         });
-    //     },
-    //     {},
-    //     {
-    //         "Authorization": `Bearer ${token}`,
-    //     }
-    // );
 
     useEffect(() => {
         formik.setFieldValue("date", eventDate)

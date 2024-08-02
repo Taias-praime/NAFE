@@ -22,6 +22,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
     const [departments, setDepartments] = useState([]);
     const [rank, setRank] = useState([]);
     const [open, setOpen] = useState(false);
+    const [id, setId] = useState('');
 
     const formik = useFormik({
         initialValues: {
@@ -51,7 +52,38 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
             toast({ description: data.message });
         },
         (e) => {
-            const { message, ...err } = e;
+            const { message, } = e;
+            // notify
+            toast({
+                title: `${message}`,
+                variant: 'destructive',
+            });
+        },
+        {},
+        {
+            "Authorization": `Bearer ${token}`,
+        }
+    );
+
+    // get
+    const { onFetch, isFetching } = useFetch(
+        `/users/sa/${id}/details`,
+        (data) => {
+            const names = data.data.full_name.split(' ');
+            formik.setValues({
+                image: data.data.image,
+                rank: data.data.rank,
+                tenant_id: data.data.tenant_id,
+                first_name: names[0],
+                last_name: names[1],
+                email: data.data.email,
+                phone_number: data.data.phone_number,
+            });
+            setFeaturedImg(data.data.profile_picture);
+            toast({ description: data.message });
+        },
+        (e) => {
+            const { message, } = e;
             // notify
             toast({
                 title: `${message}`,
@@ -81,29 +113,41 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
         }
     );
 
-        // fetch Rank
-        const { onFetch: fetchRank } = useFetch(
-            '/moderators/sa/ranks',
-            (data, status) => {
-                if (status === 200) {
-                    setRank(data.data.ranks)
-                }
-            },
-            (error, status) => {
-                const { message } = error;
-                // notify
-                toast({
-                    title: `Error: Failed to submit (${status})`,
-                    description: message || '',
-                    variant: 'destructive',
-                });
-            },
-        );
+    // fetch Rank
+    const { onFetch: fetchRank } = useFetch(
+        '/moderators/sa/ranks',
+        (data, status) => {
+            if (status === 200) {
+                setRank(data.data.ranks)
+            }
+        },
+        (error, status) => {
+            const { message } = error;
+            // notify
+            toast({
+                title: `Error: Failed to submit (${status})`,
+                description: message || '',
+                variant: 'destructive',
+            });
+        },
+    );
 
     useEffect(() => {
         getDeps();
         fetchRank();
     }, []);
+
+    useEffect(() => {
+        if (open && tenantId) {
+            setId(tenantId)
+        }
+    }, [open])
+
+    useEffect(() => {
+        if (id) {
+            onFetch()
+        }
+    }, [id])
 
     const deleteImage = () => {
         setFeaturedImg('')
@@ -121,85 +165,92 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
         <Modal open={open} onOpenChange={(value) => setOpen(value)} className="flex items-center gap-3"
             label={label}
         >
-            <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                <ProfileImage deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} />
-                <Input
-                    value={formik.values.first_name}
-                    onChange={formik.handleChange}
-                    name="first_name"
-                    placeholder="first name"
-                    className=""
-                    label="First Name"
-                />
-                <Input
-                    value={formik.values.last_name}
-                    onChange={formik.handleChange}
-                    name="last_name"
-                    placeholder="last name"
-                    className=""
-                    label="Last Name"
-                />
-                <div className="w-full">
-                    <Select onValueChange={handleRank}>
-                        <label className="block pb-3">Rank</label>
+            {
+                isFetching ? (
+                    <Loader2 className='animate-spin m-auto' />
+                ) : (
+                    <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
+                        <ProfileImage deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} />
+                        <Input
+                            value={formik.values.first_name}
+                            onChange={formik.handleChange}
+                            name="first_name"
+                            placeholder="first name"
+                            className=""
+                            label="First Name"
+                        />
+                        <Input
+                            value={formik.values.last_name}
+                            onChange={formik.handleChange}
+                            name="last_name"
+                            placeholder="last name"
+                            className=""
+                            label="Last Name"
+                        />
+                        <div className="w-full">
+                            <Select onValueChange={handleRank}>
+                                <label className="block pb-3">Rank</label>
 
-                        <SelectTrigger className="w-[330px]">
-                            <SelectValue placeholder="Select Rank" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {rank.map(
-                                (e: { name: string; value: string }) => (
-                                    <SelectItem key={e.value} value={e.value}>
-                                        {e.name}
-                                    </SelectItem>
-                                )
-                            )}
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div className="w-full">
-                    <Select onValueChange={handleDepartment}>
-                        <label className="block pb-3">Department</label>
-                        <SelectTrigger className="w-[300px]">
-                            <SelectValue placeholder="Select Here" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {departments.map(
-                                (e: { name: string; tenant_id: string }) => (
-                                    <SelectItem key={e.name} value={e.tenant_id}>
-                                        {e.name}
-                                    </SelectItem>
-                                )
-                            )}
-                        </SelectContent>
-                    </Select>
-                </div>
+                                <SelectTrigger className="w-[330px]">
+                                    <SelectValue placeholder="Select Rank" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {rank.map(
+                                        (e: { name: string; value: string }) => (
+                                            <SelectItem key={e.value} value={e.value}>
+                                                {e.name}
+                                            </SelectItem>
+                                        )
+                                    )}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="w-full">
+                            <Select onValueChange={handleDepartment}>
+                                <label className="block pb-3">Department</label>
+                                <SelectTrigger className="w-[300px]">
+                                    <SelectValue placeholder="Select Here" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {departments.map(
+                                        (e: { name: string; tenant_id: string }) => (
+                                            <SelectItem key={e.name} value={e.tenant_id}>
+                                                {e.name}
+                                            </SelectItem>
+                                        )
+                                    )}
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-                <Input
-                    value={formik.values.email}
-                    onChange={formik.handleChange}
-                    name="email"
-                    placeholder="email address"
-                    className=""
-                    label="Email"
-                />
-                <Input
-                    value={formik.values.phone_number}
-                    onChange={formik.handleChange}
-                    name="phone_number"
-                    placeholder="phone number"
-                    className=""
-                    label="Phone Number"
-                />
+                        <Input
+                            value={formik.values.email}
+                            onChange={formik.handleChange}
+                            name="email"
+                            placeholder="email address"
+                            className=""
+                            label="Email"
+                        />
+                        <Input
+                            value={formik.values.phone_number}
+                            onChange={formik.handleChange}
+                            name="phone_number"
+                            placeholder="phone number"
+                            className=""
+                            label="Phone Number"
+                        />
 
-                <div className="flex items-start justify-end mt-6">
-                    <Button variant="default" type='submit' className="px-10">
-                        {
-                            isLoadingPost ? <Loader2 className='animate-spin' /> : ('Add Member')
-                        }
-                    </Button>
-                </div>
-            </form>
+                        <div className="flex items-start justify-end mt-6">
+                            <Button variant="default" type='submit' className="px-10">
+                                {
+                                    isLoadingPost ? <Loader2 className='animate-spin' /> : ('Add Member')
+                                }
+                            </Button>
+                        </div>
+                    </form>
+                )
+            }
+
         </Modal>
     )
 }
