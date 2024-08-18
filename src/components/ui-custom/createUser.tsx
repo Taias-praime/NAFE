@@ -8,7 +8,8 @@ import { local, removeBase64 } from '../../lib/utils'
 import useFetch from '../../hooks/useFetch'
 import { toast } from '../ui/use-toast'
 import ProfileImage from './ProfileImage'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import ReactSelect from '../ui/multi-select'
+import { IDepartment, IRanks } from '../../models/interfaces'
 
 const token = local("token");
 
@@ -19,16 +20,20 @@ interface CreateUserProps {
 
 const CreateUser = ({ label, tenantId }: CreateUserProps) => {
     const [featuredImg, setFeaturedImg] = useState('');
-    const [departments, setDepartments] = useState([]);
-    const [rank, setRank] = useState([]);
+    const [departments, setDepartments] = useState<IDepartment[]>([]);
+    const [ranks, setRanks] = useState<IRanks[]>([]);
+    const [rank, setRank] = useState<IRanks>();
+    const [department, setDepartment] = useState<IDepartment>();
     const [open, setOpen] = useState(false);
+    const [disableEdit, setDisableEdit] = useState(false);
     const [id, setId] = useState('');
+    const [user, setUser] = useState<any>();
 
     const formik = useFormik({
         initialValues: {
             image: featuredImg,
             rank: '',
-            tenant_id: tenantId,
+            department: '',
             first_name: '',
             last_name: '',
             email: '',
@@ -39,7 +44,17 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                 ...obj,
                 image: removeBase64(featuredImg),
             }
-            onPost(data);
+            if (id) {
+                const user = {
+                    ...data,
+                    tenant_id: department?.tenant_id
+                }
+                onPut(user)
+                console.log(user);
+
+            } else {
+                onPost(data);
+            }
         }
     })
 
@@ -65,7 +80,29 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
         }
     );
 
-    // get
+    // edit
+    const { onPut, isFetching: isLoadingPut } = useFetch(
+        `/users/sa/${id}/edit`,
+        (data) => {
+            formik.resetForm();
+            setOpen(false);
+            toast({ description: data.message });
+        },
+        (e) => {
+            const { message, } = e;
+            // notify
+            toast({
+                title: `${message}`,
+                variant: 'destructive',
+            });
+        },
+        {},
+        {
+            "Authorization": `Bearer ${token}`,
+        }
+    );
+
+    // get user details
     const { onFetch, isFetching } = useFetch(
         `/users/sa/${id}/details`,
         (data) => {
@@ -73,13 +110,16 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
             formik.setValues({
                 image: data.data.image,
                 rank: data.data.rank,
-                tenant_id: data.data.tenant_id,
+                department: data.data.department_name,
                 first_name: names[0],
                 last_name: names[1],
                 email: data.data.email,
                 phone_number: data.data.phone_number,
             });
             setFeaturedImg(data.data.profile_picture);
+            setUser(data.data)
+            console.log(data.data);
+
             toast({ description: data.message });
         },
         (e) => {
@@ -97,37 +137,35 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
     );
 
     // fetch department
-    const { onFetch: getDeps } = useFetch(
+    const { onFetch: getDeps, isFetching: isLoadingDepartments } = useFetch(
         `/tenants/sa/`,
         (data) => {
             setDepartments(data.data.results);
         },
-        (error, status) => {
-            const { message} = error;
+        (error) => {
+            const { message } = error;
             // notify
             toast({
-                title: `${message} (${status})`,
-               
+                title: `${message}`,
                 variant: "destructive",
             });
         }
     );
 
     // fetch Rank
-    const { onFetch: fetchRank } = useFetch(
+    const { onFetch: fetchRank, isFetching: isLoadingRanks } = useFetch(
         '/moderators/sa/ranks',
         (data, status) => {
             if (status === 200) {
-                setRank(data.data.ranks)
+                setRanks(data.data.ranks)
             }
         },
-        (error, status) => {
+        (error) => {
             const { message } = error;
             // notify
             toast({
-                title: `Error: Failed to submit (${status})`,
-                description: message || '',
-                variant: 'destructive',
+                title: `${message}`,
+                variant: "destructive",
             });
         },
     );
@@ -140,6 +178,8 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
     useEffect(() => {
         if (open && tenantId) {
             setId(tenantId)
+        } else if (!tenantId) {
+            setDisableEdit(false);
         }
     }, [open])
 
@@ -149,16 +189,45 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
         }
     }, [id])
 
+    useEffect(() => {
+        if (user && ranks.length > 0 && isLoadingRanks === false) {
+            const getRank = getSelectValue(user.rank, ranks, "name");
+            setRank(getRank)
+        }
+    }, [user, isLoadingRanks])
+
+    useEffect(() => {
+        if (user && departments.length > 0 && isLoadingDepartments === false) {
+            const getDepartment = getSelectValue(user.department_name, departments, "name");
+            setDepartment(getDepartment)
+        }
+    }, [user, isLoadingDepartments])
+
     const deleteImage = () => {
         setFeaturedImg('')
     }
 
-    const handleDepartment = (value: string) => {
-        formik.setFieldValue('tenant_id', value);
+    const handleRankSelect = (rank: IRanks) => {
+        setRank(rank);
+        formik.setFieldValue('rank', rank.name)
     }
 
-    const handleRank = (rank: string) => {
-        formik.setFieldValue('rank', rank)
+    const handleDepartmentSelect = (department: IDepartment) => {
+        setDepartment(department);
+        formik.setFieldValue('department', department.name)
+    }
+
+    const enableEdit = () => {
+        setDisableEdit(false);
+    }
+
+    const getSelectValue = (name: string, arr: any[], value: string) => {
+        if (!name) return;
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i][value] === name) {
+                return arr[i];
+            }
+        }
     }
 
     return (
@@ -178,6 +247,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                             placeholder="first name"
                             className=""
                             label="First Name"
+                            disabled={disableEdit}
                         />
                         <Input
                             value={formik.values.last_name}
@@ -186,43 +256,24 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                             placeholder="last name"
                             className=""
                             label="Last Name"
+                            disabled={disableEdit}
                         />
-                        <div className="w-full">
-                            <Select onValueChange={handleRank}>
-                                <label className="block pb-3">Rank</label>
-
-                                <SelectTrigger className="w-[330px]">
-                                    <SelectValue placeholder="Select Rank" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {rank.map(
-                                        (e: { name: string; value: string }) => (
-                                            <SelectItem key={e.value} value={e.value}>
-                                                {e.name}
-                                            </SelectItem>
-                                        )
-                                    )}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="w-full">
-                            <Select onValueChange={handleDepartment}>
-                                <label className="block pb-3">Department</label>
-                                <SelectTrigger className="w-[300px]">
-                                    <SelectValue placeholder="Select Here" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {departments.map(
-                                        (e: { name: string; tenant_id: string }) => (
-                                            <SelectItem key={e.name} value={e.tenant_id}>
-                                                {e.name}
-                                            </SelectItem>
-                                        )
-                                    )}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
+                        <ReactSelect
+                            label="Select Rank"
+                            options={ranks}
+                            handleSelect={handleRankSelect}
+                            value={rank}
+                            optionName="name"
+                            optionValue="value"
+                        />
+                        <ReactSelect
+                            label="Select Department"
+                            options={departments}
+                            handleSelect={handleDepartmentSelect}
+                            value={department}
+                            optionName="name"
+                            optionValue="name"
+                        />
                         <Input
                             value={formik.values.email}
                             onChange={formik.handleChange}
@@ -230,6 +281,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                             placeholder="email address"
                             className=""
                             label="Email"
+                            disabled={disableEdit}
                         />
                         <Input
                             value={formik.values.phone_number}
@@ -238,14 +290,27 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                             placeholder="phone number"
                             className=""
                             label="Phone Number"
+                            disabled={disableEdit}
                         />
 
                         <div className="flex items-start justify-end mt-6">
-                            <Button variant="default" type='submit' className="px-10">
-                                {
-                                    isLoadingPost ? <Loader2 className='animate-spin' /> : ('Add Member')
-                                }
-                            </Button>
+                            {
+                                disableEdit ? (
+                                    <Button onClick={enableEdit} type='button' className="px-10">Edit User </Button>
+                                ) : (
+                                    <Button variant="default" type='submit' className="px-10">
+                                        {isLoadingPut ? <Loader2 className='animate-spin' /> : 'Update'}
+                                    </Button>
+                                )
+                            }
+                            {
+                                !id && (
+                                    <Button variant="default" type='submit' className="px-10">
+                                        {isLoadingPost ? <Loader2 className='animate-spin' /> : 'Add User'}
+                                    </Button>
+                                )
+                            }
+
                         </div>
                     </form>
                 )

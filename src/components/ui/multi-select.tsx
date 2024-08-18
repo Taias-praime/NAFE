@@ -1,14 +1,16 @@
 import Select from 'react-select';
-import { ITenants } from '../../models/interfaces';
 
-interface IMultiSelect {
-    options: ITenants[];
-    handleSelect: (tenant_ids: ITenants[] | any) => void;
-    value: ITenants[];
+interface IReactSelect {
+    options: any[];
+    handleSelect: (value: any) => void;
+    value: any;
     label: string;
+    isMulti?: boolean;
+    optionName: string;
+    optionValue: string;
 }
 
-const MultiSelect = ({ options, handleSelect, value, label }: IMultiSelect) => {
+const ReactSelect = ({ options, handleSelect, value, label, isMulti, optionName, optionValue }: IReactSelect) => {
 
     const customStyles = {
         control: (baseStyles: any) => ({
@@ -41,9 +43,9 @@ const MultiSelect = ({ options, handleSelect, value, label }: IMultiSelect) => {
     return (
         <>
             <label className="block pb-1"> {label} </label>
-            <Select isMulti options={options} onChange={handleSelect}
-                getOptionLabel={(options) => options.name}
-                getOptionValue={(options) => options.tenant_id}
+            <Select isMulti={isMulti} options={options} onChange={handleSelect}
+                getOptionLabel={(options) => options[optionName]}
+                getOptionValue={(options) => options[optionValue]}
                 value={value}
                 styles={customStyles}
                 placeholder='select department'
@@ -53,4 +55,4 @@ const MultiSelect = ({ options, handleSelect, value, label }: IMultiSelect) => {
     )
 }
 
-export default MultiSelect;
+export default ReactSelect;

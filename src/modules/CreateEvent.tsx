@@ -28,7 +28,7 @@ import { useDashboardContext } from '../contexts/dashboard.context';
 import { useLocation } from 'react-router-dom';
 import { IEventSpeaker, ITenants } from '../models/interfaces';
 import AddUser from './AddUser';
-import MultiSelect from '../components/ui/multi-select';
+import ReactSelect from '../components/ui/multi-select';
 import { FileItem } from '../components/ui-custom/files';
 
 interface CreateEventProps {
@@ -135,14 +135,13 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
         (data, status) => {
             if (status === 200) setEventTypes(data.data.event_types);
         },
-        (error, status) => {
+        (error) => {
             // on error
-            const { message} = error;
+            const { message } = error;
             // notify
             toast({
-                title: `${message} (${status})`,
-               
-                variant: 'destructive',
+                title: `${message}`,
+                variant: "destructive",
             });
         },
         {} // options
@@ -164,14 +163,13 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
         (data) => {
             setTenants(data.data.results)
         },
-        (error, status) => {
-            const { message} = error;
+        (error) => {
+            const { message } = error;
             // notify
             toast({
-                title: `${message} (${status})`,
-               
-                variant: 'destructive',
-            })
+                title: `${message}`,
+                variant: "destructive",
+            });
         },
     );
 
@@ -179,16 +177,15 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
     const { onFetch: getMorderators } = useFetch(
         '/moderators/sa/',
         (data) => {
-            setModerators(data.data.results) 
+            setModerators(data.data.results)
         },
-        (error, status) => {
-            const { message} = error;
+        (error) => {
+            const { message } = error;
             // notify
             toast({
-                title: `${message} (${status})`,
-               
-                variant: 'destructive',
-            })
+                title: `${message}`,
+                variant: "destructive",
+            });
         },
     );
 
@@ -198,14 +195,12 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
         (data) => {
             setKeynoteSpeakers(data.data.results)
         },
-        (error, status) => {
-            const { message} = error;
-            // notify
+        (error) => {
+            const { message } = error;
             toast({
-                title: `${message} (${status})`,
-               
-                variant: 'destructive',
-            })
+                title: `${message}`,
+                variant: "destructive",
+            });
         },
     );
 
@@ -514,11 +509,14 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                         </div>
 
                                         <div className="col-span-1">
-                                            <MultiSelect
+                                            <ReactSelect
                                                 label="Select Department"
                                                 options={tenants}
                                                 handleSelect={handleSelect}
                                                 value={tenantsId}
+                                                isMulti={true}
+                                                optionName="name"
+                                                optionValue="tenant_id"
                                             />
                                         </div>
 

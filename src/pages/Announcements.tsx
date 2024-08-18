@@ -9,7 +9,7 @@ import { format } from "date-fns"
 import { toast } from "../components/ui/use-toast";
 import { IAnnouncements, ITenants } from "../models/interfaces";
 import useFetch from "../hooks/useFetch";
-import MultiSelect from "../components/ui/multi-select";
+import ReactSelect from "../components/ui/multi-select";
 import Paginate from "../components/ui/paginate";
 
 const token = local("token");
@@ -177,11 +177,14 @@ const Announcements = () => {
               label="Details"
             />
 
-            <MultiSelect
+            <ReactSelect
               label="Select Department"
               options={tenants}
               handleSelect={handleSelect}
               value={tenantsId}
+              isMulti={true}
+              optionName="name"
+              optionValue="tenant_id"
             />
             <div className="flex justify-end mt-12">
               {
@@ -223,7 +226,7 @@ const Announcements = () => {
           {
             !isLoadingAnnouncements ? (
               announcements.map((announcement) => (
-                <AnnouncementCard announcement={announcement} editAnnouncement={editAnnouncement} />
+                <AnnouncementCard key={announcement.id} announcement={announcement} editAnnouncement={editAnnouncement} />
               ))
             ) : (
               <div className="flex items-center justify-center h-full w-full">

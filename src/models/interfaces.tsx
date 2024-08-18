@@ -115,3 +115,18 @@ export interface IEventSpeaker {
     image: string;
     description: string;
 }
+
+export interface IDepartment   {
+    tenant_id: string;
+    name: string;
+    code:string;
+    total_events: number;
+    total_members: number;
+    webinars: number;
+}
+
+export interface IRanks   {
+    name: string;
+    value: string;
+    category: string;
+}
