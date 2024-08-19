@@ -15,7 +15,7 @@ import { HEADER_HEIGHT, USER_PLACEHOLDER_IMG_URL } from "../lib/utils";
 import { useEffect, useState } from "react";
 import { useToast } from "../components/ui/use-toast";
 import useFetch from "../hooks/useFetch";
-import EditDepartment from "../components/ui-custom/editDepartment";
+import DepartmentDetails from "../components/ui-custom/departmentDetails";
 import Paginate from "../components/ui/paginate";
 import CreateDepartment from "../components/ui-custom/createDepartment";
 
@@ -28,7 +28,6 @@ const Departments = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [tenantId, setTenantId] = useState('');
   const [tenant, setTenant] = useState('');
-  const [open, setOpen] = useState(false);
 
   const { toast } = useToast();
 
@@ -40,11 +39,11 @@ const Departments = () => {
       setNumOfPages(data.data.number_of_pages);
     },
     (error, status) => {
-      const { message} = error;
+      const { message } = error;
       // notify
       toast({
         title: `${message} (${status})`,
-       
+
         variant: "destructive",
       });
     }
@@ -76,7 +75,7 @@ const Departments = () => {
             <div className="h-full overflow-y-auto">
               <div className="flex justify-between">
                 <CreateDepartment
-                  tenantId={''} open={open} setOpen={setOpen}
+                  tenantId={''}
                   label={
                     <Button className="lg:absolute top-5 right-10 flex gap-3">
                       <PlusCircle />
@@ -100,21 +99,25 @@ const Departments = () => {
                   </div>
                 </div>
                 <Table>
-                  {/* <TableCaption className="py-5">A list of your recent invoices.</TableCaption> */}
                   <TableHeader>
                     <TableRow>
                       <TableHead>Departments</TableHead>
                       <TableHead>No. of Users</TableHead>
                       <TableHead>Events</TableHead>
                       <TableHead className="text-center">Live Webinars</TableHead>
+                      <TableHead className="text-center"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody >
                     {deps.map((d: any) => (
                       <TableRow onClick={() => updateTenantId(d.tenant_id, d.code)} key={d.tenant_id} className="text-start" >
-                        <EditDepartment label={`Department/${tenant}`} tenantId={tenantId} >
-                          <TableCell className="font-medium">{d.code}</TableCell>
-                        </EditDepartment>
+                        <CreateDepartment
+                          tenantId={d.tenant_id}
+                          label={
+                            <TableCell className="font-medium">{d.code}</TableCell>
+                          }
+                        />
+
                         <TableCell>
                           <div className="flex items-center">
                             {[...Array(d.total_members).keys()]
@@ -138,6 +141,12 @@ const Departments = () => {
                         <TableCell className="flex justify-center items-center gap-3">
                           <span> {d.webinars} </span>
                           <Badge variant={"destructive"}> Live </Badge>
+                        </TableCell>
+
+                        <TableCell>
+                          <DepartmentDetails label={`Department/${tenant}`} tenantId={tenantId} >
+                            <button className="p-0 text-xs border px-3 py-0.5 rounded-full text-gray-800"> View details</button>
+                          </DepartmentDetails>
                         </TableCell>
                       </TableRow>
                     ))}

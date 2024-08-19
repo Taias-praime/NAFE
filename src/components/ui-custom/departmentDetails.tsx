@@ -16,7 +16,7 @@ interface EditDepartmentProps {
 	tenantId: string;
 }
 
-const EditDepartment = ({ children, className, label, tenantId }: EditDepartmentProps) => {
+const DepartmentDetails = ({ children, className, label, tenantId }: EditDepartmentProps) => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 
 	return (
@@ -38,4 +38,4 @@ const EditDepartment = ({ children, className, label, tenantId }: EditDepartment
 	);
 };
 
-export default EditDepartment;
+export default DepartmentDetails;

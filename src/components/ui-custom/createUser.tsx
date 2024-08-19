@@ -25,7 +25,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
     const [rank, setRank] = useState<IRanks>();
     const [department, setDepartment] = useState<IDepartment>();
     const [open, setOpen] = useState(false);
-    const [disableEdit, setDisableEdit] = useState(false);
+    const [disableEdit, setDisableEdit] = useState(true);
     const [id, setId] = useState('');
     const [user, setUser] = useState<any>();
 
@@ -86,6 +86,8 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
         (data) => {
             formik.resetForm();
             setOpen(false);
+            setId('');
+            setDisableEdit(true);
             toast({ description: data.message });
         },
         (e) => {
@@ -230,8 +232,16 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
         }
     }
 
+    const toggleOpen = (value: boolean) => {
+        if (value) {
+            setId('')
+            setDisableEdit(true);
+        }
+        setOpen(value)
+    }
+
     return (
-        <Modal open={open} onOpenChange={(value) => setOpen(value)} className="flex items-center gap-3"
+        <Modal open={open} onOpenChange={toggleOpen} className="flex items-center gap-3"
             label={label}
         >
             {
@@ -293,15 +303,15 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                             disabled={disableEdit}
                         />
 
-                        <div className="flex items-start justify-end mt-6">
+                        <div className="flex items-start gap-3 justify-end mt-6">
+                            <Button variant="outline" onClick={() => toggleOpen(false)} type='button' className="px-10">Cancel </Button>
                             {
-                                disableEdit ? (
-                                    <Button onClick={enableEdit} type='button' className="px-10">Edit User </Button>
-                                ) : (
-                                    <Button variant="default" type='submit' className="px-10">
-                                        {isLoadingPut ? <Loader2 className='animate-spin' /> : 'Update'}
-                                    </Button>
-                                )
+                                id && disableEdit && <Button onClick={enableEdit} type='button' className="px-10">Edit User </Button>
+                            }
+                            {
+                                id && !disableEdit && <Button variant="default" type='submit' className="px-10">
+                                    {isLoadingPut ? <Loader2 className='animate-spin' /> : 'Update'}
+                                </Button>
                             }
                             {
                                 !id && (
@@ -310,7 +320,6 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                                     </Button>
                                 )
                             }
-
                         </div>
                     </form>
                 )
