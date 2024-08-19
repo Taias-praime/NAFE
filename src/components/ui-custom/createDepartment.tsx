@@ -96,13 +96,14 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
         `/tenants/sa/${id}/details`,
         (data) => {
             const _data = data.data
+            const hod = _data.hod_details
             formik.setValues({
                 code: _data.code,
                 tenant_id: tenantId,
-                first_name: '',
-                last_name: '',
-                email: _data.email,
-                phone_number: _data.email,
+                first_name: hod.first_name,
+                last_name: hod.last_name,
+                email: hod.email,
+                phone_number: hod.email,
                 description: _data.description,
                 service: _data.service ?? '',
                 tenant_name: _data.name,
