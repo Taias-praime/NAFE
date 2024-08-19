@@ -8,9 +8,10 @@ interface IReactSelect {
     isMulti?: boolean;
     optionName: string;
     optionValue: string;
+    disabled?: boolean;
 }
 
-const ReactSelect = ({ options, handleSelect, value, label, isMulti, optionName, optionValue }: IReactSelect) => {
+const ReactSelect = ({ options, handleSelect, value, label, isMulti, optionName, optionValue, disabled }: IReactSelect) => {
 
     const customStyles = {
         control: (baseStyles: any) => ({
@@ -49,6 +50,7 @@ const ReactSelect = ({ options, handleSelect, value, label, isMulti, optionName,
                 value={value}
                 styles={customStyles}
                 placeholder='select department'
+                isDisabled={disabled}
             >
             </Select>
         </>

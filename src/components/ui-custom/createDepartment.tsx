@@ -35,7 +35,6 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
             tenant_type: "dept_admin"
         },
         onSubmit: (obj) => {
-            console.log(obj);
             if (id) {
                 onPut(obj)
             } else {
@@ -96,7 +95,6 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
     const { onFetch, isFetching } = useFetch(
         `/tenants/sa/${id}/details`,
         (data) => {
-            console.log(data.data);
             const _data = data.data
             formik.setValues({
                 code: _data.code,

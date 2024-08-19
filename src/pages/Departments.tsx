@@ -145,7 +145,7 @@ const Departments = () => {
 
                         <TableCell>
                           <DepartmentDetails label={`Department/${tenant}`} tenantId={tenantId} >
-                            <button className="p-0 text-xs border px-3 py-0.5 rounded-full text-gray-800"> View details</button>
+                            <Button variant="outline" className="p-0 text-sm px-3 py-0 rounded-full text-gray-800"> View details</Button>
                           </DepartmentDetails>
                         </TableCell>
                       </TableRow>

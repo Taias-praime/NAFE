@@ -50,8 +50,6 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                     tenant_id: department?.tenant_id
                 }
                 onPut(user)
-                console.log(user);
-
             } else {
                 onPost(data);
             }
@@ -120,8 +118,6 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
             });
             setFeaturedImg(data.data.profile_picture);
             setUser(data.data)
-            console.log(data.data);
-
             toast({ description: data.message });
         },
         (e) => {
