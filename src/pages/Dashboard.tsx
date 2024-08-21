@@ -132,7 +132,7 @@ const Dashboard = () => {
                                                     <TableCell>
                                                         <div className="flex items-center">
                                                             {[...Array(d.total_members).keys()].map((_,i) =>
-                                                                <ProfileImg className={i ? "-ml-4" : ''} url={USER_PLACEHOLDER_IMG_URL} />
+                                                                <ProfileImg key={i} className={i ? "-ml-4" : ''} url={USER_PLACEHOLDER_IMG_URL} />
                                                             ).slice(0, 3)}
                                                             <span className="ms-2"> 
                                                                 { (d.total_members > 3) ? '+ ' + (d.total_members - 3) : '' } 

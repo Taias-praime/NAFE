@@ -25,10 +25,7 @@ const Login = () => {
 	};
 
 	const handleLogin = () => {
-		login(formik.values).then((d) => {
-			console.log(d);
-			// nav('/dashboard');
-		});
+		login(formik.values).then(() => {});
 	};
 
 	const formik = useFormik({
