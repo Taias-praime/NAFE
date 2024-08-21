@@ -1,7 +1,14 @@
 import { ImageUpIcon, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const ProfileImage = ({ setFeaturedImg, featuredImg, deleteImage }: { setFeaturedImg: (img: string) => void, featuredImg: string, deleteImage?: () => void }) => {
+interface ProfileImageProps {
+    setFeaturedImg: (img: string) => void;
+    featuredImg: string;
+    deleteImage?: () => void;
+    disabled?: boolean
+}
+
+const ProfileImage = ({ setFeaturedImg, featuredImg, deleteImage, disabled }: ProfileImageProps) => {
 
     const [preview, setPreview] = useState<string | null>(null);
 
@@ -17,27 +24,26 @@ const ProfileImage = ({ setFeaturedImg, featuredImg, deleteImage }: { setFeature
                 setPreview(reader.result as string);
                 setFeaturedImg(reader.result as string);
             };
-            reader.readAsDataURL(file);            
+            reader.readAsDataURL(file);
         }
     };
 
     return (
         <div className="max-w-full w-full h-64 rounded flex items-center justify-center bg-black/30 relative">
             <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer text-white">
-                <div
-                    style={{ backgroundImage: `url(${preview})` }}
+                <div style={{ backgroundImage: `url(${preview})` }}
                     className="max-w-full w-full h-full rounded flex items-center justify-center bg-cover bg-center"
                 />
-                <div className="absolute">
-                    <ImageUpIcon className='mx-auto scale-125' />
-                    <div className="">
-                        {
-                            preview ? 'Change Profile Image' : 'Upload Profile Image'
-                        }
-                    </div>
-                </div>
+                {
+                    !disabled && (
+                        <div className="absolute">
+                            <ImageUpIcon className='mx-auto scale-125' />
+                            <div className=""> {preview ? 'Change Profile Image' : 'Upload Profile Image'}     </div>
+                        </div>
+                    )
+                }
 
-                <input id="featImg" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                <input disabled={disabled} id="featImg" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
             </label>
             {
                 preview && (

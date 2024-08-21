@@ -40,6 +40,7 @@ const ChiefOfArmyStaff = () => {
     const [editCOASModal, setEditCOASModal] = useState(false);
     const [editLVModal, setEditLVModal] = useState(false);
     const [editPRModal, setEditPRModal] = useState(false);
+    const [disableEdit, setDisableEdit] = useState(true);
     const [tab, setTab] = useState("press release");
     const [featuredImg, setFeaturedImg] = useState('');
     const [prId, setPrId] = useState('');
@@ -84,11 +85,10 @@ const ChiefOfArmyStaff = () => {
         },
         (error, status) => {
             // on error
-            const { message} = error;
+            const { message } = error;
             // notify
             toast({
                 title: `${message} (${status})`,
-               
                 variant: "destructive",
             });
         },
@@ -108,11 +108,10 @@ const ChiefOfArmyStaff = () => {
         },
         (error, status) => {
             // on error
-            const { message} = error;
+            const { message } = error;
             // notify
             toast({
                 title: `${message} (${status})`,
-               
                 variant: "destructive",
             });
         },
@@ -131,11 +130,10 @@ const ChiefOfArmyStaff = () => {
         },
         (error, status) => {
             // on error
-            const { message} = error;
+            const { message } = error;
             // notify
             toast({
                 title: `${message} (${status})`,
-               
                 variant: "destructive",
             });
         },
@@ -155,11 +153,10 @@ const ChiefOfArmyStaff = () => {
         },
         (error, status) => {
             // on error
-            const { message} = error;
+            const { message } = error;
             // notify
             toast({
                 title: `${message} (${status})`,
-               
                 variant: "destructive",
             });
         },
@@ -171,10 +168,11 @@ const ChiefOfArmyStaff = () => {
         `/army-staffs/sa/${COAS?.id}/edit`,
         (data) => {
             toast({ description: data.message });
-            setEditCOASModal(!editCOASModal)
+            setEditCOASModal(!editCOASModal);
+            setDisableEdit(false);
         },
         (e) => {
-            const { message} = e;
+            const { message } = e;
             // notify
             toast({
                 title: `${message} (${status})`,
@@ -274,12 +272,8 @@ const ChiefOfArmyStaff = () => {
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <div
-                                        >
-                                            <img
-                                                className="rounded-lg w-full h-72"
-                                                src={COAS.image || USER_PLACEHOLDER_IMG_URL}
-                                            />
+                                        <div>
+                                            <img className="rounded-lg w-full h-72" src={COAS.image || USER_PLACEHOLDER_IMG_URL} />
                                         </div>
                                     </TooltipTrigger>
                                     <TooltipContent>
@@ -292,16 +286,13 @@ const ChiefOfArmyStaff = () => {
                                 <Button size={"sm"} className="flex gap-3 px-5">
                                     <Modal open={editCOASModal} title="Chief of Army Staff" onOpenChange={(value) => {
                                         if (value) editCOAS();
+                                        setDisableEdit(true);
                                         setEditCOASModal(value)
                                     }} className="flex items-center gap-3 p-3"
-                                        label={
-                                            <>
-                                                <PencilLine /> Edit
-                                            </>
-                                        }
+                                        label={<> <PencilLine /> Edit </>}
                                     >
                                         <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                                            <ProfileImage setFeaturedImg={setFeaturedImg} deleteImage={deleteImage} featuredImg={featuredImg} />
+                                            <ProfileImage disabled={disableEdit} setFeaturedImg={setFeaturedImg} deleteImage={deleteImage} featuredImg={featuredImg} />
                                             <Input
                                                 value={formik.values.fullname}
                                                 onChange={formik.handleChange}
@@ -309,6 +300,7 @@ const ChiefOfArmyStaff = () => {
                                                 placeholder="title here"
                                                 className=""
                                                 label="Full Name"
+                                                disabled={disableEdit}
                                             />
                                             <Input
                                                 value={formik.values.title}
@@ -317,6 +309,7 @@ const ChiefOfArmyStaff = () => {
                                                 placeholder="title here"
                                                 className=""
                                                 label="Title"
+                                                disabled={disableEdit}
                                             />
                                             <Textarea
                                                 rows={4}
@@ -326,30 +319,35 @@ const ChiefOfArmyStaff = () => {
                                                 placeholder="details of the event here"
                                                 className="mb-10"
                                                 label="Philosophy"
+                                                disabled={disableEdit}
                                             />
                                             {formik.values.files && (
                                                 <div className="flex flex-col gap-4">
                                                     {formik.values.files.map((file) => (
-                                                        <FileItem showDelete={true} onClick={(e: { preventDefault: () => void; }) => removeFile(e, file)} file={file} />
+                                                        <FileItem disabled={disableEdit} showDelete={true} onClick={(e: { preventDefault: () => void; }) => removeFile(e, file)} file={file} />
                                                     ))}
                                                 </div>
                                             )}
-
-                                            <div className="flex items-start justify-between mt-6">
-                                                <Button variant="blue" className="px-10">
-                                                    <label className="flex items-center justify-center gap-2 w-full h-full cursor-pointer">
-                                                        <div className=" rounded">
-                                                            <Paperclip className="text-white" />
-                                                        </div>
-                                                        Attach File
-                                                        <input type="file" accept="*/" onChange={handleFileChange} className="hidden" />
-                                                    </label>
-                                                </Button>
-                                                <Button variant="default" type='submit' className="px-10">
-                                                    {
-                                                        isLoadingEdit ? <Loader2 className='animate-spin' /> : 'Update'
-                                                    }
-                                                </Button>
+                                            <div className="flex items-start gap-3 justify-end mt-6">
+                                                {disableEdit && <Button onClick={() => setDisableEdit(false)} type='button' className="px-10">Edit </Button>}
+                                                {
+                                                    !disableEdit && (
+                                                        <>
+                                                            <Button variant="blue" type="button" className="px-10">
+                                                                <label className="flex items-center justify-center gap-2 w-full h-full cursor-pointer">
+                                                                    <div className=" rounded">
+                                                                        <Paperclip className="text-white" />
+                                                                    </div>
+                                                                    Attach File
+                                                                    <input type="file" accept="*/" onChange={handleFileChange} className="hidden" />
+                                                                </label>
+                                                            </Button>
+                                                            <Button variant="default" type='submit' className="px-10">
+                                                                {isLoadingEdit ? <Loader2 className='animate-spin' /> : 'Update'}
+                                                            </Button>
+                                                        </>
+                                                    )
+                                                }
                                             </div>
                                         </form>
                                     </Modal>
@@ -367,7 +365,7 @@ const ChiefOfArmyStaff = () => {
 
                 {/* List of files */}
                 {COAS?.files.length && <FilesList files={COAS.files} />}
-            </aside>
+            </aside >
             <div className=" bg-white mt-6 mr-6">
                 <div className="">
                     <Tabs
@@ -457,7 +455,7 @@ const ChiefOfArmyStaff = () => {
                     }
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
