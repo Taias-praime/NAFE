@@ -257,12 +257,10 @@ const ChiefOfArmyStaff = () => {
     }
 
     return (
-        <div
-            className="overflow-y-auto bg-foreground/5 grid md:grid-cols-[400px_1fr] gap-4"
+        <div className="overflow-y-auto bg-foreground/5 grid md:grid-cols-[400px_1fr] gap-4"
             style={{
                 height: `calc(100vh - ${HEADER_HEIGHT}px)`,
-            }}
-        >
+            }}>
             <aside className="col-span-1 border-r p-10 bg-white">
                 {isFetchingCOAS ? (
                     <SkeletonCard />
@@ -272,17 +270,12 @@ const ChiefOfArmyStaff = () => {
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <div>
-                                            <img className="rounded-lg w-full h-72" src={COAS.image || USER_PLACEHOLDER_IMG_URL} />
-                                        </div>
+                                        <div> <img className="rounded-lg w-full h-72" src={COAS.image || USER_PLACEHOLDER_IMG_URL} /> </div>
                                     </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>{COAS.fullname}</p>
-                                    </TooltipContent>
+                                    <TooltipContent> <p>{COAS.fullname}</p> </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
-
-                            <div className="">
+                            <div>
                                 <Button size={"sm"} className="flex gap-3 px-5">
                                     <Modal open={editCOASModal} title="Chief of Army Staff" onOpenChange={(value) => {
                                         if (value) editCOAS();
@@ -333,7 +326,7 @@ const ChiefOfArmyStaff = () => {
                                                 {
                                                     !disableEdit && (
                                                         <>
-                                                            <Button variant="blue" type="button" className="px-10">
+                                                            <Button variant="blue" type="button" className="px-8">
                                                                 <label className="flex items-center justify-center gap-2 w-full h-full cursor-pointer">
                                                                     <div className=" rounded">
                                                                         <Paperclip className="text-white" />

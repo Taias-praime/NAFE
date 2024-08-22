@@ -1,15 +1,15 @@
+import { useEffect, useState } from 'react'
+import { Paperclip, Loader2 } from 'lucide-react'
+import { useFormik } from 'formik'
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css";
 import { Textarea } from '../ui/textarea'
 import { Input } from '../ui/input'
-import { Paperclip, Loader2 } from 'lucide-react'
 import { Button } from '../ui/button'
 import Modal from './modal'
-import { useEffect, useState } from 'react'
 import { FileItem } from './files'
-import { useFormik } from 'formik'
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
-import { Calendar } from '../ui/calendar'
 import { format } from 'date-fns'
-import { cn, local, removeBase64 } from '../../lib/utils'
+import { local, removeBase64 } from '../../lib/utils'
 import useFetch from '../../hooks/useFetch'
 import { toast } from '../ui/use-toast'
 import ProfileImage from './ProfileImage'
@@ -27,9 +27,10 @@ interface CreatePressReleaseProps {
 
 const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, PR, open, }: CreatePressReleaseProps) => {
 
-    const [eventDate, setEventDate] = useState<Date>();
+    const [eventDate, setEventDate] = useState<Date | null>(new Date());
     const [featuredImg, setFeaturedImg] = useState('');
     const [id, setId] = useState('');
+    const [disableEdit, setDisableEdit] = useState(true);
 
     const formik = useFormik({
         initialValues: {
@@ -50,10 +51,11 @@ const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, 
 
             if (isPREdit) {
                 onPut(data);
+                console.log(data);
             } else {
                 onPost(data);
             }
-        }, 
+        },
     })
 
     // add
@@ -86,6 +88,7 @@ const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, 
             toast({ description: data.message });
             formik.resetForm();
             setEditPRModal(false);
+            setDisableEdit(true);
             setReload(true);
         },
         (e) => {
@@ -144,7 +147,8 @@ const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, 
         setIsPREdit(false);
         setFeaturedImg('');
         formik.resetForm();
-        setEventDate(undefined);
+        setEventDate(null);
+        if (isPREdit) setDisableEdit(true);
     }
 
     const deleteImage = () => {
@@ -156,7 +160,7 @@ const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, 
             label="Upload Press Release"
         >
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                <ProfileImage deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} />
+                <ProfileImage deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} disabled={disableEdit} />
                 <Input
                     value={formik.values.title}
                     onChange={formik.handleChange}
@@ -164,30 +168,21 @@ const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, 
                     placeholder="title here"
                     className=""
                     label="Press Realease Title"
+                    disabled={disableEdit}
                 />
-                <div className="">
+                <div className="w-full">
                     <label>Select Event Date</label>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className={cn(
-                                    "w-full rounded-none border-0 border-b border-black justify-start text-left font-normal my-2 px-0",
-                                    !eventDate && "text-muted-foreground"
-                                )}
-                            >
-                                {eventDate ? format(eventDate, "dd/MM/yyyy") : <span>dd/mm/yyyy</span>}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                            <Calendar
-                                mode="single"
-                                selected={eventDate}
-                                onSelect={setEventDate}
-                                initialFocus
-                            />
-                        </PopoverContent>
-                    </Popover>
+                    <div className="w-full">
+                        <DatePicker
+                            selected={eventDate}
+                            onChange={(date) => {
+                                setEventDate(date);
+                                console.log(date);
+                            }}
+                            className="w-full block outline-none bg-none"
+                            disabled={disableEdit}
+                        />
+                    </div>
                 </div>
                 <Textarea
                     rows={4}
@@ -197,6 +192,7 @@ const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, 
                     placeholder="description here"
                     className="mb-10"
                     label="Description"
+                    disabled={disableEdit}
                 />
                 {formik.values.files && (
                     <div className="flex flex-col gap-4">
@@ -206,21 +202,25 @@ const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, 
                     </div>
                 )}
 
-                <div className="flex items-start justify-between mt-6">
-                    <div onClick={(event) => event.stopPropagation()} className="px-10 bg-blue p-2 rounded text-white">
-                        <label className="flex items-center justify-center gap-2 w-full h-full cursor-pointer">
-                            <div className=" rounded">
-                                <Paperclip className="text-white" />
-                            </div>
-                            Attach File
-                            <input type="file" accept="*/" onChange={handleFileChange} className="hidden" />
-                        </label>
-                    </div>
-                    <Button variant="default" type='submit' className="px-10">
-                        {
-                            isLoadingPut || isLoadingPost ? <Loader2 className='animate-spin' /> : (isPREdit ? 'Update' : 'Create')
-                        }
-                    </Button>
+                <div className="flex items-start justify-end gap-3 mt-6">
+                    {disableEdit && <Button onClick={() => setDisableEdit(false)} type='button' className="px-10">Edit </Button>}
+                    {
+                        !disableEdit && (
+                            <>
+                                <Button variant="blue" type="button" className="px-8">
+                                    <label className="flex items-center justify-center gap-2 w-full h-full cursor-pointer">
+                                        <div className=" rounded"> <Paperclip className="text-white" /> </div>
+                                        Attach File
+                                        <input type="file" accept="*/" onChange={handleFileChange} className="hidden" />
+                                    </label>
+                                </Button>
+                                <Button variant="default" type='submit' className="px-10">
+                                    {isLoadingPut || isLoadingPost ? <Loader2 className='animate-spin' /> : (isPREdit ? 'Update' : 'Create')}
+                                </Button>
+                            </>
+                        )
+                    }
+
                 </div>
             </form>
         </Modal>
