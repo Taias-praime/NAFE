@@ -4,7 +4,6 @@ import { FileItem, FilesList } from "../components/ui-custom/files";
 import { Paperclip, Loader2, Pencil, PencilLine } from "lucide-react";
 import { HEADER_HEIGHT, local, removeBase64, USER_PLACEHOLDER_IMG_URL } from "../lib/utils";
 import { useEffect, useMemo, useState } from "react";
-
 import {
     Tooltip,
     TooltipContent,
@@ -39,7 +38,6 @@ const ChiefOfArmyStaff = () => {
     const [isLVEdit, setIsLVEdit] = useState(false);
     const [editCOASModal, setEditCOASModal] = useState(false);
     const [editLVModal, setEditLVModal] = useState(false);
-    const [editPRModal, setEditPRModal] = useState(false);
     const [disableEdit, setDisableEdit] = useState(true);
     const [tab, setTab] = useState("press release");
     const [featuredImg, setFeaturedImg] = useState('');
@@ -189,7 +187,7 @@ const ChiefOfArmyStaff = () => {
         const PR = pressRelease.filter((item: any) => {
             return item.id === prId
         })
-        return PR;
+        return PR[0];
     }, [prId])
 
     useEffect(() => {
@@ -239,7 +237,6 @@ const ChiefOfArmyStaff = () => {
     const editPressRelease = (id: string) => {
         setPrId(id)
         setIsPREdit(true);
-        setEditPRModal(true);
     }
 
     const removeFile = (e: { preventDefault: () => void }, id: string) => {
@@ -317,7 +314,7 @@ const ChiefOfArmyStaff = () => {
                                             {formik.values.files && (
                                                 <div className="flex flex-col gap-4">
                                                     {formik.values.files.map((file) => (
-                                                        <FileItem disabled={disableEdit} showDelete={true} onClick={(e: { preventDefault: () => void; }) => removeFile(e, file)} file={file} />
+                                                        <FileItem key={file} disabled={disableEdit} showDelete={true} onClick={(e: { preventDefault: () => void; }) => removeFile(e, file)} file={file} />
                                                     ))}
                                                 </div>
                                             )}
@@ -328,9 +325,7 @@ const ChiefOfArmyStaff = () => {
                                                         <>
                                                             <Button variant="blue" type="button" className="px-8">
                                                                 <label className="flex items-center justify-center gap-2 w-full h-full cursor-pointer">
-                                                                    <div className=" rounded">
-                                                                        <Paperclip className="text-white" />
-                                                                    </div>
+                                                                    <div className=" rounded"> <Paperclip className="text-white" /> </div>
                                                                     Attach File
                                                                     <input type="file" accept="*/" onChange={handleFileChange} className="hidden" />
                                                                 </label>
@@ -359,7 +354,7 @@ const ChiefOfArmyStaff = () => {
                 {/* List of files */}
                 {COAS?.files.length && <FilesList files={COAS.files} />}
             </aside >
-            <div className=" bg-white mt-6 mr-6">
+            <div className="bg-white mt-6 mr-6">
                 <div className="">
                     <Tabs
                         defaultValue={tab}
@@ -368,9 +363,7 @@ const ChiefOfArmyStaff = () => {
                     >
                         <TabsList>
                             {tabValue.map((item) => (
-                                <TabsTrigger key={item} value={item}>
-                                    {item}
-                                </TabsTrigger>
+                                <TabsTrigger key={item} value={item}> {item} </TabsTrigger>
                             ))}
                         </TabsList>
                     </Tabs>
@@ -378,16 +371,15 @@ const ChiefOfArmyStaff = () => {
                 <div className="px-10">
                     {
                         isFetchingPR ? <Empty /> : (
-
                             tab === "press release" && (
                                 <>
                                     <SubHeader title="Press Release" number={`${numOfPR} Release`}>
-                                        <CreatePressRelease setReload={setReload} isPREdit={isPREdit} setIsPREdit={setIsPREdit} PR={PR} open={editPRModal} setEditPRModal={setEditPRModal} />
+                                        <CreatePressRelease setReload={setReload} isPREdit={isPREdit} setIsPREdit={setIsPREdit} PR={null} label="Upload Press Release" />
                                     </SubHeader>
                                     <div className="grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-5">
                                         {
                                             pressRelease.map(item => (
-                                                <GridView key={item.title} title={item.title} date={item.date} image={item.image} id={item.id} onClick={editPressRelease} />
+                                                <GridView key={item.title} title={item.title} date={item.date} image={item.image} id={item.id} setReload={setReload} isPREdit={isPREdit} setIsPREdit={setIsPREdit} PR={PR}  onClick={editPressRelease} />
                                             ))
                                         }
                                     </div>
@@ -424,7 +416,7 @@ const ChiefOfArmyStaff = () => {
                                     <div className="w-64">
                                         {
                                             suggestions.map(item => (
-                                                <button className={`p-3 border-b-2 flex flex-start flex-col gap-3 w-64 ${item.id === suggest.id && "bg-foreground/5"}`} onClick={() => viewSuggestion(item)} >
+                                                <button key={item.id} className={`p-3 border-b-2 flex flex-start flex-col gap-3 w-64 ${item.id === suggest.id && "bg-foreground/5"}`} onClick={() => viewSuggestion(item)} >
                                                     <div className="text-lg">Anonymous</div>
                                                     <div className="text-xs">{format(item.date_created, 'MMM dd, yyyy | p')} </div>
                                                 </button>
@@ -496,24 +488,20 @@ const Empty = () => {
 
 export default ChiefOfArmyStaff;
 
-const GridView = ({ title, date, image, id, onClick }: any) => {
+const GridView = ({ title, date, image, id, onClick, setReload, isPREdit, setIsPREdit, PR }: any) => {
     return (
-        <div
-            key={"id"}
-            className="relative rounded-lg border overflow-hidden flex h-40 bg-foreground/5 max-w-100"
-        >
+        <div key={id} className="relative rounded-lg border overflow-hidden flex h-40 bg-foreground/5 max-w-100">
             <img className='w-32 h-full object-center object-cover' src={image} alt="" />
-
             <div className=" p-5">
                 <h1 className="text-lg line-clamp-2 mb-5 text-ellipsis overflow-hidden"> {title} </h1>
-
                 <div className="flex gap-3 justify-between items-center">
                     <h1 className="text-sm opacity-50 text-ellipsis  "> {date ? format(date, ' MMM dd, yyyy') : ''} </h1>
+                    <CreatePressRelease setReload={setReload} isPREdit={isPREdit} setIsPREdit={setIsPREdit} PR={PR} label={
+                        <Button size={"sm"} className="flex gap-2" onClick={() => onClick(id)} >
+                            <Pencil className="w-4 h-4" /> <span className="text-sm">Edit</span>
+                        </Button>
+                    } />
 
-                    <Button size={"sm"} className="flex gap-2" onClick={() => onClick(id)} >
-                        <Pencil className="w-4 h-4" />
-                        <span className="text-sm">Edit</span>
-                    </Button>
                 </div>
             </div>
         </div>
@@ -526,18 +514,9 @@ const SubHeader = ({ title, number, children }: any) => {
         <div className="flex justify-between my-10">
             <div className="">
                 <h4 className="mb-2 text-xl"> {title} </h4>
-                {
-                    number && <p className="opacity-50 text-sm"> {number} </p>
-                }
+                {number && <p className="opacity-50 text-sm"> {number} </p>}
             </div>
-            {
-                children && (
-                    <Button className="flex gap-3" variant="secondary">
-                        {children}
-                    </Button>
-                )
-            }
-
+            {children && (<Button className="flex gap-3" variant="secondary"> {children} </Button>)}
         </div>
     )
 }

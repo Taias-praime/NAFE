@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { Paperclip, Loader2 } from 'lucide-react'
 import { useFormik } from 'formik'
 import DatePicker from "react-datepicker"
@@ -18,19 +18,18 @@ const token = local("token");
 
 interface CreatePressReleaseProps {
     isPREdit: boolean;
-    setEditPRModal: (value: boolean) => void;
     setReload: (value: boolean) => void;
     setIsPREdit: (value: boolean) => void;
     PR: any;
-    open: boolean;
+    label: ReactNode | string;
 }
 
-const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, PR, open, }: CreatePressReleaseProps) => {
-
+const CreatePressRelease = ({ isPREdit, setReload, setIsPREdit, PR, label }: CreatePressReleaseProps) => {
     const [eventDate, setEventDate] = useState<Date | null>(new Date());
     const [featuredImg, setFeaturedImg] = useState('');
-    const [id, setId] = useState('');
+    const [id, setId] = useState<string | null>(null);
     const [disableEdit, setDisableEdit] = useState(true);
+    const [open, setOpen] = useState(false);
 
     const formik = useFormik({
         initialValues: {
@@ -51,7 +50,6 @@ const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, 
 
             if (isPREdit) {
                 onPut(data);
-                console.log(data);
             } else {
                 onPost(data);
             }
@@ -64,8 +62,8 @@ const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, 
         (data) => {
             toast({ description: data.message });
             formik.resetForm();
-            setEditPRModal(false);
             setReload(true);
+            setOpen(false);
         },
         (e) => {
             const { message, } = e;
@@ -87,9 +85,10 @@ const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, 
         (data) => {
             toast({ description: data.message });
             formik.resetForm();
-            setEditPRModal(false);
             setDisableEdit(true);
             setReload(true);
+            setOpen(false);
+            setId(null)
         },
         (e) => {
             const { message } = e;
@@ -110,20 +109,24 @@ const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, 
     }, [eventDate])
 
     useEffect(() => {
-        if (isPREdit) {
-            const pressRelease = PR[0]
-            setId(pressRelease.id)
-            setEventDate(pressRelease.date)
-            setFeaturedImg(pressRelease.image)
-            formik.setValues({
-                image: pressRelease.image,
-                date: pressRelease.date,
-                title: pressRelease.title,
-                description: pressRelease.description,
-                files: pressRelease.files,
-            })
+        if (open) {
+            if (PR) {
+                const pressRelease = PR;
+                setId(pressRelease.id);
+                setEventDate(pressRelease.date);
+                setFeaturedImg(pressRelease.image);
+                formik.setValues({
+                    image: pressRelease.image,
+                    date: pressRelease.date,
+                    title: pressRelease.title,
+                    description: pressRelease.description,
+                    files: pressRelease.files,
+                })
+            } else {
+                setDisableEdit(false);
+            }
         }
-    }, [isPREdit])
+    }, [open])
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -142,13 +145,14 @@ const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, 
         formik.setFieldValue("files", files)
     }
 
-    const prModal = (value: boolean) => {
-        setEditPRModal(value);
+    const toggleOpen = (value: boolean) => {
         setIsPREdit(false);
         setFeaturedImg('');
         formik.resetForm();
         setEventDate(null);
+        setOpen(value);
         if (isPREdit) setDisableEdit(true);
+        if (!value) setId(null);
     }
 
     const deleteImage = () => {
@@ -156,9 +160,7 @@ const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, 
     }
 
     return (
-        <Modal open={open} onOpenChange={(value) => prModal(value)} className="flex items-center gap-3 p-3"
-            label="Upload Press Release"
-        >
+        <Modal open={open} onOpenChange={(value) => toggleOpen(value)} className="flex items-center gap-3 p-3" label={label}>
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
                 <ProfileImage deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} disabled={disableEdit} />
                 <Input
@@ -177,7 +179,6 @@ const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, 
                             selected={eventDate}
                             onChange={(date) => {
                                 setEventDate(date);
-                                console.log(date);
                             }}
                             className="w-full block outline-none bg-none"
                             disabled={disableEdit}
@@ -197,33 +198,38 @@ const CreatePressRelease = ({ isPREdit, setEditPRModal, setReload, setIsPREdit, 
                 {formik.values.files && (
                     <div className="flex flex-col gap-4">
                         {formik.values.files.map((file) => (
-                            <FileItem showDelete={true} onClick={(e: { preventDefault: () => void }) => removeFile(e, file)} file={file} />
+                            <FileItem key={file} showDelete={true} onClick={(e: { preventDefault: () => void }) => removeFile(e, file)} file={file} />
                         ))}
                     </div>
                 )}
 
                 <div className="flex items-start justify-end gap-3 mt-6">
-                    {disableEdit && <Button onClick={() => setDisableEdit(false)} type='button' className="px-10">Edit </Button>}
+                    <Button variant="blue" type="button" className="px-8">
+                        <label className="flex items-center justify-center gap-2 w-full h-full cursor-pointer">
+                            <div className=" rounded"> <Paperclip className="text-white" /> </div>
+                            Attach File
+                            <input type="file" accept="*/" onChange={handleFileChange} className="hidden" />
+                        </label>
+                    </Button>
+                    {id && disableEdit && <Button onClick={() => setDisableEdit(false)} type='button' className="px-10">Edit </Button>}
                     {
-                        !disableEdit && (
-                            <>
-                                <Button variant="blue" type="button" className="px-8">
-                                    <label className="flex items-center justify-center gap-2 w-full h-full cursor-pointer">
-                                        <div className=" rounded"> <Paperclip className="text-white" /> </div>
-                                        Attach File
-                                        <input type="file" accept="*/" onChange={handleFileChange} className="hidden" />
-                                    </label>
-                                </Button>
-                                <Button variant="default" type='submit' className="px-10">
-                                    {isLoadingPut || isLoadingPost ? <Loader2 className='animate-spin' /> : (isPREdit ? 'Update' : 'Create')}
-                                </Button>
-                            </>
+                        id && !disableEdit && (
+                            <Button variant="default" type='submit' className="px-10">
+                                {isLoadingPut ? <Loader2 className='animate-spin' /> : 'Update'}
+                            </Button>
+                        )
+                    }
+                    {
+                        !id && (
+                            <Button variant="default" type='submit' className="px-10">
+                                {isLoadingPost ? <Loader2 className='animate-spin' /> : 'Create'}
+                            </Button>
                         )
                     }
 
                 </div>
             </form>
-        </Modal>
+        </Modal >
     )
 }
 

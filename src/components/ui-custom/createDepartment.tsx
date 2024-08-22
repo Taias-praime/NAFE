@@ -145,16 +145,14 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
 
     const toggleOpen = (value: boolean) => {
         if (value) {
-            setId('')
+            setId('');
             setDisableEdit(true);
         }
-        setOpen(value)
+        setOpen(value);
     }
 
     return (
-        <Modal open={open} onOpenChange={toggleOpen} className="flex items-center gap-3"
-            label={label}
-        >
+        <Modal open={open} onOpenChange={toggleOpen} className="flex items-center gap-3" label={label}>
             {
                 isFetching ? (
                     <Loader2 className='animate-spin m-auto' />
