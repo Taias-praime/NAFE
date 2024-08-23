@@ -1,11 +1,4 @@
 import { ChangeEvent, useEffect, useState } from 'react';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '../components/ui/select';
 import { cn, removeBase64 } from "../lib/utils";
 import { format } from "date-fns";
 import { Calendar } from "../components/ui/calendar";
@@ -58,7 +51,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
     const [eventDate, setEventDate] = useState<Date>();
     const [startTime, setStartTime] = useState<string>('');
     const [endTime, setEndTime] = useState<string>('');
-
+    const [eventType, setEventType] = useState<any>();
     const [event, setEvent] = useState<any>(null);
 
     const [tenants, setTenants] = useState<ITenants[]>([]);
@@ -70,9 +63,10 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
     const [mods, setMods] = useState<{ id: string; image: string; name: string, position: string }[]>([]);
     const [speakers, setSpeakers] = useState<{ id: string; image: string; name: string, position: string }[]>([]);
 
-    const handleEventTypeSelect = (eventType: string) => {
-        formikForm.setFieldValue('type', eventType)
+    const handleEventTypeSelect = (eventType: { name: string; value: string; }) => {
+        formikForm.setFieldValue('type', eventType.value)
         setStep(step + 1);
+        setEventType(eventType)
     }
 
     const handleCancel = onCancel;
@@ -412,27 +406,22 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
             <div className="flex items-center justify-center" style={{ height: 'calc(100% - 80px)' }}>
                 {step === 1 && (
                     <div className="max-w-[400px]">
-                        <h3 className="text-xl mb-16">Select Event Type.</h3>
+                        <h3 className="text-xl mb-10">Select Event Type.</h3>
 
                         {isFetchingEventTypes && <div className='w-[300px] h-20'><Loader2 className='mx-auto animate-spin' /></div>}
 
                         {!!eventTypes.length && !isFetchingEventTypes && (
-                            <Select onValueChange={handleEventTypeSelect}>
-                                <label className="block pb-3">Event Type</label>
+                            <div className=" w-[300px] ">
+                                <ReactSelect
+                                    label="Event Type"
+                                    options={eventTypes}
+                                    handleSelect={handleEventTypeSelect}
+                                    value={eventType}
+                                    optionName="name"
+                                    optionValue="name"
+                                />
+                            </div>
 
-                                <SelectTrigger className="w-[300px]">
-                                    <SelectValue placeholder="Select Here" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {eventTypes.map(
-                                        (e: { name: string; value: string }) => (
-                                            <SelectItem key={e.value} value={e.value}>
-                                                {e.name}
-                                            </SelectItem>
-                                        )
-                                    )}
-                                </SelectContent>
-                            </Select>
                         )}
                     </div>
                 )}
