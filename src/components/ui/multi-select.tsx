@@ -51,6 +51,7 @@ const ReactSelect = ({ options, handleSelect, value, label, isMulti, optionName,
                 styles={customStyles}
                 placeholder='select department'
                 isDisabled={disabled}
+                className="text-sm"
             >
             </Select>
         </>

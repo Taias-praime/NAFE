@@ -1,9 +1,9 @@
+import { ReactNode, useEffect, useState } from 'react'
+import { useFormik } from 'formik'
 import { Input } from '../ui/input'
 import { Loader2 } from 'lucide-react'
 import { Button } from '../ui/button'
 import Modal from './modal'
-import { ReactNode, useEffect, useState } from 'react'
-import { useFormik } from 'formik'
 import { local, removeBase64 } from '../../lib/utils'
 import useFetch from '../../hooks/useFetch'
 import { toast } from '../ui/use-toast'
@@ -271,6 +271,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                             value={rank}
                             optionName="name"
                             optionValue="value"
+                            disabled={disableEdit}
                         />
                         <ReactSelect
                             label="Select Department"
@@ -279,6 +280,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                             value={department}
                             optionName="name"
                             optionValue="name"
+                            disabled={disableEdit}
                         />
                         <Input
                             value={formik.values.email}
