@@ -374,7 +374,7 @@ const ChiefOfArmyStaff = () => {
                             tab === "press release" && (
                                 <>
                                     <SubHeader title="Press Release" number={`${numOfPR} Release`}>
-                                        <CreatePressRelease setReload={setReload} isPREdit={isPREdit} setIsPREdit={setIsPREdit} PR={null} label="Upload Press Release" />
+                                        <CreatePressRelease setReload={setReload} isPREdit={isPREdit} setIsPREdit={setIsPREdit} PR={null} title="Create Press Release" label="Upload Press Release" />
                                     </SubHeader>
                                     <div className="grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-5">
                                         {
@@ -496,7 +496,7 @@ const GridView = ({ title, date, image, id, onClick, setReload, isPREdit, setIsP
                 <h1 className="text-lg line-clamp-2 mb-5 text-ellipsis overflow-hidden"> {title} </h1>
                 <div className="flex gap-3 justify-between items-center">
                     <h1 className="text-sm opacity-50 text-ellipsis  "> {date ? format(date, ' MMM dd, yyyy') : ''} </h1>
-                    <CreatePressRelease setReload={setReload} isPREdit={isPREdit} setIsPREdit={setIsPREdit} PR={PR} label={
+                    <CreatePressRelease setReload={setReload} isPREdit={isPREdit} setIsPREdit={setIsPREdit} PR={PR} title="Update Press Release" label={
                         <Button size={"sm"} className="flex gap-2" onClick={() => onClick(id)} >
                             <Pencil className="w-4 h-4" /> <span className="text-sm">Edit</span>
                         </Button>

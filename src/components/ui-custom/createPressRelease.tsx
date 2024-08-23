@@ -22,9 +22,10 @@ interface CreatePressReleaseProps {
     setIsPREdit: (value: boolean) => void;
     PR: any;
     label: ReactNode | string;
+    title: string;
 }
 
-const CreatePressRelease = ({ isPREdit, setReload, setIsPREdit, PR, label }: CreatePressReleaseProps) => {
+const CreatePressRelease = ({ isPREdit, setReload, setIsPREdit, PR, label, title }: CreatePressReleaseProps) => {
     const [eventDate, setEventDate] = useState<Date | null>(new Date());
     const [featuredImg, setFeaturedImg] = useState('');
     const [id, setId] = useState<string | null>(null);
@@ -151,7 +152,7 @@ const CreatePressRelease = ({ isPREdit, setReload, setIsPREdit, PR, label }: Cre
         formik.resetForm();
         setEventDate(null);
         setOpen(value);
-        if (isPREdit) setDisableEdit(true);
+        if (id) setDisableEdit(true);
         if (!value) setId(null);
     }
 
@@ -160,7 +161,7 @@ const CreatePressRelease = ({ isPREdit, setReload, setIsPREdit, PR, label }: Cre
     }
 
     return (
-        <Modal open={open} onOpenChange={(value) => toggleOpen(value)} className="flex items-center gap-3 p-3" label={label}>
+        <Modal open={open} onOpenChange={(value) => toggleOpen(value)} title={title} className="flex items-center gap-3 p-3" label={label}>
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
                 <ProfileImage deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} disabled={disableEdit} />
                 <Input
@@ -174,19 +175,17 @@ const CreatePressRelease = ({ isPREdit, setReload, setIsPREdit, PR, label }: Cre
                 />
                 <div className="w-full">
                     <label>Select Event Date</label>
-                    <div className="w-full">
-                        <DatePicker
-                            selected={eventDate}
-                            onChange={(date) => {
-                                setEventDate(date);
-                            }}
-                            className="w-full block outline-none bg-none"
-                            disabled={disableEdit}
-                        />
-                    </div>
+                    <DatePicker
+                        selected={eventDate}
+                        onChange={(date) => {
+                            setEventDate(date);
+                        }}
+                        className="w-full block outline-none bg-none focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                        disabled={disableEdit}
+                    />
                 </div>
                 <Textarea
-                    rows={4}
+                    rows={1}
                     value={formik.values.description}
                     onChange={formik.handleChange}
                     name="description"

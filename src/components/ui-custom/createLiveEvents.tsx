@@ -20,13 +20,14 @@ interface CreateLiveEventsProps {
     setEditLVModal: (value: boolean) => void;
     setIsLVEdit: (value: boolean) => void;
     setReload: (value: boolean) => void;
-    open: boolean;
     lvId: string | null;
 }
 
-const CreateLiveEvents = ({ isLVEdit, setEditLVModal, setReload, setIsLVEdit, open, lvId }: CreateLiveEventsProps) => {
+const CreateLiveEvents = ({ isLVEdit, setEditLVModal, setReload, setIsLVEdit, lvId }: CreateLiveEventsProps) => {
     const [eventDate, setEventDate] = useState<Date>();
     const [featuredImg, setFeaturedImg] = useState('');
+    const [id, setId] = useState<string | null>(null);
+    const [open, setOpen] = useState(false);
 
     const formik = useFormik({
         initialValues: {
@@ -142,7 +143,7 @@ const CreateLiveEvents = ({ isLVEdit, setEditLVModal, setReload, setIsLVEdit, op
         formik.setFieldValue("date", eventDate)
     }, [eventDate])
 
-    const lvModal = (value: boolean) => {
+    const toggleOpen = (value: boolean) => {
         setEditLVModal(value);
         setIsLVEdit(false);
         setFeaturedImg('');
@@ -151,7 +152,7 @@ const CreateLiveEvents = ({ isLVEdit, setEditLVModal, setReload, setIsLVEdit, op
     }
 
     return (
-        <Modal open={open} onOpenChange={(value) => lvModal(value)} className="flex items-center gap-3 p-3"
+        <Modal open={open} onOpenChange={(value) => toggleOpen(value)} className="flex items-center gap-3 p-3"
             label="Create Live Event"
         >
             {
