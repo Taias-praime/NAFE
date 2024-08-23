@@ -9,13 +9,8 @@ import { removeBase64 } from '../../lib/utils'
 import useFetch from '../../hooks/useFetch'
 import { toast } from '../ui/use-toast'
 import { Loader2 } from 'lucide-react'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '../../components/ui/select';
+import ReactSelect from '../ui/multi-select'
+import { IRanks } from '../../models/interfaces'
 
 interface ModeratorProps {
     setModalOpen: (value: boolean) => void;
@@ -28,7 +23,8 @@ interface ModeratorProps {
 const Moderator = ({ setModalOpen, setReload, open, label, title }: ModeratorProps) => {
 
     const [featuredImg, setFeaturedImg] = useState('');
-    const [rank, setRank] = useState([]);
+    const [ranks, setRanks] = useState<IRanks[]>([]);
+    const [rank, setRank] = useState<IRanks>();
 
     const formik = useFormik({
         initialValues: {
@@ -81,7 +77,7 @@ const Moderator = ({ setModalOpen, setReload, open, label, title }: ModeratorPro
         '/moderators/sa/ranks',
         (data, status) => {
             if (status === 200) {
-                setRank(data.data.ranks)
+                setRanks(data.data.ranks)
             }
         },
         (error, status) => {
@@ -99,8 +95,9 @@ const Moderator = ({ setModalOpen, setReload, open, label, title }: ModeratorPro
         fetchRank();
     }, [])
 
-    const handleRank = (rank: string) => {
-        formik.setFieldValue('rank', rank)
+    const handleRank = (rank: IRanks) => {
+        formik.setFieldValue('rank', rank);
+        setRank(rank);
     }
 
     const prModal = (value: boolean) => {
@@ -128,22 +125,14 @@ const Moderator = ({ setModalOpen, setReload, open, label, title }: ModeratorPro
                     label={label}
                 />
                 <div className="w-full">
-                    <Select onValueChange={handleRank}>
-                        <label className="block pb-3">Rank</label>
-
-                        <SelectTrigger className="w-[330px]">
-                            <SelectValue placeholder="Select Rank" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {rank.map(
-                                (e: { name: string; value: string }) => (
-                                    <SelectItem key={e.value} value={e.value}>
-                                        {e.name}
-                                    </SelectItem>
-                                )
-                            )}
-                        </SelectContent>
-                    </Select>
+                    <ReactSelect
+                        label="Select Rank"
+                        options={ranks}
+                        handleSelect={handleRank}
+                        value={rank}
+                        optionName="name"
+                        optionValue="value"
+                    />
                 </div>
 
                 <Textarea
