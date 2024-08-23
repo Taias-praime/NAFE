@@ -1,9 +1,10 @@
+import { useEffect, useMemo, useState } from "react";
+import { Paperclip, Loader2, PencilLine } from "lucide-react";
+import { format } from "date-fns";
 import { Button } from "../components/ui/button";
 import { Skeleton } from "../components/ui/skeleton";
 import { FileItem, FilesList } from "../components/ui-custom/files";
-import { Paperclip, Loader2, Pencil, PencilLine } from "lucide-react";
 import { HEADER_HEIGHT, local, removeBase64, USER_PLACEHOLDER_IMG_URL } from "../lib/utils";
-import { useEffect, useMemo, useState } from "react";
 import {
     Tooltip,
     TooltipContent,
@@ -13,7 +14,6 @@ import {
 import useFetch from "../hooks/useFetch";
 import { useToast } from "../components/ui/use-toast";
 import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { format } from "date-fns";
 import Modal from "../components/ui-custom/modal";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
@@ -22,6 +22,8 @@ import CreateLiveEvents from "../components/ui-custom/createLiveEvents";
 import { useFormik } from "formik";
 import { ArmyStaff, ILiveEvent, IPressRelease, ISuggestions } from "../models/interfaces";
 import ProfileImage from "../components/ui-custom/ProfileImage";
+import LiveEvents from "../components/ui-custom/liveEvents";
+import PressRelease from "../components/ui-custom/pressRelease";
 
 const token = local("token");
 const tabValue = ["press release", "live events", "suggestions"]
@@ -34,15 +36,11 @@ const ChiefOfArmyStaff = () => {
     const [numOfPR, setNumOfPR] = useState(0);
     const [numOfLV, setNumOfLV] = useState(0);
     const [suggest, setSuggest] = useState<ISuggestions>(suggestions[0]);
-    const [isPREdit, setIsPREdit] = useState(false);
-    const [isLVEdit, setIsLVEdit] = useState(false);
     const [editCOASModal, setEditCOASModal] = useState(false);
-    const [editLVModal, setEditLVModal] = useState(false);
     const [disableEdit, setDisableEdit] = useState(true);
     const [tab, setTab] = useState("press release");
     const [featuredImg, setFeaturedImg] = useState('');
     const [prId, setPrId] = useState('');
-    const [lvId, setLvId] = useState<string | null>(null);
     const [reload, setReload] = useState(false);
 
     const { toast } = useToast();
@@ -196,7 +194,6 @@ const ChiefOfArmyStaff = () => {
         onFetchLV();
         onFetchSuggestion();
         setReload(false);
-        setLvId(null);
     }, [reload]);
 
     useEffect(() => {
@@ -228,15 +225,8 @@ const ChiefOfArmyStaff = () => {
         }
     };
 
-    const editLiveEvents = (id: string) => {
-        setLvId(id)
-        setIsLVEdit(true);
-        setEditLVModal(true);
-    }
-
     const editPressRelease = (id: string) => {
         setPrId(id)
-        setIsPREdit(true);
     }
 
     const removeFile = (e: { preventDefault: () => void }, id: string) => {
@@ -374,12 +364,12 @@ const ChiefOfArmyStaff = () => {
                             tab === "press release" && (
                                 <>
                                     <SubHeader title="Press Release" number={`${numOfPR} Release`}>
-                                        <CreatePressRelease setReload={setReload} isPREdit={isPREdit} setIsPREdit={setIsPREdit} PR={null} title="Create Press Release" label="Upload Press Release" />
+                                        <CreatePressRelease setReload={setReload} isPREdit={false} PR={null} title="Create Press Release" label="Upload Press Release" />
                                     </SubHeader>
                                     <div className="grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-5">
                                         {
                                             pressRelease.map(item => (
-                                                <GridView key={item.title} title={item.title} date={item.date} image={item.image} id={item.id} setReload={setReload} isPREdit={isPREdit} setIsPREdit={setIsPREdit} PR={PR}  onClick={editPressRelease} />
+                                                <PressRelease key={item.title} title={item.title} date={item.date} image={item.image} id={item.id} setReload={setReload} isPREdit={true} PR={PR} onClick={editPressRelease} />
                                             ))
                                         }
                                     </div>
@@ -394,12 +384,12 @@ const ChiefOfArmyStaff = () => {
                             tab === "live events" && (
                                 <>
                                     <SubHeader title="Live Events" number={`${numOfLV} Events`} >
-                                        <CreateLiveEvents lvId={lvId} setReload={setReload} isLVEdit={isLVEdit} setIsLVEdit={setIsLVEdit} open={editLVModal} setEditLVModal={setEditLVModal} />
+                                        <CreateLiveEvents id={null} setReload={setReload} isLVEdit={false} title="Create Live Event" label="Create Live Event" />
                                     </SubHeader>
                                     <div className="grid lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-5">
                                         {
                                             liveEvents.map(item => (
-                                                <GridView key={item.title} title={item.title} date={item.date} image={item.image} onClick={editLiveEvents} id={item.id} />
+                                                <LiveEvents key={item.title} setReload={setReload} title={item.title} isLVEdit={true} date={item.date} image={item.image} lvId={item.id} id={item.id} />
                                             ))
                                         }
                                     </div>
@@ -487,26 +477,6 @@ const Empty = () => {
 };
 
 export default ChiefOfArmyStaff;
-
-const GridView = ({ title, date, image, id, onClick, setReload, isPREdit, setIsPREdit, PR }: any) => {
-    return (
-        <div key={id} className="relative rounded-lg border overflow-hidden flex h-40 bg-foreground/5 max-w-100">
-            <img className='w-32 h-full object-center object-cover' src={image} alt="" />
-            <div className=" p-5">
-                <h1 className="text-lg line-clamp-2 mb-5 text-ellipsis overflow-hidden"> {title} </h1>
-                <div className="flex gap-3 justify-between items-center">
-                    <h1 className="text-sm opacity-50 text-ellipsis  "> {date ? format(date, ' MMM dd, yyyy') : ''} </h1>
-                    <CreatePressRelease setReload={setReload} isPREdit={isPREdit} setIsPREdit={setIsPREdit} PR={PR} title="Update Press Release" label={
-                        <Button size={"sm"} className="flex gap-2" onClick={() => onClick(id)} >
-                            <Pencil className="w-4 h-4" /> <span className="text-sm">Edit</span>
-                        </Button>
-                    } />
-
-                </div>
-            </div>
-        </div>
-    );
-};
 
 const SubHeader = ({ title, number, children }: any) => {
 

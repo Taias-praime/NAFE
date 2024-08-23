@@ -1,14 +1,14 @@
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css";
 import { Textarea } from '../ui/textarea'
 import { Input } from '../ui/input'
 import { Loader2 } from 'lucide-react'
 import { Button } from '../ui/button'
 import Modal from './modal'
-import { useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { useFormik } from 'formik'
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { format } from 'date-fns'
-import { Calendar } from '../ui/calendar'
-import { cn, local, removeBase64 } from '../../lib/utils'
+import { local, removeBase64 } from '../../lib/utils'
 import { toast } from '../ui/use-toast'
 import useFetch from '../../hooks/useFetch'
 import ProfileImage from './ProfileImage'
@@ -17,16 +17,16 @@ const token = local("token");
 
 interface CreateLiveEventsProps {
     isLVEdit: boolean;
-    setEditLVModal: (value: boolean) => void;
-    setIsLVEdit: (value: boolean) => void;
     setReload: (value: boolean) => void;
-    lvId: string | null;
+    label: string | ReactNode;
+    title: string;
+    id: string | null;
 }
 
-const CreateLiveEvents = ({ isLVEdit, setEditLVModal, setReload, setIsLVEdit, lvId }: CreateLiveEventsProps) => {
-    const [eventDate, setEventDate] = useState<Date>();
+const CreateLiveEvents = ({ isLVEdit, setReload, title, label, id }: CreateLiveEventsProps) => {
+    const [eventDate, setEventDate] = useState<Date | null>(new Date());
     const [featuredImg, setFeaturedImg] = useState('');
-    const [id, setId] = useState<string | null>(null);
+    const [disableEdit, setDisableEdit] = useState(true);
     const [open, setOpen] = useState(false);
 
     const formik = useFormik({
@@ -63,11 +63,11 @@ const CreateLiveEvents = ({ isLVEdit, setEditLVModal, setReload, setIsLVEdit, lv
         (data) => {
             toast({ description: data.message });
             formik.resetForm();
-            setEditLVModal(false);
             setReload(true);
+            setOpen(false);
         },
         (e) => {
-            const { message,} = e;
+            const { message, } = e;
             // notify
             toast({
                 title: `${message} (${status})`,
@@ -82,12 +82,13 @@ const CreateLiveEvents = ({ isLVEdit, setEditLVModal, setReload, setIsLVEdit, lv
 
     // edit
     const { onPut, isFetching: isLoadingEdit } = useFetch(
-        `/army-staffs/sa/${lvId}/edit-live-event`,
+        `/army-staffs/sa/${id}/edit-live-event`,
         (data) => {
             toast({ description: data.message });
             formik.resetForm();
-            setEditLVModal(false);
+            setDisableEdit(true);
             setReload(true);
+            setOpen(false);
         },
         (e) => {
             const { message, } = e;
@@ -104,7 +105,7 @@ const CreateLiveEvents = ({ isLVEdit, setEditLVModal, setReload, setIsLVEdit, lv
     );
 
     const { onFetch, isFetching } = useFetch(
-        `/army-staffs/sa/${lvId}/live-event-detail`,
+        `/army-staffs/sa/${id}/live-event-detail`,
         (data, status) => {
             if (status === 200) {
                 const _data = data.data;
@@ -134,31 +135,27 @@ const CreateLiveEvents = ({ isLVEdit, setEditLVModal, setReload, setIsLVEdit, lv
     );
 
     useEffect(() => {
-        if (lvId) {
-            onFetch()
-        }
-    }, [lvId])
-
-    useEffect(() => {
         formik.setFieldValue("date", eventDate)
     }, [eventDate])
 
     const toggleOpen = (value: boolean) => {
-        setEditLVModal(value);
-        setIsLVEdit(false);
         setFeaturedImg('');
         formik.resetForm();
-        setEventDate(undefined);
+        setEventDate(null);
+        setOpen(value);
+        if (id) {
+            onFetch()
+        } else setDisableEdit(false);
     }
 
     return (
-        <Modal open={open} onOpenChange={(value) => toggleOpen(value)} className="flex items-center gap-3 p-3"
-            label="Create Live Event"
+        <Modal open={open} onOpenChange={(value) => toggleOpen(value)} title={title} className="flex items-center gap-3 p-3"
+            label={label}
         >
             {
                 isFetching ? <Loader2 className='animate-spin m-auto' /> : (
                     <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                        <ProfileImage setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} />
+                        <ProfileImage setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} disabled={disableEdit} />
                         <Input
                             value={formik.values.title}
                             onChange={formik.handleChange}
@@ -166,30 +163,18 @@ const CreateLiveEvents = ({ isLVEdit, setEditLVModal, setReload, setIsLVEdit, lv
                             placeholder="title here"
                             className=""
                             label="Event Title"
+                            disabled={disableEdit}
                         />
-                        <div className="">
+                        <div className="w-full">
                             <label>Select Event Date</label>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        className={cn(
-                                            "w-full rounded-none border-0 border-b border-black justify-start text-left font-normal my-2 px-0",
-                                            !eventDate && "text-muted-foreground"
-                                        )}
-                                    >
-                                        {eventDate ? format(eventDate, "dd/MM/yyyy") : <span>dd/mm/yyyy</span>}
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0">
-                                    <Calendar
-                                        mode="single"
-                                        selected={eventDate}
-                                        onSelect={setEventDate}
-                                        initialFocus
-                                    />
-                                </PopoverContent>
-                            </Popover>
+                            <DatePicker
+                                selected={eventDate}
+                                onChange={(date) => {
+                                    setEventDate(date);
+                                }}
+                                className="w-full block outline-none bg-none focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled={disableEdit}
+                            />
                         </div>
                         <Input
                             value={formik.values.event_link}
@@ -198,6 +183,7 @@ const CreateLiveEvents = ({ isLVEdit, setEditLVModal, setReload, setIsLVEdit, lv
                             placeholder="paste your event_link here"
                             className=""
                             label="Live Link"
+                            disabled={disableEdit}
                         />
                         <Textarea
                             rows={4}
@@ -207,14 +193,25 @@ const CreateLiveEvents = ({ isLVEdit, setEditLVModal, setReload, setIsLVEdit, lv
                             placeholder="description here"
                             className="mb-10"
                             label="Description"
+                            disabled={disableEdit}
                         />
 
                         <div className="flex items-start justify-end mt-6">
-                            <Button variant="default" type='submit' className="px-10">
-                                {
-                                    isLoadingEdit || isLoadingCreate ? <Loader2 className='animate-spin' /> : (isLVEdit ? 'Update' : 'Create')
-                                }
-                            </Button>
+                            {
+                                id && !disableEdit && (
+                                    <Button variant="default" type='submit' className="px-10">
+                                        {isLoadingEdit ? <Loader2 className='animate-spin' /> : 'Update'}
+                                    </Button>
+                                )
+                            }
+                            {
+                                !id && (
+                                    <Button variant="default" type='submit' className="px-10">
+                                        {isLoadingCreate? <Loader2 className='animate-spin' /> : 'Create'}
+                                    </Button>
+                                )
+                            }
+                            {id && disableEdit && <Button onClick={() => setDisableEdit(false)} type='button' className="px-10">Edit </Button>}
                         </div>
                     </form>
                 )

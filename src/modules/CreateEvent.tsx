@@ -583,7 +583,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                     {formikForm.values.files && (
                                                         <div className="flex flex-col gap-4 my-6">
                                                             {formikForm.values.files.map((file) => (
-                                                                <FileItem showDelete={true} onClick={(e: { preventDefault: () => void; }) => removeFile(e, file.name)} file={`${file.name} - ${file.document_type}`} />
+                                                                <FileItem key={file} showDelete={true} onClick={(e: { preventDefault: () => void; }) => removeFile(e, file.name)} file={`${file.name} - ${file.document_type}`} />
                                                             ))}
                                                         </div>
                                                     )}</div>

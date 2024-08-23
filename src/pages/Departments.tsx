@@ -123,6 +123,7 @@ const Departments = () => {
                             {[...Array(d.total_members).keys()]
                               .map((_, i) => (
                                 <ProfileImg
+                                key={i}
                                   className={i ? "-ml-4" : ""}
                                   url={USER_PLACEHOLDER_IMG_URL}
                                 />

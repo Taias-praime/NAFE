@@ -4,7 +4,7 @@ export const FilesList = ({ files, onClick, showDelete }: any) => {
 	return (
 		<ul className="flex flex-col gap-4">
 			{files.map((f: any) => (
-				<FileItem onClick={onClick} showDelete={showDelete} file={f} />
+				<FileItem key={f} onClick={onClick} showDelete={showDelete} file={f} />
 			))}
 		</ul>
 	);

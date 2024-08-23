@@ -19,13 +19,12 @@ const token = local("token");
 interface CreatePressReleaseProps {
     isPREdit: boolean;
     setReload: (value: boolean) => void;
-    setIsPREdit: (value: boolean) => void;
     PR: any;
     label: ReactNode | string;
     title: string;
 }
 
-const CreatePressRelease = ({ isPREdit, setReload, setIsPREdit, PR, label, title }: CreatePressReleaseProps) => {
+const CreatePressRelease = ({ isPREdit, setReload, PR, label, title }: CreatePressReleaseProps) => {
     const [eventDate, setEventDate] = useState<Date | null>(new Date());
     const [featuredImg, setFeaturedImg] = useState('');
     const [id, setId] = useState<string | null>(null);
@@ -147,7 +146,6 @@ const CreatePressRelease = ({ isPREdit, setReload, setIsPREdit, PR, label, title
     }
 
     const toggleOpen = (value: boolean) => {
-        setIsPREdit(false);
         setFeaturedImg('');
         formik.resetForm();
         setEventDate(null);
@@ -225,7 +223,6 @@ const CreatePressRelease = ({ isPREdit, setReload, setIsPREdit, PR, label, title
                             </Button>
                         )
                     }
-
                 </div>
             </form>
         </Modal >
