@@ -1,7 +1,7 @@
 import { DialogContext } from "../contexts/dialog.context";
 import { useState, useContext } from "react";
-import { local, local_clear } from "../lib/utils";
-import { useNavigate } from 'react-router-dom';
+import { local, } from "../lib/utils";
+// import { useNavigate } from 'react-router-dom';
 
 interface IOptions {
     handleError?: boolean;
@@ -25,7 +25,7 @@ const useFetch = (
 
     const [isFetching, setIsFetching] = useState(false);
     const { onSetMessage } = useContext(DialogContext);
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     const encodeFormData = (data: any) => {
         return Object.keys(data)
