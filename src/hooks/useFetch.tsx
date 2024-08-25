@@ -46,10 +46,10 @@ const useFetch = (
             activeControllers.clear();
 
             // Perform logout actions here if necessary (e.g., clearing tokens)
-            local_clear(); // Assuming you have a function to clear local storage
+            // local_clear(); // Assuming you have a function to clear local storage
 
             // Redirect to the login page
-            navigate("/login");
+            // navigate("/login");
         }
     };
 
@@ -93,7 +93,7 @@ const useFetch = (
 
             if (res.status === 401) {
                 console.log(res)
-                // logoutAndRedirect();
+                logoutAndRedirect();
                 // return;
             }
 
