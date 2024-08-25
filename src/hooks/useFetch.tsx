@@ -1,6 +1,6 @@
 import { DialogContext } from "../contexts/dialog.context";
 import { useState, useContext } from "react";
-import { local } from "../lib/utils";
+import { local, local_clear } from "../lib/utils";
 
 interface IOptions {
     handleError?: boolean;
@@ -32,6 +32,27 @@ const useFetch = (
             .join('&');
     }
 
+    let isRedirecting = false;
+    // Map to keep track of active controllers
+    const activeControllers = new Map();
+
+    const logoutAndRedirect = () => {
+        if (!isRedirecting) {
+            isRedirecting = true;
+
+            // Abort all ongoing requests
+            activeControllers.forEach(controller => controller.abort());
+            activeControllers.clear();
+
+            // Perform logout actions here if necessary (e.g., clearing tokens)
+            local_clear(); // Assuming you have a function to clear local storage
+
+            // Redirect to the login page
+            window.location.href = "/login";
+        }
+    };
+
+
     const onFetch = async (method = 'get', body: any = undefined) => {
         const BASE_URL: string = import.meta.env.VITE_BASE_URL!;
 
@@ -40,10 +61,18 @@ const useFetch = (
         const token = local("token");
         const _path = path;
 
+        // Create a new AbortController for this fetch request
+        const controller = new AbortController();
+        const { signal } = controller;
+
+        // Save the controller so we can abort it if needed
+        activeControllers.set(_path, controller);
+
         try {
             setIsFetching(true);
             const headers = {
                 "Content-Type": "application/json",
+                // "Authorization": `Bearer `,
                 "Authorization": `Bearer ${token}`,
                 ...customHeaders
             };
@@ -57,11 +86,14 @@ const useFetch = (
             const res = await fetch(`${host}${_path}`, {
                 method,
                 headers,
-                body: formattedBody
+                body: formattedBody,
+                signal
             });
 
-            //debugging
-            // console.log(`[${method}] ${path}: ${res.status}`); 
+            if (res.status === 401) {
+                logoutAndRedirect();
+                return;
+            }
 
             if (res.ok) {
                 try {
