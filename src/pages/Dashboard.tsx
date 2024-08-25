@@ -23,7 +23,7 @@ const Dashboard = () => {
             setEvents(data.data.results);
             setEventsCount(data.data.number_of_items);
         },
-        () => {},
+        () => { },
     );
 
     const { onFetch: getWebinars, isFetching: isLoadingWebinars } = useFetch(
@@ -32,7 +32,7 @@ const Dashboard = () => {
             setWebinars(data.data.results);
             setWebinarsCount(data.data.number_of_items);
         },
-        () => {},
+        () => { },
     );
 
     const { onFetch: getDeps, isFetching: isLoadingDeps } = useFetch(
@@ -41,7 +41,7 @@ const Dashboard = () => {
             setDeps(data.data.results)
             setDepsCount(data.data.number_of_items);
         },
-        () => {},
+        () => { },
     );
 
     const [deps, setDeps] = useState([]);
@@ -68,7 +68,7 @@ const Dashboard = () => {
             <div className="overflow-y-auto pb-5 pt-10 px-10 bg-foreground/5" style={{
                 height: `calc(100vh - ${HEADER_HEIGHT}px)`
             }}>
-                
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                     <div className="col-span-2">
 
@@ -78,23 +78,23 @@ const Dashboard = () => {
                             </div>
                             <div className="col-span-1">
                                 {
-                                    isLoadingEvents ? 
-                                    <CardSkeleton /> :
-                                    <Card setReload={setReload} title="Events" stat={eventsCount} img={<CalendarDays size={40} />} />
+                                    isLoadingEvents ?
+                                        <CardSkeleton /> :
+                                        <Card setReload={setReload} title="Events" stat={eventsCount} img={<CalendarDays size={40} />} />
                                 }
                             </div>
                             <div className="col-span-1">
                                 {
                                     isLoadingWebinars ?
-                                    <CardSkeleton /> :
-                                    <Card setReload={setReload} title="Live Webinars" stat={webinarsCount} img={<RadioTower size={40} color="red" />} />
+                                        <CardSkeleton /> :
+                                        <Card setReload={setReload} title="Live Webinars" stat={webinarsCount} img={<RadioTower size={40} color="red" />} />
                                 }
                             </div>
                             <div className="col-span-1">
                                 {
                                     isLoadingDeps ?
-                                    <CardSkeleton /> :
-                                    <Card setReload={setReload} title="Departments" stat={depsCount} img={<Building2 size={40} />} />
+                                        <CardSkeleton /> :
+                                        <Card setReload={setReload} title="Departments" stat={depsCount} img={<Building2 size={40} />} />
                                 }
                             </div>
 
@@ -123,19 +123,19 @@ const Dashboard = () => {
                                     </TableHeader>
                                     <TableBody>
                                         {
-                                            deps.slice(0,4).map((d: any) => (
+                                            deps.slice(0, 4).map((d: any) => (
                                                 <TableRow key={d.tenant_id}>
-                                                    <TableCell className="font-medium"> 
-                                                        {d.code} 
+                                                    <TableCell className="font-medium">
+                                                        {d.code}
                                                     </TableCell>
 
                                                     <TableCell>
                                                         <div className="flex items-center">
-                                                            {[...Array(d.total_members).keys()].map((_,i) =>
+                                                            {[...Array(d.total_members).keys()].map((_, i) =>
                                                                 <ProfileImg key={i} className={i ? "-ml-4" : ''} url={USER_PLACEHOLDER_IMG_URL} />
                                                             ).slice(0, 3)}
-                                                            <span className="ms-2"> 
-                                                                { (d.total_members > 3) ? '+ ' + (d.total_members - 3) : '' } 
+                                                            <span className="ms-2">
+                                                                {(d.total_members > 3) ? '+ ' + (d.total_members - 3) : ''}
                                                             </span>
                                                         </div>
                                                     </TableCell>
@@ -144,7 +144,7 @@ const Dashboard = () => {
 
                                                     <TableCell className="flex justify-center items-center gap-3">
                                                         <span> {d.webinars} </span>
-                                                        <Badge variant={d.webinars > 0 ? "destructive" : "disabled" }> Live </Badge>
+                                                        <Badge variant={d.webinars > 0 ? "destructive" : "disabled"}> Live </Badge>
                                                     </TableCell>
 
                                                 </TableRow>

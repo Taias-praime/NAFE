@@ -1,6 +1,7 @@
 import { DialogContext } from "../contexts/dialog.context";
 import { useState, useContext } from "react";
 import { local, local_clear } from "../lib/utils";
+import { useNavigate } from 'react-router-dom';
 
 interface IOptions {
     handleError?: boolean;
@@ -23,8 +24,8 @@ const useFetch = (
 ): UseFetchResult => {
 
     const [isFetching, setIsFetching] = useState(false);
-
     const { onSetMessage } = useContext(DialogContext);
+    const navigate = useNavigate();
 
     const encodeFormData = (data: any) => {
         return Object.keys(data)
@@ -48,7 +49,7 @@ const useFetch = (
             local_clear(); // Assuming you have a function to clear local storage
 
             // Redirect to the login page
-            window.location.href = "/login";
+            navigate("/login");
         }
     };
 
