@@ -92,8 +92,9 @@ const useFetch = (
             });
 
             if (res.status === 401) {
-                logoutAndRedirect();
-                return;
+                console.log(res)
+                // logoutAndRedirect();
+                // return;
             }
 
             if (res.ok) {
