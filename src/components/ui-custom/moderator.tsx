@@ -96,7 +96,7 @@ const Moderator = ({ setModalOpen, setReload, open, label, title }: ModeratorPro
     }, [])
 
     const handleRank = (rank: IRanks) => {
-        formik.setFieldValue('rank', rank);
+        formik.setFieldValue('rank', rank.value);
         setRank(rank);
     }
 

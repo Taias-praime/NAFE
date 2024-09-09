@@ -44,10 +44,9 @@ const useFetch = (
             // Abort all ongoing requests
             activeControllers.forEach(controller => controller.abort());
             activeControllers.clear();
+            // local_clear();
 
-            local_clear();
-
-            navigate("/login");
+            // navigate("/login");
         }
     };
 
