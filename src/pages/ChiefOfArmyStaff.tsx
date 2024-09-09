@@ -54,17 +54,7 @@ const ChiefOfArmyStaff = () => {
             files: [] as string[]
         },
         onSubmit: (obj) => {
-            const baseData = {
-                description: obj.description,
-                files: obj.files,
-                fullname: obj.fullname,
-                title: obj.title,
-            };
-
-            const data = featuredImg.startsWith('http')
-                ? baseData
-                : { ...baseData, image: removeBase64(featuredImg) };
-
+            const data = { ...obj, image: removeBase64(featuredImg) };
             onPut(data);
         }
     })
@@ -166,6 +156,7 @@ const ChiefOfArmyStaff = () => {
             toast({ description: data.message });
             setEditCOASModal(!editCOASModal);
             setDisableEdit(false);
+            setReload(true);
         },
         (e) => {
             const { message } = e;
