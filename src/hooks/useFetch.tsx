@@ -37,6 +37,7 @@ const useFetch = (
     // Map to keep track of active controllers
     const activeControllers = new Map();
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const logoutAndRedirect = () => {
         if (!isRedirecting) {
             isRedirecting = true;
@@ -44,9 +45,9 @@ const useFetch = (
             // Abort all ongoing requests
             activeControllers.forEach(controller => controller.abort());
             activeControllers.clear();
-            // local_clear();
+            local_clear();
 
-            // navigate("/login");
+            navigate("/login");
         }
     };
 
@@ -89,7 +90,8 @@ const useFetch = (
             });
 
             if (res.status === 401) {
-                logoutAndRedirect();
+                // logout and clear local storage
+                // logoutAndRedirect();
                 return;
             }
 
