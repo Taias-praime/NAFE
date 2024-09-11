@@ -47,7 +47,6 @@ const useFetch = (
             setIsFetching(true);
             const headers = {
                 "Content-Type": "application/json",
-                // "Authorization": `Bearer `,
                 "Authorization": `Bearer ${token}`,
                 ...customHeaders
             };
