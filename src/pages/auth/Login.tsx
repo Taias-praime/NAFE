@@ -5,6 +5,7 @@ import useAuth from '../../hooks/useAuth';
 import { useFormik } from 'formik';
 import SubmitButton from '../../components/ui-custom/submitButton';
 import { useEffect } from 'react';
+import { Password } from '../../components/ui/password';
 // import { LoginVS } from '../../models/validationSchema';
 
 const SAMPLE_IMG = '';
@@ -72,12 +73,11 @@ const Login = () => {
 						label="Email"
 					/>
 
-					<Input
+					<Password
 						value={formik.values.password}
 						onChange={formik.handleChange}
 						name="password"
 						placeholder=""
-						type="password"
 						autoComplete="current-password"
 						className="mb-10"
 						label="Password"
