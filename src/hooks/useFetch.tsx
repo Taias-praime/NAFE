@@ -1,7 +1,6 @@
 import { DialogContext } from "../contexts/dialog.context";
 import { useState, useContext } from "react";
-import { local, local_clear } from "../lib/utils";
-import { useNavigate } from 'react-router-dom';
+import { local} from "../lib/utils";
 
 interface IOptions {
     handleError?: boolean;
@@ -25,32 +24,12 @@ const useFetch = (
 
     const [isFetching, setIsFetching] = useState(false);
     const { onSetMessage } = useContext(DialogContext);
-    const navigate = useNavigate();
 
     const encodeFormData = (data: any) => {
         return Object.keys(data)
             .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
             .join('&');
     }
-
-    let isRedirecting = false;
-    // Map to keep track of active controllers
-    const activeControllers = new Map();
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const logoutAndRedirect = () => {
-        if (!isRedirecting) {
-            isRedirecting = true;
-
-            // Abort all ongoing requests
-            activeControllers.forEach(controller => controller.abort());
-            activeControllers.clear();
-            local_clear();
-
-            navigate("/login");
-        }
-    };
-
 
     const onFetch = async (method = 'get', body: any = undefined) => {
         const BASE_URL: string = import.meta.env.VITE_BASE_URL!;
@@ -63,9 +42,6 @@ const useFetch = (
         // Create a new AbortController for this fetch request
         const controller = new AbortController();
         const { signal } = controller;
-
-        // Save the controller so we can abort it if needed
-        activeControllers.set(_path, controller);
 
         try {
             setIsFetching(true);
@@ -88,12 +64,6 @@ const useFetch = (
                 body: formattedBody,
                 signal
             });
-
-            if (res.status === 401) {
-                // logout and clear local storage
-                // logoutAndRedirect();
-                return;
-            }
 
             if (res.ok) {
                 try {
