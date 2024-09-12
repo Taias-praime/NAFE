@@ -39,10 +39,6 @@ const useFetch = (
         const token = local("token");
         const _path = path;
 
-        // Create a new AbortController for this fetch request
-        const controller = new AbortController();
-        const { signal } = controller;
-
         try {
             setIsFetching(true);
             const headers = {
@@ -61,7 +57,6 @@ const useFetch = (
                 method,
                 headers,
                 body: formattedBody,
-                signal
             });
 
             if (res.ok) {

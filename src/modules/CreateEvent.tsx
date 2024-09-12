@@ -1,13 +1,8 @@
 import { ChangeEvent, useEffect, useState } from 'react';
-import { cn, removeBase64 } from "../lib/utils";
 import { format } from "date-fns";
-import { Calendar } from "../components/ui/calendar";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "../components/ui/popover";
-
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css";
+import { removeBase64 } from "../lib/utils";
 import { useToast } from '../components/ui/use-toast';
 import useFetch from '../hooks/useFetch';
 import { useFormik } from 'formik';
@@ -48,7 +43,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
     const [featuredImg, setFeaturedImg] = useState('');
     const [eventTypes, setEventTypes] = useState([]);
     const [step, setStep] = useState<number>(currentStep);
-    const [eventDate, setEventDate] = useState<Date>();
+    const [eventDate, setEventDate] = useState<Date| null>();
     const [startTime, setStartTime] = useState<string>('');
     const [endTime, setEndTime] = useState<string>('');
     const [eventType, setEventType] = useState<any>();
@@ -450,29 +445,15 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
 
                                         <div className="col-span-1">
                                             <label>Select Event Date</label>
-                                            <div className='mt-2'>
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <Button
-                                                            variant="outline"
-                                                            className={cn(
-                                                                "w-full rounded-none border-0 border-b border-black justify-start text-left font-normal",
-                                                                !eventDate && "text-muted-foreground"
-                                                            )}
-                                                        >
-                                                            {eventDate ? format(eventDate, "dd/MM/yyyy") : <span>dd/mm/yyyy</span>}
-                                                        </Button>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent className="w-auto p-0">
-                                                        <Calendar
-                                                            mode="single"
-                                                            selected={eventDate}
-                                                            onSelect={setEventDate}
-                                                            initialFocus
-                                                        />
-                                                    </PopoverContent>
-                                                </Popover>
-                                            </div>
+                                            <DatePicker
+                                                minDate={new Date()}
+                                                selected={eventDate}
+                                                onChange={(date) => {
+                                                    setEventDate(date);
+                                                }}
+                                                className="w-full block outline-none bg-none focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                                            // disabled={disableEdit}
+                                            />
                                         </div>
 
                                         <div className="col-span-1">

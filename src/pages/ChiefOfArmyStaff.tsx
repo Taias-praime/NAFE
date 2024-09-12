@@ -44,6 +44,28 @@ const ChiefOfArmyStaff = () => {
     const [reload, setReload] = useState(false);
 
     const { toast } = useToast();
+    const validate = (values: any) => {
+        const errors: any = {};
+        if (!values.image) {
+            errors.image = 'Required';
+        }
+        if (!values.fullname) {
+            errors.lastName = 'Required';
+        } else if (values.fullname < 5) {
+            errors.lastName = 'Must be more that 5 characters';
+        }
+        if (!values.title) {
+            errors.title = 'Required';
+        } else if (values.title < 5) {
+            errors.title = 'Must be more that 5 characters';
+        }
+        if (!values.description) {
+            errors.description = 'Required';
+        } else if (values.description < 5) {
+            errors.description = 'Must be more that 5 characters';
+        }
+        return errors;
+    };
 
     const formik = useFormik({
         initialValues: {
@@ -53,6 +75,7 @@ const ChiefOfArmyStaff = () => {
             description: '',
             files: [] as string[]
         },
+        validate,
         onSubmit: (obj) => {
             const data = { ...obj, image: removeBase64(featuredImg) };
             onPut(data);

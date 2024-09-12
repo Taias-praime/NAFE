@@ -168,6 +168,7 @@ const CreateLiveEvents = ({ isLVEdit, setReload, title, label, id }: CreateLiveE
                         <div className="w-full">
                             <label>Select Event Date</label>
                             <DatePicker
+                                minDate={new Date()}
                                 selected={eventDate}
                                 onChange={(date) => {
                                     setEventDate(date);
@@ -207,7 +208,7 @@ const CreateLiveEvents = ({ isLVEdit, setReload, title, label, id }: CreateLiveE
                             {
                                 !id && (
                                     <Button variant="default" type='submit' className="px-10">
-                                        {isLoadingCreate? <Loader2 className='animate-spin' /> : 'Create'}
+                                        {isLoadingCreate ? <Loader2 className='animate-spin' /> : 'Create'}
                                     </Button>
                                 )
                             }

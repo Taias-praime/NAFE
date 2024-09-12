@@ -1,4 +1,4 @@
-import { Loader2, PlusCircle, Search } from "lucide-react";
+import { Loader2, PlusCircle, Search, X } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import ProfileImg from "../components/ui-custom/profileImg";
@@ -18,23 +18,27 @@ import useFetch from "../hooks/useFetch";
 import DepartmentDetails from "../components/ui-custom/departmentDetails";
 import Paginate from "../components/ui/paginate";
 import CreateDepartment from "../components/ui-custom/createDepartment";
+import { IDepartment } from "../models/interfaces";
 
 const Departments = () => {
   const PAGINATION_HEIGHT = 40;
 
-  const [deps, setDeps] = useState([]);
+  const [departments, setDepartment] = useState<IDepartment[]>([]);
+  const [filteredDepartment, setFilteredDepartment] = useState<IDepartment[]>([]);
   const [depsCount, setDepsCount] = useState(0);
   const [numOfPages, setNumOfPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [tenantId, setTenantId] = useState('');
   const [tenant, setTenant] = useState('');
+  const [searchValue, setSearchValue] = useState("");
 
   const { toast } = useToast();
 
   const { onFetch: getDeps, isFetching } = useFetch(
     `/tenants/sa/?page=${currentPage}&items_per_page=10`,
     (data) => {
-      setDeps(data.data.results);
+      setDepartment(data.data.results);
+      setFilteredDepartment(data.data.results);
       setDepsCount(data.data.number_of_items);
       setNumOfPages(data.data.number_of_pages);
     },
@@ -62,6 +66,17 @@ const Departments = () => {
     setCurrentPage(event.selected + 1);
   };
 
+  const handleSearch = (value: string) => {
+    setSearchValue(value);
+    const filtered = departments.filter((department) => department.code.toLowerCase().includes(value.toLowerCase()))
+    setFilteredDepartment(filtered);
+  }
+
+  const clearSearch = () => {
+    setSearchValue("");
+    setFilteredDepartment(departments);
+  }
+
   return (
     <div
       className="pb-5 pt-10 px-10"
@@ -86,17 +101,21 @@ const Departments = () => {
               </div>
 
               <div className="">
-                <div className="lg:flex justify-between items-center p-5 space-y-5">
+                <div className="flex items-center justify-between flex-wrap p-5">
                   <div className="">
                     <h5 className="text-xl "> List of Departments </h5>
                     <small className="text-muted-foreground">
                       {depsCount} Departments
                     </small>
                   </div>
-                  <div className="relative flex items-center w-fit">
-                    <Input className="p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[300px]" />
-                    <Search className="absolute right-5 opacity-30" />
+                  <div className="relative flex items-center">
+                  <Input value={searchValue} onChange={(e) => handleSearch(e.target.value)} className='p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[300px]' />
+                  <div className="absolute right-5 opacity-30">
+                    {
+                      searchValue ? <X role="button" onClick={clearSearch}  /> : <Search/>
+                    }
                   </div>
+                </div>
                 </div>
                 <Table>
                   <TableHeader>
@@ -109,7 +128,7 @@ const Departments = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody >
-                    {deps.map((d: any) => (
+                    {filteredDepartment.map((d: any) => (
                       <TableRow onClick={() => updateTenantId(d.tenant_id, d.code)} key={d.tenant_id} className="text-start" >
                         <CreateDepartment
                           tenantId={d.tenant_id}
