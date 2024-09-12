@@ -1,4 +1,4 @@
-import { Loader2, PlusCircle, Search } from "lucide-react";
+import { Loader2, PlusCircle, Search, X } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { useEffect, useState } from "react";
 import { Input } from "../components/ui/input";
@@ -13,9 +13,12 @@ import CreateUser from "../components/ui-custom/createUser";
 const Users = () => {
   const PAGINATION_HEIGHT = 40;
   const [users, setUsers] = useState<IUser[]>([]);
-  const [, setUserCount] = useState(0);
+  const [filteredUsers, setFilteredUsers] = useState<IUser[]>([]);
+  const [userCount, setUserCount] = useState(0);
   const [numOfPages, setNumOfPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchValue, setSearchValue] = useState("");
+
 
   // get users
   const { onFetch: onFetchUsers, isFetching } = useFetch(
@@ -26,15 +29,16 @@ const Users = () => {
         const results = _data.results;
         setUserCount(_data.number_of_items);
         setNumOfPages(_data.number_of_pages);
-        setUsers(results)
+        setUsers(results);
+        setFilteredUsers(results);
       }
     },
     (error, status) => { // on error
-      const { message} = error;
+      const { message } = error;
       // notify
       toast({
         title: `${message} (${status})`,
-       
+
         variant: 'destructive',
       })
     },
@@ -48,6 +52,17 @@ const Users = () => {
   const handlePageClick = (event: { selected: number; }) => {
     setCurrentPage(event.selected + 1);
   };
+
+  const handleSearch = (value: string) => {
+    setSearchValue(value);
+    const filtered = users.filter((user) => user.full_name.toLowerCase().includes(value.toLowerCase()))
+    setFilteredUsers(filtered);
+  }
+
+  const clearSearch = () => {
+    setSearchValue("");
+    setFilteredUsers(users);
+  }
 
   return (
     <div className="pb-5 pt-10 px-10" style={{
@@ -67,21 +82,24 @@ const Users = () => {
         {
           isFetching ? <Loader2 className='animate-spin m-auto' /> : (
             <div className="">
-              <div className="lg:flex justify-between items-center p-5 space-y-5">
+              <div className="flex items-center justify-between flex-wrap p-5">
                 <div className="">
                   <h5 className="text-xl"> List of Users </h5>
                   <small className="text-muted-foreground">
-                    {/* {users.length || 0} Departments */}
+                    {userCount} Users
                   </small>
                 </div>
-                <div className="relative flex items-center w-fit">
-                  <Input className='p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[300px]' />
-                  <Search className='absolute right-5 opacity-30' />
+                <div className="relative flex items-center">
+                  <Input value={searchValue} onChange={(e) => handleSearch(e.target.value)} className='p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[300px]' />
+                  <div className="absolute right-5 opacity-30">
+                    {
+                      searchValue ? <X role="button" onClick={clearSearch}  /> : <Search/>
+                    }
+                  </div>
                 </div>
               </div>
 
               <Table className="">
-                {/* <TableCaption className="py-5">A list of your recent invoices.</TableCaption> */}
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
@@ -91,7 +109,7 @@ const Users = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {users.map((user: IUser) => (
+                  {filteredUsers.map((user: IUser) => (
                     <TableRow key={user.id}>
                       <CreateUser tenantId={user.id}
                         label={

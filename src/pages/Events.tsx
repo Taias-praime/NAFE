@@ -53,7 +53,6 @@ const Events = () => {
 
     const {
         onFetch: getLiveEvents,
-        // isFetching: isFetchingLE 
     } = useFetch(
         `/events/sa/list-live-webinars`,
         (data) => {
