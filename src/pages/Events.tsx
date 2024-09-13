@@ -1,4 +1,4 @@
-import { LayoutGrid, ListFilter, ListOrdered, Loader2, Pencil, PlusCircle, Search } from 'lucide-react';
+import { LayoutGrid, ListFilter, ListOrdered, Loader2, Pencil, PlusCircle, Search, X } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { useEffect, useState } from 'react';
@@ -29,8 +29,7 @@ const Events = () => {
     const [isEditEvent, setIsEditEvent] = useState(false)
     const [reload, setReload] = useState(false);
     const [eventType, setEventType] = useState('today');
-
-    const [, setSearchTerm] = useState<string>('');
+    const [searchValue, setSearchValue] = useState("");
 
     const count = (): number => {
         let num = 0;
@@ -48,7 +47,17 @@ const Events = () => {
             setEventsCount(data.data.number_of_items);
 
         },
-        () => { },
+    );
+
+    // search event
+    const { onFetch: searchEvent, isFetching: isSearching } = useFetch(
+        `/events/sa/?search_query${searchValue}`,
+        (data) => {
+            setEvents(data.data.results)
+            setFilteredEvents(data.data.results);
+            setEventsCount(data.data.number_of_items);
+
+        },
     );
 
     const {
@@ -64,12 +73,7 @@ const Events = () => {
             setEventsCount(data.data.number_of_items);
             setNumOfPages(data.data.number_of_pages);
         },
-        () => { },
     );
-
-    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(event.target.value);
-    }
 
     useEffect(() => {
         if (eventType === 'live') return;
@@ -88,6 +92,16 @@ const Events = () => {
         }
     }
 
+    const handleSearch = (e: { preventDefault: () => void; }) => {
+        e.preventDefault();
+        if (!searchValue) return;
+        searchEvent();
+    }
+
+    const clearSearch = () => {
+        setSearchValue("");
+        getEvents();
+    }
 
     return (
         <div className="overflow-y-auto pb-5 pt-10 px-10 relative" style={{
@@ -117,8 +131,14 @@ const Events = () => {
                     </div>
                     <div className="flex gap-5 items-center">
                         <div className="relative flex items-center w-fit">
-                            <Input className='p-6 border-transparent rounded-full bg-foreground/5 2xl:w-[300px]' onChange={handleSearch} />
-                            <Search className='absolute right-5 opacity-30' />
+                            <form onSubmit={handleSearch} className="relative flex items-center">
+                                <Input value={searchValue} onChange={(e) => setSearchValue(e.target.value)} className='p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[250px]' />
+                                <div className="absolute right-5 opacity-30">
+                                    {
+                                        searchValue ? <X role="button" onClick={clearSearch} /> : <Search />
+                                    }
+                                </div>
+                            </form>
                         </div>
 
                         <DropdownMenu>
@@ -180,7 +200,7 @@ const Events = () => {
                 </div>
 
                 {
-                    isFetching ?
+                    isFetching || isSearching ?
                         <div className='w-full h-[400px] flex justify-center items-center'>
                             <Loader2 className='animate-spin mx-auto' />
                         </div> : (
@@ -190,7 +210,7 @@ const Events = () => {
                                         <TableView events={filteredEvents} />
                                         :
                                         <GridView setReload={setReload} events={filteredEvents} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} eventType={eventType} />
-                                ) :  <NoEvents noEventsLabel={`No ${eventType === 'today' ? 'ongoing' : eventType} event`} />
+                                ) : <NoEvents noEventsLabel={`No ${eventType === 'today' ? 'ongoing' : eventType} event`} />
                         )
                 }
             </div>

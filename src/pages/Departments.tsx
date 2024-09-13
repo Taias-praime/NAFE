@@ -24,7 +24,6 @@ const Departments = () => {
   const PAGINATION_HEIGHT = 40;
 
   const [departments, setDepartment] = useState<IDepartment[]>([]);
-  const [filteredDepartment, setFilteredDepartment] = useState<IDepartment[]>([]);
   const [depsCount, setDepsCount] = useState(0);
   const [numOfPages, setNumOfPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,11 +33,29 @@ const Departments = () => {
 
   const { toast } = useToast();
 
-  const { onFetch: getDeps, isFetching } = useFetch(
+  const { onFetch: getDepartment, isFetching } = useFetch(
     `/tenants/sa/?page=${currentPage}&items_per_page=10`,
     (data) => {
       setDepartment(data.data.results);
-      setFilteredDepartment(data.data.results);
+      setDepsCount(data.data.number_of_items);
+      setNumOfPages(data.data.number_of_pages);
+    },
+    (error, status) => {
+      const { message } = error;
+      // notify
+      toast({
+        title: `${message} (${status})`,
+
+        variant: "destructive",
+      });
+    }
+  );
+
+  // search
+  const { onFetch: searchDepartment, isFetching: isSearching } = useFetch(
+    `/tenants/sa/?search_query=${searchValue}`,
+    (data) => {
+      setDepartment(data.data.results);
       setDepsCount(data.data.number_of_items);
       setNumOfPages(data.data.number_of_pages);
     },
@@ -54,7 +71,7 @@ const Departments = () => {
   );
 
   useEffect(() => {
-    getDeps();
+    getDepartment();
   }, [currentPage]);
 
   const updateTenantId = (id: string, code: string) => {
@@ -66,15 +83,15 @@ const Departments = () => {
     setCurrentPage(event.selected + 1);
   };
 
-  const handleSearch = (value: string) => {
-    setSearchValue(value);
-    const filtered = departments.filter((department) => department.code.toLowerCase().includes(value.toLowerCase()))
-    setFilteredDepartment(filtered);
+  const handleSearch = (e: { preventDefault: () => void; }) => {
+    e.preventDefault();
+    if (!searchValue) return;
+    searchDepartment();
   }
 
   const clearSearch = () => {
     setSearchValue("");
-    setFilteredDepartment(departments);
+    getDepartment();
   }
 
   return (
@@ -85,7 +102,7 @@ const Departments = () => {
       }}
     >
       {
-        isFetching ? <Loader2 className='animate-spin m-auto' /> : (
+        isFetching || isSearching ? <Loader2 className='animate-spin m-auto' /> : (
           <>
             <div className="h-full overflow-y-auto">
               <div className="flex justify-between">
@@ -108,14 +125,14 @@ const Departments = () => {
                       {depsCount} Departments
                     </small>
                   </div>
-                  <div className="relative flex items-center">
-                  <Input value={searchValue} onChange={(e) => handleSearch(e.target.value)} className='p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[300px]' />
-                  <div className="absolute right-5 opacity-30">
-                    {
-                      searchValue ? <X role="button" onClick={clearSearch}  /> : <Search/>
-                    }
-                  </div>
-                </div>
+                  <form onSubmit={handleSearch} className="relative flex items-center">
+                    <Input value={searchValue} onChange={(e) => setSearchValue(e.target.value)} className='p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[300px]' />
+                    <div className="absolute right-5 opacity-30">
+                      {
+                        searchValue ? <X role="button" onClick={clearSearch} /> : <Search />
+                      }
+                    </div>
+                  </form>
                 </div>
                 <Table>
                   <TableHeader>
@@ -128,7 +145,7 @@ const Departments = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody >
-                    {filteredDepartment.map((d: any) => (
+                    {departments.map((d: any) => (
                       <TableRow onClick={() => updateTenantId(d.tenant_id, d.code)} key={d.tenant_id} className="text-start" >
                         <CreateDepartment
                           tenantId={d.tenant_id}
@@ -142,7 +159,7 @@ const Departments = () => {
                             {[...Array(d.total_members).keys()]
                               .map((_, i) => (
                                 <ProfileImg
-                                key={i}
+                                  key={i}
                                   className={i ? "-ml-4" : ""}
                                   url={USER_PLACEHOLDER_IMG_URL}
                                 />

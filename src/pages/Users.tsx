@@ -13,7 +13,6 @@ import CreateUser from "../components/ui-custom/createUser";
 const Users = () => {
   const PAGINATION_HEIGHT = 40;
   const [users, setUsers] = useState<IUser[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<IUser[]>([]);
   const [userCount, setUserCount] = useState(0);
   const [numOfPages, setNumOfPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,7 +29,6 @@ const Users = () => {
         setUserCount(_data.number_of_items);
         setNumOfPages(_data.number_of_pages);
         setUsers(results);
-        setFilteredUsers(results);
       }
     },
     (error, status) => { // on error
@@ -42,7 +40,29 @@ const Users = () => {
         variant: 'destructive',
       })
     },
-    {}, // options
+  );
+
+  // search user
+  const { onFetch: onSearchUser, isFetching: isSearching } = useFetch(
+    `/users/sa/?search_query${searchValue}`,
+    (data, status) => {
+      if (status === 200) {
+        const _data = data.data;
+        const results = _data.results;
+        setUserCount(_data.number_of_items);
+        setNumOfPages(_data.number_of_pages);
+        setUsers(results);
+      }
+    },
+    (error, status) => { // on error
+      const { message } = error;
+      // notify
+      toast({
+        title: `${message} (${status})`,
+
+        variant: 'destructive',
+      })
+    },
   );
 
   useEffect(() => {
@@ -53,15 +73,15 @@ const Users = () => {
     setCurrentPage(event.selected + 1);
   };
 
-  const handleSearch = (value: string) => {
-    setSearchValue(value);
-    const filtered = users.filter((user) => user.full_name.toLowerCase().includes(value.toLowerCase()))
-    setFilteredUsers(filtered);
+  const handleSearch = (e: { preventDefault: () => void; }) => {
+    e.preventDefault();
+    if (!searchValue) return;
+    onSearchUser();
   }
 
   const clearSearch = () => {
     setSearchValue("");
-    setFilteredUsers(users);
+    onFetchUsers();
   }
 
   return (
@@ -80,7 +100,7 @@ const Users = () => {
           />
         </div>
         {
-          isFetching ? <Loader2 className='animate-spin m-auto' /> : (
+          isFetching || isSearching ? <Loader2 className='animate-spin m-auto' /> : (
             <div className="">
               <div className="flex items-center justify-between flex-wrap p-5">
                 <div className="">
@@ -89,14 +109,14 @@ const Users = () => {
                     {userCount} Users
                   </small>
                 </div>
-                <div className="relative flex items-center">
-                  <Input value={searchValue} onChange={(e) => handleSearch(e.target.value)} className='p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[300px]' />
+                <form onSubmit={handleSearch} className="relative flex items-center">
+                  <Input value={searchValue} onChange={(e) => setSearchValue(e.target.value)}  className='p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[300px]' />
                   <div className="absolute right-5 opacity-30">
                     {
                       searchValue ? <X role="button" onClick={clearSearch}  /> : <Search/>
                     }
                   </div>
-                </div>
+                </form>
               </div>
 
               <Table className="">
@@ -109,7 +129,7 @@ const Users = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredUsers.map((user: IUser) => (
+                  {users.map((user: IUser) => (
                     <TableRow key={user.id}>
                       <CreateUser tenantId={user.id}
                         label={

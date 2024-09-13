@@ -4,7 +4,7 @@ import { HEADER_HEIGHT } from "../lib/utils";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import { useEffect, useState } from "react";
-import { ListFilter, Loader2, PencilLine } from "lucide-react";
+import { ListFilter, Loader2, PencilLine, Search, X } from "lucide-react";
 import { format } from "date-fns"
 import { toast } from "../components/ui/use-toast";
 import { IAnnouncements, ITenants } from "../models/interfaces";
@@ -23,6 +23,26 @@ const Announcements = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isEdit, setIsEdit] = useState(false);
   const [id, setId] = useState('');
+  const [searchValue, setSearchValue] = useState("");
+
+  const formik = useFormik({
+    initialValues: {
+      title: '',
+      description: '',
+      tenant_ids: [] as string[],
+    },
+    onSubmit: (values) => {
+      if (!isEdit) {
+        onPost(values)
+      } else {
+        onPut(values)
+      }
+      formik.resetForm();
+      setIsEdit(false)
+      setEditTenantsId([])
+      setId('')
+    }
+  })
 
   const { onFetch: getEvents, isFetching: isLoadingAnnouncements } = useFetch(
     `/announcements/sa/?page=${currentPage}&items_per_page=3`,
@@ -38,6 +58,16 @@ const Announcements = () => {
     '/tenants/sa/',
     (data) => {
       setTenants(data.data.results)
+    },
+    () => { },
+  );
+
+  const { onFetch: searchAnnouncement, isFetching: isSearching } = useFetch(
+    `/announcements/sa/?search_query${searchValue}`,
+    (data) => {
+      setAnnouncement(data.data.results);
+      setNumOfAnnouncement(data.data.number_of_items);
+      setNumOfPages(data.data.number_of_pages);
     },
     () => { },
   );
@@ -78,25 +108,6 @@ const Announcements = () => {
     getEvents();
     getTenants();
   }, [isLoadingCreate, isLoadingEdit, currentPage])
-
-  const formik = useFormik({
-    initialValues: {
-      title: '',
-      description: '',
-      tenant_ids: [] as string[],
-    },
-    onSubmit: (values) => {
-      if (!isEdit) {
-        onPost(values)
-      } else {
-        onPut(values)
-      }
-      formik.resetForm();
-      setIsEdit(false)
-      setEditTenantsId([])
-      setId('')
-    }
-  })
 
   const getIdsFromTenants = (tenant_ids: ITenants[]) => {
     const tenants = []
@@ -139,94 +150,116 @@ const Announcements = () => {
     setCurrentPage(event.selected + 1);
   };
 
+  const handleSearch = (e: { preventDefault: () => void; }) => {
+    e.preventDefault();
+    if (!searchValue) return;
+    searchAnnouncement();
+  }
+
+  const clearSearch = () => {
+    setSearchValue("");
+    getEvents();
+  }
+
   return (
     <div className=" pt-10 px-10 bg-foreground/5" style={{
       height: `calc(100vh - ${HEADER_HEIGHT}px - ${PAGINATION_HEIGHT}px)`
     }}>
-      <div className="grid grid-cols-12 gap-x-10 overflow-y-scroll h-full">
-        <div className="col-span-7">
-          <div className="">
-            <h4 className="mb-2 text-xl"> Create Announcement </h4>
-            <p className="opacity-50 text-sm"> Create new announcements </p>
+
+      <div className="overflow-y-scroll h-full">
+        <form onSubmit={handleSearch} className="relative flex items-center justify-end mb-5">
+          <Input value={searchValue} onChange={(e) => setSearchValue(e.target.value)} className='p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[300px]' />
+          <div className="absolute right-5 opacity-30">
+            {
+              searchValue ? <X role="button" onClick={clearSearch} /> : <Search />
+            }
           </div>
-
-          <form onSubmit={formik.handleSubmit} className="rounded-md bg-white p-4 mt-12">
-            <Input
-              value={formik.values.title}
-              onChange={formik.handleChange}
-              name="title"
-              placeholder="title here"
-              className="mb-10"
-              label="Announcement Title"
-            />
-
-            <Textarea
-              rows={4}
-              value={formik.values.description}
-              onChange={formik.handleChange}
-              name="description"
-              placeholder="details of the event here"
-              className="mb-10"
-              label="Details"
-            />
-
-            <ReactSelect
-              label="Select Department"
-              options={tenants}
-              handleSelect={handleSelect}
-              value={tenantsId}
-              isMulti={true}
-              optionName="name"
-              optionValue="tenant_id"
-            />
-            <div className="flex justify-end mt-12">
-              {
-                isEdit ? (
-                  <Button
-                    variant={`${formik.values.title === '' || formik.values.description === '' || formik.values.tenant_ids.length === 0 ? 'disabled' : 'default'}`}
-                    type='submit' className="px-10">
-                    {
-                      isLoadingEdit ? <Loader2 className='animate-spin' /> : 'Edit'
-                    }
-                  </Button>
-                ) : (
-                  <Button
-                    variant={`${formik.values.title === '' || formik.values.description === '' || formik.values.tenant_ids.length === 0 ? 'disabled' : 'default'}`}
-                    type='submit' className="px-10">
-                    {
-                      isLoadingCreate ? <Loader2 className='animate-spin' /> : 'Create'
-                    }
-                  </Button>
-                )
-              }
-            </div>
-          </form>
-        </div>
-
-        <div className="col-span-5">
-          <div className="flex justify-between mb-12">
+        </form>
+        <div className="grid grid-cols-12 gap-x-10">
+          <div className="col-span-7">
             <div className="">
-              <h4 className="mb-2 text-xl"> Recent Announcements </h4>
-              <p className="opacity-50 text-sm"> {numOfAnnouncement} announcements </p>
+              <h4 className="mb-2 text-xl"> Create Announcement </h4>
+              <p className="opacity-50 text-sm"> Create new announcements </p>
             </div>
-            <div className="">
-              <Button className='flex gap-3' variant={'secondary'}>
-                Filter
-                <ListFilter />
-              </Button>
-            </div>
-          </div>
-          {
-            !isLoadingAnnouncements ? (
-              announcements.map((announcement) => (
-                <AnnouncementCard key={announcement.id} announcement={announcement} editAnnouncement={editAnnouncement} />
-              ))
-            ) : (
-              <div className="flex items-center justify-center h-full w-full">
-                <Loader2 className="animate-spin" />
+
+            <form onSubmit={formik.handleSubmit} className="rounded-md bg-white p-4 mt-12">
+              <Input
+                value={formik.values.title}
+                onChange={formik.handleChange}
+                name="title"
+                placeholder="title here"
+                className="mb-10"
+                label="Announcement Title"
+              />
+
+              <Textarea
+                rows={4}
+                value={formik.values.description}
+                onChange={formik.handleChange}
+                name="description"
+                placeholder="details of the event here"
+                className="mb-10"
+                label="Details"
+              />
+
+              <ReactSelect
+                label="Select Department"
+                options={tenants}
+                handleSelect={handleSelect}
+                value={tenantsId}
+                isMulti={true}
+                optionName="name"
+                optionValue="tenant_id"
+              />
+              <div className="flex justify-end mt-12">
+                {
+                  isEdit ? (
+                    <Button
+                      variant={`${formik.values.title === '' || formik.values.description === '' || formik.values.tenant_ids.length === 0 ? 'disabled' : 'default'}`}
+                      type='submit' className="px-10">
+                      {
+                        isLoadingEdit ? <Loader2 className='animate-spin' /> : 'Edit'
+                      }
+                    </Button>
+                  ) : (
+                    <Button
+                      variant={`${formik.values.title === '' || formik.values.description === '' || formik.values.tenant_ids.length === 0 ? 'disabled' : 'default'}`}
+                      type='submit' className="px-10">
+                      {
+                        isLoadingCreate ? <Loader2 className='animate-spin' /> : 'Create'
+                      }
+                    </Button>
+                  )
+                }
               </div>
-            )
-          }
+            </form>
+          </div>
+
+          <div className="col-span-5">
+            <div className="flex justify-between mb-12">
+              <div className="">
+                <h4 className="mb-2 text-xl"> Recent Announcements </h4>
+                <p className="opacity-50 text-sm"> {numOfAnnouncement} announcements </p>
+              </div>
+              <div className="">
+                <Button className='flex gap-3' variant={'secondary'}>
+                  Filter
+                  <ListFilter />
+                </Button>
+              </div>
+            </div>
+            {
+              !isLoadingAnnouncements || !isSearching ? (
+                announcements.map((announcement) => (
+                  <AnnouncementCard key={announcement.id} announcement={announcement} editAnnouncement={editAnnouncement} />
+                ))
+              ) : (
+                <div className="flex items-center justify-center h-full w-full">
+                  <Loader2 className="animate-spin" />
+                </div>
+              )
+            }
+          </div>
         </div>
       </div>
       <Paginate
