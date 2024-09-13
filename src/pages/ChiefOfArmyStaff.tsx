@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { Button } from "../components/ui/button";
 import { Skeleton } from "../components/ui/skeleton";
 import { FileItem, FilesList } from "../components/ui-custom/files";
-import { HEADER_HEIGHT, local, removeBase64, USER_PLACEHOLDER_IMG_URL } from "../lib/utils";
+import { HEADER_HEIGHT, removeBase64, USER_PLACEHOLDER_IMG_URL } from "../lib/utils";
 import {
     Tooltip,
     TooltipContent,
@@ -25,7 +25,6 @@ import ProfileImage from "../components/ui-custom/ProfileImage";
 import LiveEvents from "../components/ui-custom/liveEvents";
 import PressRelease from "../components/ui-custom/pressRelease";
 
-const token = local("token");
 const tabValue = ["press release", "live events", "suggestions"]
 
 const ChiefOfArmyStaff = () => {
@@ -190,9 +189,6 @@ const ChiefOfArmyStaff = () => {
             });
         },
         {},
-        {
-            "Authorization": `Bearer ${token}`,
-        }
     );
 
     const PR = useMemo(() => {

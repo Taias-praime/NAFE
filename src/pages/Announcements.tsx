@@ -1,6 +1,6 @@
 import { useFormik } from "formik";
 import { Input } from "../components/ui/input";
-import { HEADER_HEIGHT, local } from "../lib/utils";
+import { HEADER_HEIGHT } from "../lib/utils";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import { useEffect, useState } from "react";
@@ -12,7 +12,6 @@ import useFetch from "../hooks/useFetch";
 import ReactSelect from "../components/ui/multi-select";
 import Paginate from "../components/ui/paginate";
 
-const token = local("token");
 const PAGINATION_HEIGHT = 50;
 
 const Announcements = () => {
@@ -57,9 +56,6 @@ const Announcements = () => {
       });
     },
     {},
-    {
-      "Authorization": `Bearer ${token}`,
-    }
   );
 
   const { onPut, isFetching: isLoadingEdit } = useFetch(
@@ -76,9 +72,6 @@ const Announcements = () => {
       });
     },
     {},
-    {
-      "Authorization": `Bearer ${token}`,
-    }
   );
 
   useEffect(() => {

@@ -8,12 +8,10 @@ import Modal from './modal'
 import { ReactNode, useEffect, useState } from 'react'
 import { useFormik } from 'formik'
 import { format } from 'date-fns'
-import { local, removeBase64 } from '../../lib/utils'
+import { removeBase64 } from '../../lib/utils'
 import { toast } from '../ui/use-toast'
 import useFetch from '../../hooks/useFetch'
 import ProfileImage from './ProfileImage'
-
-const token = local("token");
 
 interface CreateLiveEventsProps {
     isLVEdit: boolean;
@@ -75,9 +73,6 @@ const CreateLiveEvents = ({ isLVEdit, setReload, title, label, id }: CreateLiveE
             });
         },
         {},
-        {
-            "Authorization": `Bearer ${token}`,
-        }
     );
 
     // edit
@@ -99,9 +94,6 @@ const CreateLiveEvents = ({ isLVEdit, setReload, title, label, id }: CreateLiveE
             });
         },
         {},
-        {
-            "Authorization": `Bearer ${token}`,
-        }
     );
 
     const { onFetch, isFetching } = useFetch(

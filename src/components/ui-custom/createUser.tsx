@@ -4,14 +4,12 @@ import { Input } from '../ui/input'
 import { Loader2 } from 'lucide-react'
 import { Button } from '../ui/button'
 import Modal from './modal'
-import { local, removeBase64 } from '../../lib/utils'
+import { removeBase64 } from '../../lib/utils'
 import useFetch from '../../hooks/useFetch'
 import { toast } from '../ui/use-toast'
 import ProfileImage from './ProfileImage'
 import ReactSelect from '../ui/multi-select'
 import { IDepartment, IRanks } from '../../models/interfaces'
-
-const token = local("token");
 
 interface CreateUserProps {
     label: ReactNode;
@@ -73,9 +71,6 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
             });
         },
         {},
-        {
-            "Authorization": `Bearer ${token}`,
-        }
     );
 
     // edit
@@ -97,9 +92,6 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
             });
         },
         {},
-        {
-            "Authorization": `Bearer ${token}`,
-        }
     );
 
     // get user details
@@ -129,9 +121,6 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
             });
         },
         {},
-        {
-            "Authorization": `Bearer ${token}`,
-        }
     );
 
     // fetch department

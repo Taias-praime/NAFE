@@ -9,12 +9,10 @@ import { Button } from '../ui/button'
 import Modal from './modal'
 import { FileItem } from './files'
 import { format } from 'date-fns'
-import { local, removeBase64 } from '../../lib/utils'
+import { removeBase64 } from '../../lib/utils'
 import useFetch from '../../hooks/useFetch'
 import { toast } from '../ui/use-toast'
 import ProfileImage from './ProfileImage'
-
-const token = local("token");
 
 interface CreatePressReleaseProps {
     isPREdit: boolean;
@@ -74,9 +72,6 @@ const CreatePressRelease = ({ isPREdit, setReload, PR, label, title }: CreatePre
             });
         },
         {},
-        {
-            "Authorization": `Bearer ${token}`,
-        }
     );
 
     // edit
@@ -99,9 +94,6 @@ const CreatePressRelease = ({ isPREdit, setReload, PR, label, title }: CreatePre
             });
         },
         {},
-        {
-            "Authorization": `Bearer ${token}`,
-        }
     );
 
     useEffect(() => {

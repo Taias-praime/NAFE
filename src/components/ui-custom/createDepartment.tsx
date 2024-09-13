@@ -4,11 +4,8 @@ import { Button } from '../ui/button'
 import Modal from './modal'
 import { ReactNode, useEffect, useState, } from 'react'
 import { useFormik } from 'formik'
-import { local, } from '../../lib/utils'
 import useFetch from '../../hooks/useFetch'
 import { toast } from '../ui/use-toast'
-
-const token = local("token");
 
 interface CreateDepartmentProps {
     label: ReactNode;
@@ -63,9 +60,6 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
             });
         },
         {},
-        {
-            "Authorization": `Bearer ${token}`,
-        }
     );
 
     // edit
@@ -85,9 +79,6 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
             });
         },
         {},
-        {
-            "Authorization": `Bearer ${token}`,
-        }
     );
 
     // fetch department details
@@ -120,9 +111,6 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
             });
         },
         {},
-        {
-            "Authorization": `Bearer ${token}`,
-        }
     );
 
     useEffect(() => {
