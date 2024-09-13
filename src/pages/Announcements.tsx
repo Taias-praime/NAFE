@@ -25,22 +25,39 @@ const Announcements = () => {
   const [id, setId] = useState('');
   const [searchValue, setSearchValue] = useState("");
 
+  const validate = (values: any) => {
+    const errors: any= {};
+    if (!values.title) {
+      errors.title = 'Required';
+    } else if (values.title.length < 5) {
+      errors.title = 'Must be more that 5 characters';
+    }
+    if (!values.description) {
+      errors.description = 'Required';
+    } else if (values.description.length < 5) {
+      errors.description = 'Must be more that 5 characters';
+    }
+    if (!values.tenant_ids) {
+      errors.tenant_ids = 'Required';
+    } else if (values.tenant_ids.length < 1) {
+      errors.tenant_ids = 'Must be more that 5 characters';
+    }
+    return errors;
+  };
+
   const formik = useFormik({
     initialValues: {
       title: '',
       description: '',
       tenant_ids: [] as string[],
     },
+    validate,
     onSubmit: (values) => {
       if (!isEdit) {
         onPost(values)
       } else {
         onPut(values)
       }
-      formik.resetForm();
-      setIsEdit(false)
-      setEditTenantsId([])
-      setId('')
     }
   })
 
@@ -76,7 +93,11 @@ const Announcements = () => {
     '/announcements/sa/add',
     (data) => {
       toast({ description: data.message });
-    }, // on success
+      formik.resetForm();
+      setIsEdit(false)
+      setEditTenantsId([])
+      setId('')
+    },
     (e) => {
       const { message } = e;
       // notify
@@ -92,6 +113,10 @@ const Announcements = () => {
     `/announcements/sa/${id}/edit`,
     (data) => {
       toast({ description: data.message });
+      formik.resetForm();
+      setIsEdit(false)
+      setEditTenantsId([])
+      setId('')
     },
     (e) => {
       const { message } = e;
@@ -188,18 +213,19 @@ const Announcements = () => {
                 onChange={formik.handleChange}
                 name="title"
                 placeholder="title here"
-                className="mb-10"
+                divClass="mb-10"
                 label="Announcement Title"
+                error={formik.errors.title}
               />
-
               <Textarea
                 rows={4}
                 value={formik.values.description}
                 onChange={formik.handleChange}
                 name="description"
                 placeholder="details of the event here"
-                className="mb-10"
                 label="Details"
+                divClass="mb-10"
+                error={formik.errors.description}
               />
 
               <ReactSelect
@@ -210,6 +236,8 @@ const Announcements = () => {
                 isMulti={true}
                 optionName="name"
                 optionValue="tenant_id"
+                divClass="mb-10"
+                error={formik.errors.tenant_ids}
               />
               <div className="flex justify-end mt-12">
                 {

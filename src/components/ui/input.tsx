@@ -1,17 +1,20 @@
 
 import { cn } from "../../lib/utils"
 import { InputHTMLAttributes, forwardRef } from "react";
+import ErrorMessage from "./error";
 
 
 export interface InputProps
     extends InputHTMLAttributes<HTMLInputElement> {
       label?: string;
+      error?: string;
+      divClass?: string;
     }
 
 
-const Input = forwardRef<HTMLInputElement, InputProps>(({ className, type, label, ...props }, ref) => {
+const Input = forwardRef<HTMLInputElement, InputProps>(({ className, type, label, error, divClass, ...props }, ref) => {
     return (
-      <>
+      <div className={divClass} >
         { label && <label htmlFor={label.toLowerCase()}> {label} </label> }
         <input
           type={type}
@@ -22,7 +25,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({ className, type, label
           ref={ref}
           {...props}
         />
-      </>
+        <ErrorMessage error={error} />
+      </div>
     )
   }
 )
