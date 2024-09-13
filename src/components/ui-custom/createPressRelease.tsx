@@ -164,7 +164,7 @@ const CreatePressRelease = ({ isPREdit, setReload, PR, label, title }: CreatePre
                     disabled={disableEdit}
                 />
                 <div className="w-full">
-                    <label>Select Event Date</label>
+                    <label>Press Release Date</label>
                     <DatePicker
                         selected={eventDate}
                         minDate={new Date()}
