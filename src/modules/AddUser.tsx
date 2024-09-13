@@ -87,7 +87,6 @@ const User = ({
 					<div className="">
 						<div className="text-md">{user.name}</div>
 						<div className="text-xs uppercase">
-							{/* {user.position || 'no-position-set'} */}
 						</div>
 					</div>
 				</div>
@@ -152,7 +151,7 @@ const AddUserActionSheet = ({
 	}, [reload]);
 
 	useEffect(() => {
-		const filter = userList.filter((item) => item.name.includes(search))
+		const filter = userList.filter((item) => item.name.toLowerCase().includes(search.toLowerCase()))
 		setFilterList(filter)
 		setReload(false);
 	}, [search])
@@ -180,7 +179,6 @@ const AddUserActionSheet = ({
 						<TableHeader>
 							<TableRow>
 								<TableHead className="text-sm">Name</TableHead>
-								{/* <TableHead className="text-sm">Email</TableHead> */}
 								<TableHead></TableHead>
 							</TableRow>
 						</TableHeader>
@@ -199,7 +197,6 @@ const AddUserActionSheet = ({
 												<span className='ms-2'> {user.name} </span>
 											</div>
 										</TableCell>
-										{/* <TableCell>{user.email}</TableCell> */}
 										<TableCell>
 											<Checkbox
 												checked={selectedUsers.some(
