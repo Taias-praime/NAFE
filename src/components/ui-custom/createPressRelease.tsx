@@ -167,6 +167,7 @@ const CreatePressRelease = ({ isPREdit, setReload, PR, label, title }: CreatePre
                     <label>Select Event Date</label>
                     <DatePicker
                         selected={eventDate}
+                        minDate={new Date()}
                         onChange={(date) => {
                             setEventDate(date);
                         }}
