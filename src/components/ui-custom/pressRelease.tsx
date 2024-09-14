@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { Pencil } from "lucide-react";
-import CreatePressRelease from "./createPressRelease";
+import CreatePressRelease from "./create-press-release";
 import { Button } from "../ui/button";
 
 const PressRelease = ({ title, date, image, id, onClick, setReload, isPREdit, PR }: any) => {

@@ -24,17 +24,17 @@ const EditChiefOfStaff = ({ id, setReload }: EditChiefOfStaffProps) => {
 
     const validate = (values: any) => {
         const errors: any = {};
-        if (!values.image && !disableEdit) {
+        if (!values.image && !disableEdit && !featuredImg) {
             errors.image = 'Image is required';
         }
         if (values.fullname < 5) {
-            errors.lastName = 'Must be more that 5 characters';
+            errors.fullname = 'Name be more that 5 characters';
         }
-        if (values.title < 5) {
-            errors.title = 'Must be more that 5 characters';
+        else if (values.title < 5) {
+            errors.title = 'Title be more that 5 characters';
         }
-        if (values.description < 5) {
-            errors.description = 'Must be more that 5 characters';
+        else if (values.description < 5) {
+            errors.description = 'Description be more that 5 characters';
         }
         return errors;
     };
@@ -69,7 +69,6 @@ const EditChiefOfStaff = ({ id, setReload }: EditChiefOfStaffProps) => {
                 files: [..._data.files],
             })
             setFeaturedImg(_data.image)
-            console.log(data);
         },
         (e) => {
             const { message } = e;

@@ -13,8 +13,8 @@ import {
 import useFetch from "../hooks/useFetch";
 import { useToast } from "../components/ui/use-toast";
 import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs";
-import CreatePressRelease from "../components/ui-custom/createPressRelease";
-import CreateLiveEvents from "../components/ui-custom/createLiveEvents";
+import CreatePressRelease from "../components/ui-custom/create-press-release";
+import CreateLiveEvents from "../components/ui-custom/create-live-events";
 import { ArmyStaff, ILiveEvent, IPressRelease, ISuggestions } from "../models/interfaces";
 import LiveEvents from "../components/ui-custom/liveEvents";
 import PressRelease from "../components/ui-custom/pressRelease";

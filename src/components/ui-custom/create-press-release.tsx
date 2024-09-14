@@ -29,6 +29,23 @@ const CreatePressRelease = ({ isPREdit, setReload, PR, label, title }: CreatePre
     const [disableEdit, setDisableEdit] = useState(true);
     const [open, setOpen] = useState(false);
 
+    const validate = (values: any) => {
+        const errors: any = {};
+        if (!values.image && !disableEdit) {
+            errors.image = 'Image is required';
+        }
+        if (values.date < 5) {
+            errors.date = 'Date is required';
+        }
+        else if (values.title < 5) {
+            errors.title = 'Title must be more that 5 characters';
+        }
+        else if (values.description < 5) {
+            errors.description = 'Description be more that 5 characters';
+        }
+        return errors;
+    };
+
     const formik = useFormik({
         initialValues: {
             image: '',
@@ -37,6 +54,7 @@ const CreatePressRelease = ({ isPREdit, setReload, PR, label, title }: CreatePre
             description: '',
             files: [] as string[]
         },
+        validate,
         onSubmit: (obj) => {
             const date = format((eventDate as Date), "yyyy-MM-dd");
 
@@ -153,7 +171,7 @@ const CreatePressRelease = ({ isPREdit, setReload, PR, label, title }: CreatePre
     return (
         <Modal open={open} onOpenChange={(value) => toggleOpen(value)} title={title} className="flex items-center gap-3 p-3" label={label}>
             <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                <ProfileImage deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} disabled={disableEdit} />
+                <ProfileImage deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} disabled={disableEdit}  error={formik.errors.image} />
                 <Input
                     value={formik.values.title}
                     onChange={formik.handleChange}
@@ -162,6 +180,7 @@ const CreatePressRelease = ({ isPREdit, setReload, PR, label, title }: CreatePre
                     className=""
                     label="Press Realease Title"
                     disabled={disableEdit}
+                    error={formik.errors.title}
                 />
                 <div className="w-full">
                     <label>Press Release Date</label>
@@ -173,6 +192,7 @@ const CreatePressRelease = ({ isPREdit, setReload, PR, label, title }: CreatePre
                         }}
                         className="w-full block outline-none bg-none focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                         disabled={disableEdit}
+                        // error={formik.errors.date}
                     />
                 </div>
                 <Textarea
@@ -184,6 +204,7 @@ const CreatePressRelease = ({ isPREdit, setReload, PR, label, title }: CreatePre
                     className="mb-10"
                     label="Description"
                     disabled={disableEdit}
+                    error={formik.errors.description}
                 />
                 {formik.values.files && (
                     <div className="flex flex-col gap-4">
@@ -204,14 +225,14 @@ const CreatePressRelease = ({ isPREdit, setReload, PR, label, title }: CreatePre
                     {id && disableEdit && <Button onClick={() => setDisableEdit(false)} type='button' className="px-10">Edit </Button>}
                     {
                         id && !disableEdit && (
-                            <Button variant="default" type='submit' className="px-10">
+                            <Button variant={`${formik.values.date === '' || featuredImg === '' || formik.values.title === '' || formik.values.description === '' ? 'disabled' : 'default'}`}  type='submit' className="px-10">
                                 {isLoadingPut ? <Loader2 className='animate-spin' /> : 'Update'}
                             </Button>
                         )
                     }
                     {
                         !id && (
-                            <Button variant="default" type='submit' className="px-10">
+                            <Button variant={`${formik.values.date === '' || featuredImg === '' || formik.values.title === '' || formik.values.description === '' ? 'disabled' : 'default'}`}  type='submit' className="px-10">
                                 {isLoadingPost ? <Loader2 className='animate-spin' /> : 'Create'}
                             </Button>
                         )

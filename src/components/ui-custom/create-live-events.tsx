@@ -27,6 +27,26 @@ const CreateLiveEvents = ({ isLVEdit, setReload, title, label, id }: CreateLiveE
     const [disableEdit, setDisableEdit] = useState(true);
     const [open, setOpen] = useState(false);
 
+    const validate = (values: any) => {
+        const errors: any = {};
+        if (!values.image && !disableEdit) {
+            errors.image = 'Image is required';
+        }
+        if (values.date < 5) {
+            errors.date = 'Date is required';
+        }
+        else if (values.title < 5) {
+            errors.title = 'Title must be more that 5 characters';
+        }
+        else if (values.event_link < 5) {
+            errors.title = 'Title must be more that 5 characters';
+        }
+        else if (values.description < 5) {
+            errors.description = 'Description be more that 5 characters';
+        }
+        return errors;
+    };
+
     const formik = useFormik({
         initialValues: {
             image: '',
@@ -36,6 +56,7 @@ const CreateLiveEvents = ({ isLVEdit, setReload, title, label, id }: CreateLiveE
             description: '',
             files: [] as string[]
         },
+        validate,
         onSubmit: (obj) => {
             const date = format((eventDate as Date), "yyyy-MM-dd");
 
@@ -147,15 +168,16 @@ const CreateLiveEvents = ({ isLVEdit, setReload, title, label, id }: CreateLiveE
             {
                 isFetching ? <Loader2 className='animate-spin m-auto' /> : (
                     <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                        <ProfileImage setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} disabled={disableEdit} />
+                        <ProfileImage setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} disabled={disableEdit}  error={formik.errors.image} />
                         <Input
                             value={formik.values.title}
                             onChange={formik.handleChange}
                             name="title"
-                            placeholder="title here"
+                            placeholder="title"
                             className=""
                             label="Event Title"
                             disabled={disableEdit}
+                            error={formik.errors.title}
                         />
                         <div className="w-full">
                             <label>Select Event Date</label>
@@ -167,6 +189,7 @@ const CreateLiveEvents = ({ isLVEdit, setReload, title, label, id }: CreateLiveE
                                 }}
                                 className="w-full block outline-none bg-none focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                 disabled={disableEdit}
+                                // error={formik.errors.date}
                             />
                         </div>
                         <Input
@@ -177,29 +200,31 @@ const CreateLiveEvents = ({ isLVEdit, setReload, title, label, id }: CreateLiveE
                             className=""
                             label="Live Link"
                             disabled={disableEdit}
+                            error={formik.errors.event_link}
                         />
                         <Textarea
                             rows={4}
                             value={formik.values.description}
                             onChange={formik.handleChange}
                             name="description"
-                            placeholder="description here"
+                            placeholder="description"
                             className="mb-10"
                             label="Description"
                             disabled={disableEdit}
+                            error={formik.errors.description}
                         />
 
                         <div className="flex items-start justify-end mt-6">
                             {
                                 id && !disableEdit && (
-                                    <Button variant="default" type='submit' className="px-10">
+                                    <Button variant={`${formik.values.date === '' || formik.values.event_link === "" || featuredImg === '' || formik.values.title === '' || formik.values.description === '' ? 'disabled' : 'default'}`} type='submit' className="px-10">
                                         {isLoadingEdit ? <Loader2 className='animate-spin' /> : 'Update'}
                                     </Button>
                                 )
                             }
                             {
                                 !id && (
-                                    <Button variant="default" type='submit' className="px-10">
+                                    <Button variant={`${formik.values.date === '' || formik.values.event_link === "" || featuredImg === '' || formik.values.title === '' || formik.values.description === '' ? 'disabled' : 'default'}`} type='submit' className="px-10">
                                         {isLoadingCreate ? <Loader2 className='animate-spin' /> : 'Create'}
                                     </Button>
                                 )

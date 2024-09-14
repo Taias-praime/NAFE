@@ -1,5 +1,5 @@
 import { Pencil } from "lucide-react";
-import CreateLiveEvents from "./createLiveEvents";
+import CreateLiveEvents from "./create-live-events";
 import { Button } from "../ui/button";
 import { format } from "date-fns";
 
