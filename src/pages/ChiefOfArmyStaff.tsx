@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { Paperclip, Loader2, PencilLine } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "../components/ui/button";
 import { Skeleton } from "../components/ui/skeleton";
-import { FileItem, FilesList } from "../components/ui-custom/files";
-import { HEADER_HEIGHT, removeBase64, USER_PLACEHOLDER_IMG_URL } from "../lib/utils";
+import { FilesList } from "../components/ui-custom/files";
+import { HEADER_HEIGHT, USER_PLACEHOLDER_IMG_URL } from "../lib/utils";
 import {
     Tooltip,
     TooltipContent,
@@ -14,16 +13,12 @@ import {
 import useFetch from "../hooks/useFetch";
 import { useToast } from "../components/ui/use-toast";
 import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs";
-import Modal from "../components/ui-custom/modal";
-import { Input } from "../components/ui/input";
-import { Textarea } from "../components/ui/textarea";
 import CreatePressRelease from "../components/ui-custom/createPressRelease";
 import CreateLiveEvents from "../components/ui-custom/createLiveEvents";
-import { useFormik } from "formik";
 import { ArmyStaff, ILiveEvent, IPressRelease, ISuggestions } from "../models/interfaces";
-import ProfileImage from "../components/ui-custom/ProfileImage";
 import LiveEvents from "../components/ui-custom/liveEvents";
 import PressRelease from "../components/ui-custom/pressRelease";
+import EditChiefOfStaff from "../components/ui-custom/edit-chief-of-staff";
 
 const tabValue = ["press release", "live events", "suggestions"]
 
@@ -35,51 +30,11 @@ const ChiefOfArmyStaff = () => {
     const [numOfPR, setNumOfPR] = useState(0);
     const [numOfLV, setNumOfLV] = useState(0);
     const [suggest, setSuggest] = useState<ISuggestions>(suggestions[0]);
-    const [editCOASModal, setEditCOASModal] = useState(false);
-    const [disableEdit, setDisableEdit] = useState(true);
     const [tab, setTab] = useState("press release");
-    const [featuredImg, setFeaturedImg] = useState('');
     const [prId, setPrId] = useState('');
     const [reload, setReload] = useState(false);
 
     const { toast } = useToast();
-    const validate = (values: any) => {
-        const errors: any = {};
-        if (!values.image) {
-            errors.image = 'Required';
-        }
-        if (!values.fullname) {
-            errors.lastName = 'Required';
-        } else if (values.fullname < 5) {
-            errors.lastName = 'Must be more that 5 characters';
-        }
-        if (!values.title) {
-            errors.title = 'Required';
-        } else if (values.title < 5) {
-            errors.title = 'Must be more that 5 characters';
-        }
-        if (!values.description) {
-            errors.description = 'Required';
-        } else if (values.description < 5) {
-            errors.description = 'Must be more that 5 characters';
-        }
-        return errors;
-    };
-
-    const formik = useFormik({
-        initialValues: {
-            image: featuredImg,
-            fullname: '',
-            title: '',
-            description: '',
-            files: [] as string[]
-        },
-        validate,
-        onSubmit: (obj) => {
-            const data = { ...obj, image: removeBase64(featuredImg) };
-            onPut(data);
-        }
-    })
 
     // get COAS
     const { isFetching: isFetchingCOAS, onFetch: onFetchCOAS } = useFetch(
@@ -100,7 +55,6 @@ const ChiefOfArmyStaff = () => {
                 variant: "destructive",
             });
         },
-        {} // options
     );
 
     // get Suggestions
@@ -123,7 +77,6 @@ const ChiefOfArmyStaff = () => {
                 variant: "destructive",
             });
         },
-        {} // options
     );
 
     // get Press Release (PR)
@@ -145,7 +98,6 @@ const ChiefOfArmyStaff = () => {
                 variant: "destructive",
             });
         },
-        {} // options
     );
 
     // get Live Events (LV)
@@ -168,27 +120,6 @@ const ChiefOfArmyStaff = () => {
                 variant: "destructive",
             });
         },
-        {} // options
-    );
-
-    // edit COAS
-    const { onPut, isFetching: isLoadingEdit } = useFetch(
-        `/army-staffs/sa/${COAS?.id}/edit`,
-        (data) => {
-            toast({ description: data.message });
-            setEditCOASModal(!editCOASModal);
-            setDisableEdit(false);
-            setReload(true);
-        },
-        (e) => {
-            const { message } = e;
-            // notify
-            toast({
-                title: `${message} (${status})`,
-                variant: 'destructive',
-            });
-        },
-        {},
     );
 
     const PR = useMemo(() => {
@@ -206,51 +137,12 @@ const ChiefOfArmyStaff = () => {
         setReload(false);
     }, [reload]);
 
-    useEffect(() => {
-        if (featuredImg) formik.setFieldValue('image', featuredImg.split('data:image/jpeg;')[1]);
-    }, [featuredImg])
-
-    const editCOAS = () => {
-        setEditCOASModal(!editCOASModal)
-
-        if (!COAS) return;
-        formik.setValues({
-            image: COAS.image,
-            fullname: COAS.fullname,
-            title: COAS.title,
-            description: COAS.description,
-            files: [...COAS.files],
-        })
-        setFeaturedImg(COAS.image)
-    }
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                formik.setFieldValue('files', [...formik.values.files, (reader.result as string)]);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
     const editPressRelease = (id: string) => {
         setPrId(id)
     }
 
-    const removeFile = (e: { preventDefault: () => void }, id: string) => {
-        e.preventDefault();
-        const files = formik.values.files.filter((file) => file !== id);
-        formik.setFieldValue("files", files)
-    }
-
     const viewSuggestion = (suggestion: ISuggestions) => {
         setSuggest(suggestion)
-    }
-
-    const deleteImage = () => {
-        setFeaturedImg('')
     }
 
     return (
@@ -274,71 +166,7 @@ const ChiefOfArmyStaff = () => {
                             </TooltipProvider>
                             <div>
                                 <Button size={"sm"} className="flex gap-3 px-5">
-                                    <Modal open={editCOASModal} title="Chief of Army Staff" onOpenChange={(value) => {
-                                        if (value) editCOAS();
-                                        setDisableEdit(true);
-                                        setEditCOASModal(value)
-                                    }} className="flex items-center gap-3 p-3"
-                                        label={<> <PencilLine /> Edit </>}
-                                    >
-                                        <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                                            <ProfileImage disabled={disableEdit} setFeaturedImg={setFeaturedImg} deleteImage={deleteImage} featuredImg={featuredImg} />
-                                            <Input
-                                                value={formik.values.fullname}
-                                                onChange={formik.handleChange}
-                                                name="fullname"
-                                                placeholder="title here"
-                                                className=""
-                                                label="Full Name"
-                                                disabled={disableEdit}
-                                            />
-                                            <Input
-                                                value={formik.values.title}
-                                                onChange={formik.handleChange}
-                                                name="title"
-                                                placeholder="title here"
-                                                className=""
-                                                label="Title"
-                                                disabled={disableEdit}
-                                            />
-                                            <Textarea
-                                                rows={4}
-                                                value={formik.values.description}
-                                                onChange={formik.handleChange}
-                                                name="philosophy"
-                                                placeholder="details of the event here"
-                                                className="mb-10"
-                                                label="Philosophy"
-                                                disabled={disableEdit}
-                                            />
-                                            {formik.values.files && (
-                                                <div className="flex flex-col gap-4">
-                                                    {formik.values.files.map((file) => (
-                                                        <FileItem key={file} disabled={disableEdit} showDelete={true} onClick={(e: { preventDefault: () => void; }) => removeFile(e, file)} file={file} />
-                                                    ))}
-                                                </div>
-                                            )}
-                                            <div className="flex items-start gap-3 justify-end mt-6">
-                                                {disableEdit && <Button onClick={() => setDisableEdit(false)} type='button' className="px-10">Edit </Button>}
-                                                {
-                                                    !disableEdit && (
-                                                        <>
-                                                            <Button variant="blue" type="button" className="px-8">
-                                                                <label className="flex items-center justify-center gap-2 w-full h-full cursor-pointer">
-                                                                    <div className=" rounded"> <Paperclip className="text-white" /> </div>
-                                                                    Attach File
-                                                                    <input type="file" accept="*/" onChange={handleFileChange} className="hidden" />
-                                                                </label>
-                                                            </Button>
-                                                            <Button variant="default" type='submit' className="px-10">
-                                                                {isLoadingEdit ? <Loader2 className='animate-spin' /> : 'Update'}
-                                                            </Button>
-                                                        </>
-                                                    )
-                                                }
-                                            </div>
-                                        </form>
-                                    </Modal>
+                                    <EditChiefOfStaff setReload={setReload} id={COAS.id} />
                                 </Button>
                             </div>
 

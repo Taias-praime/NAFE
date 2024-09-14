@@ -26,21 +26,15 @@ const Announcements = () => {
   const [searchValue, setSearchValue] = useState("");
 
   const validate = (values: any) => {
-    const errors: any= {};
-    if (!values.title) {
-      errors.title = 'Required';
-    } else if (values.title.length < 5) {
+    const errors: any = {};
+    if (values.title.length < 5) {
       errors.title = 'Must be more that 5 characters';
     }
-    if (!values.description) {
-      errors.description = 'Required';
-    } else if (values.description.length < 5) {
+    else if (values.description.length < 5) {
       errors.description = 'Must be more that 5 characters';
     }
-    if (!values.tenant_ids) {
-      errors.tenant_ids = 'Required';
-    } else if (values.tenant_ids.length < 1) {
-      errors.tenant_ids = 'Must be more that 5 characters';
+    else if (values.tenant_ids.length < 1) {
+      errors.tenant_ids = 'Select at least one department';
     }
     return errors;
   };
