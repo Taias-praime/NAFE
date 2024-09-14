@@ -18,6 +18,35 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
     const [disableEdit, setDisableEdit] = useState(true);
     const [id, setId] = useState('');
 
+    const validate = (values: any) => {
+        const errors: any = {};
+        if (values.first_name < 5) {
+            errors.first_name = 'Firstname must be more that 5 characters';
+        }
+        else if (values.last_name < 5) {
+            errors.last_name = 'Lastname must be more that 5 characters';
+        }
+        else if (values.email < 5) {
+            errors.email = 'Email must be more that 5 characters';
+        }
+        else if (values.phone_number < 5) {
+            errors.phone_number = 'Phone number must be more that 5 characters';
+        }
+        else if (values.description < 5) {
+            errors.description = 'Department must be more that 5 characters';
+        }
+        else if (values.service < 5) {
+            errors.service = 'Department must be more that 5 characters';
+        }
+        else if (values.tenant_name < 5) {
+            errors.tenant_name = 'Department must be more that 5 characters';
+        }
+        else if (values.code < 5) {
+            errors.code = 'Department must be more that 5 characters';
+        }
+        return errors;
+    };
+
     const formik = useFormik({
         initialValues: {
             code: '',
@@ -31,6 +60,7 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
             tenant_name: '',
             tenant_type: "dept_admin"
         },
+        validate,
         onSubmit: (obj) => {
             if (id) {
                 onPut(obj)
@@ -40,6 +70,15 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
 
         }
     })
+
+    const isDisabled = formik.values.first_name === '' ||
+        formik.values.last_name === '' ||
+        formik.values.email === '' ||
+        formik.values.phone_number === '';
+        formik.values.code === '';
+        formik.values.description === '';
+        formik.values.service === '';
+        formik.values.tenant_name === '';
 
     // add
     const { onPost, isFetching: isLoadingPost } = useFetch(
@@ -154,6 +193,7 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
                             className=""
                             label="Name of Department"
                             disabled={disableEdit}
+                            // error={formik.error.tenant_name}
                         />
                         <Input
                             value={formik.values.code}
@@ -163,6 +203,7 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
                             className=""
                             label="Abbreviation"
                             disabled={disableEdit}
+                            error={formik.errors.code}
                         />
                         <Input
                             value={formik.values.first_name}
@@ -172,6 +213,7 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
                             className=""
                             label="HOD First Name"
                             disabled={disableEdit}
+                            error={formik.errors.first_name}
                         />
                         <Input
                             value={formik.values.last_name}
@@ -181,6 +223,7 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
                             className=""
                             label="HOD Last Name"
                             disabled={disableEdit}
+                            error={formik.errors.last_name}
                         />
 
                         <Input
@@ -191,6 +234,7 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
                             className=""
                             label="Email"
                             disabled={disableEdit}
+                            error={formik.errors.email}
                         />
                         <Input
                             value={formik.values.phone_number}
@@ -200,6 +244,7 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
                             className=""
                             label="Phone Number"
                             disabled={disableEdit}
+                            error={formik.errors.phone_number}
                         />
                         <Input
                             value={formik.values.description}
@@ -209,6 +254,7 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
                             className=""
                             label="Description of the department"
                             disabled={disableEdit}
+                            error={formik.errors.description}
                         />
                         <Input
                             value={formik.values.service}
@@ -218,22 +264,23 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
                             className=""
                             label="Service of the Department"
                             disabled={disableEdit}
+                            error={formik.errors.service}
                         />
 
                         <div className="flex items-start gap-3 justify-end mt-6">
-                        <Button variant="outline" onClick={() => toggleOpen(false)} type='button' className="px-10">Cancel </Button>
+                            <Button variant="outline" onClick={() => toggleOpen(false)} type='button' className="px-10">Cancel </Button>
 
                             {
                                 id && disableEdit && <Button onClick={enableEdit} type='button' className="px-10">Edit Department </Button>
                             }
                             {
-                                id && !disableEdit && <Button variant="default" type='submit' className="px-10">
+                                id && !disableEdit && <Button variant={isDisabled ? 'disabled' : 'default'} type='submit' className="px-10">
                                     {isLoadingPut ? <Loader2 className='animate-spin' /> : 'Update Department'}
                                 </Button>
                             }
                             {
                                 !id && (
-                                    <Button variant="default" type='submit' className="px-10">
+                                    <Button variant={isDisabled ? 'disabled' : 'default'} type='submit' className="px-10">
                                         {isLoadingPost ? <Loader2 className='animate-spin' /> : 'Add Department'}
                                     </Button>
                                 )

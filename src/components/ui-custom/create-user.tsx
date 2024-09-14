@@ -85,9 +85,9 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
         formik.values.last_name === '' ||
         featuredImg === '' ||
         formik.values.rank === '' ||
-        formik.values.department === '';
-    formik.values.email === '';
-    formik.values.phone_number === '';
+        formik.values.department === '' ||
+        formik.values.email === '' ||
+        formik.values.phone_number === '';
 
     // add
     const { onPost, isFetching: isLoadingPost } = useFetch(
@@ -269,7 +269,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                     <Loader2 className='animate-spin m-auto' />
                 ) : (
                     <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                        <ProfileImage deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} featuredImg={featuredImg}  error={formik.errors.image} />
+                        <ProfileImage deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} error={formik.errors.image} />
                         <Input
                             value={formik.values.first_name}
                             onChange={formik.handleChange}

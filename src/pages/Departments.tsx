@@ -17,7 +17,7 @@ import { useToast } from "../components/ui/use-toast";
 import useFetch from "../hooks/useFetch";
 import DepartmentDetails from "../components/ui-custom/departmentDetails";
 import Paginate from "../components/ui/paginate";
-import CreateDepartment from "../components/ui-custom/createDepartment";
+import CreateDepartment from "../components/ui-custom/create-department";
 import { IDepartment } from "../models/interfaces";
 
 const Departments = () => {
