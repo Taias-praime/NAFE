@@ -8,7 +8,7 @@ import { HEADER_HEIGHT } from "../../lib/utils";
 import useFetch from "../../hooks/useFetch";
 import { Input } from "../ui/input";
 import { NoEvents, Event } from "./upcomingEvents";
-import CreateUser from "./createUser";
+import CreateUser from "./create-user";
 import { Button } from "../ui/button";
 
 interface DepartmentDashboard {

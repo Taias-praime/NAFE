@@ -8,7 +8,7 @@ import useFetch from "../hooks/useFetch";
 import { toast } from "../components/ui/use-toast";
 import { IUser } from "../models/interfaces";
 import Paginate from "../components/ui/paginate";
-import CreateUser from "../components/ui-custom/createUser";
+import CreateUser from "../components/ui-custom/create-user";
 
 const Users = () => {
   const PAGINATION_HEIGHT = 40;

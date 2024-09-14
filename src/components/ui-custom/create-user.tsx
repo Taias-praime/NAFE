@@ -27,6 +27,32 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
     const [id, setId] = useState('');
     const [user, setUser] = useState<any>();
 
+    const validate = (values: any) => {
+        const errors: any = {};
+        if (!values.image && !disableEdit && !featuredImg) {
+            errors.image = 'Image is required';
+        }
+        if (values.first_name < 5) {
+            errors.first_name = 'Firstname must be more that 5 characters';
+        }
+        else if (values.last_name < 5) {
+            errors.last_name = 'Lastname must be more that 5 characters';
+        }
+        else if (values.email < 5) {
+            errors.email = 'Email must be more that 5 characters';
+        }
+        else if (values.phone_number < 5) {
+            errors.phone_number = 'Phone number must be more that 5 characters';
+        }
+        else if (values.department < 5) {
+            errors.department = 'Department must be more that 5 characters';
+        }
+        else if (!values.rank) {
+            errors.rank = 'Rank is required';
+        }
+        return errors;
+    };
+
     const formik = useFormik({
         initialValues: {
             image: featuredImg,
@@ -37,6 +63,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
             email: '',
             phone_number: '',
         },
+        validate,
         onSubmit: (obj) => {
             const data = {
                 ...obj,
@@ -53,6 +80,14 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
             }
         }
     })
+
+    const isDisabled = formik.values.first_name === '' ||
+        formik.values.last_name === '' ||
+        featuredImg === '' ||
+        formik.values.rank === '' ||
+        formik.values.department === '';
+    formik.values.email === '';
+    formik.values.phone_number === '';
 
     // add
     const { onPost, isFetching: isLoadingPost } = useFetch(
@@ -234,7 +269,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                     <Loader2 className='animate-spin m-auto' />
                 ) : (
                     <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-                        <ProfileImage deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} />
+                        <ProfileImage deleteImage={deleteImage} setFeaturedImg={setFeaturedImg} featuredImg={featuredImg}  error={formik.errors.image} />
                         <Input
                             value={formik.values.first_name}
                             onChange={formik.handleChange}
@@ -243,6 +278,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                             className=""
                             label="First Name"
                             disabled={disableEdit}
+                            error={formik.errors.first_name}
                         />
                         <Input
                             value={formik.values.last_name}
@@ -252,6 +288,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                             className=""
                             label="Last Name"
                             disabled={disableEdit}
+                            error={formik.errors.last_name}
                         />
                         <ReactSelect
                             label="Select Rank"
@@ -261,6 +298,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                             optionName="name"
                             optionValue="value"
                             disabled={disableEdit}
+                            error={formik.errors.rank}
                         />
                         <ReactSelect
                             label="Select Department"
@@ -270,6 +308,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                             optionName="name"
                             optionValue="name"
                             disabled={disableEdit}
+                            error={formik.errors.department}
                         />
                         <Input
                             value={formik.values.email}
@@ -279,6 +318,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                             className=""
                             label="Email"
                             disabled={disableEdit}
+                            error={formik.errors.email}
                         />
                         <Input
                             value={formik.values.phone_number}
@@ -288,6 +328,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                             className=""
                             label="Phone Number"
                             disabled={disableEdit}
+                            error={formik.errors.phone_number}
                         />
 
                         <div className="flex items-start gap-3 justify-end mt-6">
@@ -296,13 +337,13 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
                                 id && disableEdit && <Button onClick={enableEdit} type='button' className="px-10">Edit User </Button>
                             }
                             {
-                                id && !disableEdit && <Button variant="default" type='submit' className="px-10">
+                                id && !disableEdit && <Button variant={isDisabled ? 'disabled' : 'default'} type='submit' className="px-10">
                                     {isLoadingPut ? <Loader2 className='animate-spin' /> : 'Update'}
                                 </Button>
                             }
                             {
                                 !id && (
-                                    <Button variant="default" type='submit' className="px-10">
+                                    <Button variant={isDisabled ? 'disabled' : 'default'} type='submit' className="px-10">
                                         {isLoadingPost ? <Loader2 className='animate-spin' /> : 'Add User'}
                                     </Button>
                                 )

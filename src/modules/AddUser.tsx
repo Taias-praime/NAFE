@@ -93,7 +93,6 @@ const User = ({
 			</div>
 		</div>
 	) : (
-		// actionable add user placehlder
 		<div className="rounded-lg border-2 border-dotted border-gray-300 min-w-[200px] h-[250px] max-h-[200px] overflow-hidden flex items-center justify-center">
 			<Sheet>
 				<SheetTrigger>
