@@ -74,10 +74,10 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
     const isDisabled = formik.values.first_name === '' ||
         formik.values.last_name === '' ||
         formik.values.email === '' ||
-        formik.values.phone_number === '';
-        formik.values.code === '';
-        formik.values.description === '';
-        formik.values.service === '';
+        formik.values.phone_number === '' ||
+        formik.values.code === '' ||
+        formik.values.description === '' ||
+        formik.values.service === '' ||
         formik.values.tenant_name === '';
 
     // add

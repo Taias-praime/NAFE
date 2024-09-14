@@ -6,7 +6,7 @@ import { removeBase64 } from "../lib/utils";
 import { useToast } from '../components/ui/use-toast';
 import useFetch from '../hooks/useFetch';
 import { useFormik } from 'formik';
-import { ImageUpIcon, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
@@ -18,6 +18,7 @@ import { IEventSpeaker, ITenants } from '../models/interfaces';
 import AddUser from './AddUser';
 import ReactSelect from '../components/ui/multi-select';
 import { FileItem } from '../components/ui-custom/files';
+import ProfileImage from '../components/ui-custom/ProfileImage';
 
 interface CreateEventProps {
     onCancel: () => void;
@@ -43,11 +44,12 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
     const [featuredImg, setFeaturedImg] = useState('');
     const [eventTypes, setEventTypes] = useState([]);
     const [step, setStep] = useState<number>(currentStep);
-    const [eventDate, setEventDate] = useState<Date| null>();
+    const [eventDate, setEventDate] = useState<Date | null>();
     const [startTime, setStartTime] = useState<string>('');
     const [endTime, setEndTime] = useState<string>('');
     const [eventType, setEventType] = useState<any>();
     const [event, setEvent] = useState<any>(null);
+    const [disableEdit, setDisableEdit] = useState(true);
 
     const [tenants, setTenants] = useState<ITenants[]>([]);
     const [tenantsId, setEditTenantsId] = useState<ITenants[]>([]);
@@ -58,37 +60,63 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
     const [mods, setMods] = useState<{ id: string; image: string; name: string, position: string }[]>([]);
     const [speakers, setSpeakers] = useState<{ id: string; image: string; name: string, position: string }[]>([]);
 
-    const handleEventTypeSelect = (eventType: { name: string; value: string; }) => {
-        formikForm.setFieldValue('type', eventType.value)
-        setStep(step + 1);
-        setEventType(eventType)
-    }
-
-    const handleCancel = onCancel;
-
-    const { reload } = useDashboardContext(); // reload function to refect dashboard data and statistics
-    const { pathname } = useLocation();
-
-    const handleNext = () => {
-        if (step > MAX_STEPS) return;
-        else if (step === MAX_STEPS) handleSubmit(); // submit logic
-        else setStep(step + 1);
-    }
-
     const handleSubmit = () => {
-        const data = formikForm.values;
+        const data = formik.values;
         const body = {
             ...data,
-            image: removeBase64(formikForm.values.image)
+            image: removeBase64(formik.values.image)
         };
         if (isEditEvent) {
             editEvent(body)
+            setDisableEdit(true);
         } else {
             createEvent(body);
+            setDisableEdit(true);
         }
     }
 
-    const formikForm = useFormik({
+    const validate = (values: any) => {
+        const errors: any = {};
+        if (!values.image && !featuredImg) {
+            errors.image = 'Image is required';
+        }
+        if (values.venue < 5) {
+            errors.venue = 'Name be more that 5 characters';
+        }
+        else if (values.title < 5) {
+            errors.title = 'Title be more that 5 characters';
+        }
+        else if (values.description < 5) {
+            errors.description = 'Description be more that 5 characters';
+        }
+        else if (values.slots.date < 5) {
+            errors.description = 'Description be more that 5 characters';
+        }
+        else if (values.slots.end_time < 5) {
+            errors.slots.end_time = 'Description be more that 5 characters';
+        }
+        else if (values.slots.start_time < 5) {
+            errors.slots.start_time = 'Description be more that 5 characters';
+        }
+        else if (values.department < 5) {
+            errors.department = 'Description be more that 5 characters';
+        }
+        else if (values.event_link < 5) {
+            errors.event_link = 'Description be more that 5 characters';
+        }
+        else if (values.moderators.length < 1) {
+            errors.moderators = 'Description be more that 5 characters';
+        }
+        else if (values.keynote_speakers < 5) {
+            errors.keynote_speakers = 'Description be more that 5 characters';
+        }
+        else if (values.adminInstructionsTitle < 1) {
+            errors.adminInstructionsTitle = 'Description be more that 5 characters';
+        }
+        return errors;
+    };
+
+    const formik = useFormik({
         initialValues: {
             type: '',
             image: '',
@@ -99,9 +127,9 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
             theme_title: "",
             slots: [
                 {
-                    date: '',
-                    start_time: '00:00:00',
-                    end_time: '00:00:00'
+                    date: "",
+                    start_time: "",
+                    end_time: ""
                 }
             ],
             description: '',
@@ -115,8 +143,22 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
             programmeUrl: '',
             participants: [],
         },
+        validate,
         onSubmit: handleSubmit,
     })
+
+    const isDisabled = formik.values.image === "" ||
+        formik.values.venue === "" ||
+        formik.values.title === "" ||
+        formik.values.description === "" ||
+        formik.values.slots[0].date === "" ||
+        formik.values.slots[0].end_time === "" ||
+        formik.values.slots[0].start_time === "" ||
+        formik.values.department === "" ||
+        formik.values.event_link === "" ||
+        formik.values.moderators.length === 0 ||
+        formik.values.keynote_speakers.length === 0 ||
+        formik.values.adminInstructionsTitle === ""
 
     // get event types
     const { onFetch: onFetchEventTypes, isFetching: isFetchingEventTypes } = useFetch(
@@ -141,7 +183,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
         `/events/sa/${eventId}/details`,
         (data) => {
             setEvent(data.data)
-
+            setDisableEdit(true);
         },
         () => { },
     );
@@ -207,7 +249,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                 // Reset form and states
                 setIsOpen(false);
                 setReload(true);
-                formikForm.resetForm();
+                formik.resetForm();
                 setFeaturedImg('');
                 setEventDate(undefined);
                 setStartTime('');
@@ -248,7 +290,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                 // Reset form and states
                 setReload(true);
                 setIsOpen(false);
-                formikForm.resetForm();
+                formik.resetForm();
                 setFeaturedImg('');
                 setEventDate(undefined);
                 setStartTime('');
@@ -278,27 +320,27 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
     useEffect(() => {
         if (eventDate) {
             // set date
-            const data = formikForm.values.slots;
+            const data = formik.values.slots;
             data[0].date = format(eventDate, 'yyyy-MM-dd');
-            formikForm.setFieldValue('slots', data);
+            formik.setFieldValue('slots', data);
         }
         if (startTime) {
             // set start time
-            const data = formikForm.values.slots;
+            const data = formik.values.slots;
             data[0].start_time = startTime;
-            formikForm.setFieldValue('slots', data);
+            formik.setFieldValue('slots', data);
         }
         if (endTime) {
             // set end time
-            const data = formikForm.values.slots;
+            const data = formik.values.slots;
             data[0].end_time = endTime;
-            formikForm.setFieldValue('slots', data);
+            formik.setFieldValue('slots', data);
         }
 
-        // const matchedTenants = matchedItem(formikForm.values, tenants, "tenant_ids", "tenant_id");
-        if (featuredImg) formikForm.setFieldValue('image', featuredImg);
-        if (mods) formikForm.setFieldValue('moderators', mods.map((m: { id: string }) => m.id));
-        if (speakers) formikForm.setFieldValue('keynote_speakers', speakers.map((s: { id: string }) => s.id));
+        // const matchedTenants = matchedItem(formik.values, tenants, "tenant_ids", "tenant_id");
+        if (featuredImg) formik.setFieldValue('image', featuredImg);
+        if (mods) formik.setFieldValue('moderators', mods.map((m: { id: string }) => m.id));
+        if (speakers) formik.setFieldValue('keynote_speakers', speakers.map((s: { id: string }) => s.id));
     }, [
         startTime,
         endTime,
@@ -345,10 +387,27 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
             setMods(matchedModerators)
             setSpeakers(matchedSpeakers)
             setEditTenantsId(matchedTenants);
-            formikForm.setValues(event)
+            formik.setValues(event)
             setEventDate(event.start_date)
         }
     }, [event])
+
+    const handleEventTypeSelect = (eventType: { name: string; value: string; }) => {
+        formik.setFieldValue('type', eventType.value)
+        setStep(step + 1);
+        setEventType(eventType)
+    }
+
+    const handleCancel = onCancel;
+
+    const { reload } = useDashboardContext(); // reload function to refect dashboard data and statistics
+    const { pathname } = useLocation();
+
+    const handleNext = () => {
+        if (step > MAX_STEPS) return;
+        else if (step === MAX_STEPS) handleSubmit(); // submit logic
+        else setStep(step + 1);
+    }
 
     const getIdsFromTenants = (tenant_ids: any) => {
         const tenants = []
@@ -361,13 +420,13 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
     const handleSelect = (tenant_ids: ITenants[]) => {
         setEditTenantsId(tenant_ids)
         const tenants = getIdsFromTenants(tenant_ids)
-        formikForm.setFieldValue('tenant_ids', tenants)
+        formik.setFieldValue('tenant_ids', tenants)
     }
 
     const removeFile = (e: { preventDefault: () => void }, name: string) => {
         e.preventDefault();
-        const files = formikForm.values.files.filter((file) => file.name !== name);
-        formikForm.setFieldValue("files", files)
+        const files = formik.values.files.filter((file) => file.name !== name);
+        formik.setFieldValue("files", files)
     }
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>, document_type: string) => {
@@ -393,7 +452,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
             reader.readAsDataURL(file);
         }
 
-        formikForm.setFieldValue("files", [...formikForm.values.files, data])
+        formik.setFieldValue("files", [...formik.values.files, data])
     }
 
     return (
@@ -426,21 +485,30 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                         <div className="h-full w-full">
                             <div className="grid grid-cols-3 gap-5 h-full">
                                 <div className="col-span-1">
-                                    <FeaturedImg setFeaturedImg={setFeaturedImg} />
+                                    <ProfileImage disabled={disableEdit} setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} error={formik.errors.image} height="h-full" />
                                 </div>
 
                                 <div className="col-span-2">
                                     <div className="grid grid-cols-2 gap-5 gap-y-10">
                                         <div className="col-span-1">
-                                            <Input label='Event Title' name='title' value={formikForm.values.title} onChange={formikForm.handleChange} placeholder='Title for the event' />
+                                            <Input
+                                                label='Event Title'
+                                                name='title'
+                                                value={formik.values.title}
+                                                onChange={formik.handleChange}
+                                                placeholder='Title for the event'
+                                                error={formik.errors.title}
+                                            />
                                         </div>
                                         <div className="col-span-1">
                                             <Input
                                                 label='Venue'
                                                 name='venue'
-                                                value={formikForm.values.venue}
-                                                onChange={formikForm.handleChange}
-                                                placeholder='Location of the event' />
+                                                value={formik.values.venue}
+                                                onChange={formik.handleChange}
+                                                placeholder='Location of the event'
+                                                error={formik.errors.venue}
+                                            />
                                         </div>
 
                                         <div className="col-span-1">
@@ -453,6 +521,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                 }}
                                                 className="w-full block outline-none bg-none focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                             // disabled={disableEdit}
+                                            // error={formik.errors.slots.date}
                                             />
                                         </div>
 
@@ -461,7 +530,8 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                 label='Start Time'
                                                 name='startTime'
                                                 onChange={(e) => setStartTime(e.target.value)}
-                                                value={formikForm.values.slots[0].start_time}
+                                                value={formik.values.slots[0].start_time}
+                                            // error={formik.errors.slots[0].start_time}
                                             />
                                         </div>
 
@@ -470,12 +540,20 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                 label='End Time'
                                                 name='endTime'
                                                 onChange={(e) => setEndTime(e.target.value)}
-                                                value={formikForm.values.slots[0].end_time}
+                                                value={formik.values.slots[0].end_time}
+                                            // error={formik.errors.slots[0].end_time}
                                             />
                                         </div>
 
                                         <div className="col-span-2">
-                                            <Textarea label='About Event' name='description' onChange={formikForm.handleChange} value={formikForm.values.description} placeholder='Event details' />
+                                            <Textarea
+                                                label='About Event'
+                                                name='description'
+                                                onChange={formik.handleChange}
+                                                value={formik.values.description}
+                                                placeholder='Event details'
+                                                error={formik.errors.description}
+                                            />
                                         </div>
 
                                         <div className="col-span-1">
@@ -487,6 +565,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                 isMulti={true}
                                                 optionName="name"
                                                 optionValue="tenant_id"
+                                            // error={formik.errors}
                                             />
                                         </div>
 
@@ -494,10 +573,12 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                             <Input
                                                 type='url'
                                                 label='Live link'
-                                                value={formikForm.values.event_link}
+                                                value={formik.values.event_link}
                                                 placeholder='eg: meet.google.com/abc-def-gh'
                                                 name='event_link'
-                                                onChange={formikForm.handleChange} />
+                                                onChange={formik.handleChange}
+                                                error={formik.errors.event_link}
+                                            />
                                         </div>
 
                                     </div>
@@ -528,9 +609,10 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                         label='Admin instructions title'
                                                         placeholder='title here'
                                                         name='adminInstructionsTitle'
-                                                        value={formikForm.values.adminInstructionsTitle}
-                                                        onChange={formikForm.handleChange}
+                                                        value={formik.values.adminInstructionsTitle}
+                                                        onChange={formik.handleChange}
                                                         className='max-w-[350px] mb-10'
+                                                        error={formik.errors.adminInstructionsTitle}
                                                     />
 
                                                     <Input
@@ -550,9 +632,9 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                     />
                                                 </div>
                                                 <div className="max-w-[400px]">
-                                                    {formikForm.values.files && (
+                                                    {formik.values.files && (
                                                         <div className="flex flex-col gap-4 my-6">
-                                                            {formikForm.values.files.map((file) => (
+                                                            {formik.values.files.map((file) => (
                                                                 <FileItem key={file} showDelete={true} onClick={(e: { preventDefault: () => void; }) => removeFile(e, file.name)} file={`${file.name} - ${file.document_type}`} />
                                                             ))}
                                                         </div>
@@ -566,7 +648,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                         <Button variant='ghost' onClick={handleCancel}>Cancel</Button>
 
                                         {step === MAX_STEPS && (
-                                            <Button onClick={handleNext}>
+                                            <Button variant={isDisabled ? 'disabled' : 'default'} onClick={handleNext}>
                                                 {isCreatingEvent || isUpdatingEvent ? <Loader2 className='animate-spin mx-8' /> : (isEditEvent ? 'Update Event' : 'Create Event')}
                                             </Button>
                                         )}
@@ -578,49 +660,6 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                 )}
             </div>
         </>
-    );
-};
-
-const FeaturedImg = ({ setFeaturedImg }: { setFeaturedImg: (img: string) => void }) => {
-
-    const [preview, setPreview] = useState<string | null>(null);
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const image = reader.result as string;
-                setPreview(image);
-                setFeaturedImg(image);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const handleUnset = () => {
-        setFeaturedImg('');
-        setPreview(null);
-        const fileInput = document.getElementById('featImg') as HTMLInputElement;
-        if (fileInput) fileInput.value = '';
-    }
-
-    return (
-        <div className="max-w-full w-full h-full rounded border flex items-center justify-center bg-black/30">
-            {preview ? (
-                <div
-                    onClick={handleUnset}
-                    style={{ backgroundImage: `url(${preview})` }}
-                    className="max-w-full w-full h-full rounded border flex items-center justify-center bg-cover bg-center"
-                />
-            ) : (
-                <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer text-white">
-                    <ImageUpIcon className='mx-auto scale-125' />
-                    <div className="mt-2">Featured Image</div>
-                    <input id="featImg" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-                </label>
-            )}
-        </div>
     );
 };
 

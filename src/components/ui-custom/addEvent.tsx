@@ -1,6 +1,6 @@
 import { ReactNode, useState } from 'react';
 import { cn } from '../../lib/utils';
-import CreateEvent from '../../modules/CreateEvent';
+import CreateEvent from '../../modules/create-event';
 import {
 	Sheet,
 	SheetContent,

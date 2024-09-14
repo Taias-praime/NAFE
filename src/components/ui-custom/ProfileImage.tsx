@@ -8,9 +8,10 @@ interface ProfileImageProps {
     deleteImage?: () => void;
     disabled?: boolean
     error?: string
+    height?: string;
 }
 
-const ProfileImage = ({ setFeaturedImg, featuredImg, deleteImage, disabled, error }: ProfileImageProps) => {
+const ProfileImage = ({ setFeaturedImg, featuredImg, deleteImage, disabled, error, height = "h-72" }: ProfileImageProps) => {
 
     const [preview, setPreview] = useState<string | null>(null);
 
@@ -32,7 +33,7 @@ const ProfileImage = ({ setFeaturedImg, featuredImg, deleteImage, disabled, erro
 
     return (
         <>
-            <div className="max-w-full w-full h-64 rounded flex items-center justify-center bg-black/30 relative">
+            <div className={`max-w-full w-full rounded flex items-center justify-center bg-black/30 relative ${height} `}>
                 <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer text-white">
                     <div style={{ backgroundImage: `url(${preview})` }}
                         className="max-w-full w-full h-full rounded flex items-center justify-center bg-cover bg-center"
