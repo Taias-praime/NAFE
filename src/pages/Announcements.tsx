@@ -263,12 +263,6 @@ const Announcements = () => {
                 <h4 className="mb-2 text-xl"> Recent Announcements </h4>
                 <p className="opacity-50 text-sm"> {numOfAnnouncement} announcements </p>
               </div>
-              <div className="">
-                <Button className='flex gap-3' variant={'secondary'}>
-                  Filter
-                  <ListFilter />
-                </Button>
-              </div>
             </div>
             {
               !isLoadingAnnouncements || !isSearching ? (
