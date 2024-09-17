@@ -21,23 +21,19 @@ const Events = () => {
 
     const [events, setEvents] = useState<IEvent[]>([]);
     const [filteredEvents, setFilteredEvents] = useState<IEvent[]>([]);
+    const [selectedFilter, setSelectedFilter] = useState<string[]>([]);
+    const [filterType, setFilterType] = useState([
+        { type: "Registered", checked: false },
+        { type: "Confidential", checked: false },
+        { type: "General", checked: false },
+        { type: "Restricted", checked: false },
+    ])
 
     const [isList, setIsList] = useState<boolean>(false);
-    const [showNormalEvent, setShowNormalEvent] = useState<boolean>(false);
-    const [showRestrictedEvent, setShowRestrictedEvent] = useState<boolean>(false);
-    const [showSecretEvent, setShowSecretEvent] = useState<boolean>(false);
     const [isEditEvent, setIsEditEvent] = useState(false)
     const [reload, setReload] = useState(false);
     const [eventType, setEventType] = useState('today');
     const [searchValue, setSearchValue] = useState("");
-
-    const count = (): number => {
-        let num = 0;
-        if (showNormalEvent) num += 1;
-        if (showRestrictedEvent) num += 1;
-        if (showSecretEvent) num += 1;
-        return num;
-    }
 
     const { onFetch: getEvents, isFetching } = useFetch(
         `/events/sa/?event_type=${eventType}&page=${currentPage}&items_per_page=10`,
@@ -45,7 +41,7 @@ const Events = () => {
             setEvents(data.data.results)
             setFilteredEvents(data.data.results);
             setEventsCount(data.data.number_of_items);
-
+            setNumOfPages(data.data.number_of_pages);
         },
     );
 
@@ -78,6 +74,7 @@ const Events = () => {
     useEffect(() => {
         if (eventType === 'live') return;
         getEvents();
+        setFilteredEvents([]);
         setReload(false);
     }, [reload, currentPage, eventType]);
 
@@ -101,6 +98,38 @@ const Events = () => {
     const clearSearch = () => {
         setSearchValue("");
         getEvents();
+    }
+
+    const handleFilter = (type: string) => {
+        let filterArr = [...selectedFilter]
+        const updatedFilteredEvent = []
+        const filterTypeCopy = filterType.map(filter => {
+            if (filter.type.toLowerCase() === type.toLowerCase()) {
+                filter.checked = !filter.checked
+            }
+            return filter
+        })
+        if (selectedFilter.includes(type)) {
+            filterArr = selectedFilter.filter((filtercopy: string) => type !== filtercopy)
+        } else {
+            filterArr = [...selectedFilter, type]
+        }
+        setFilterType(filterTypeCopy);
+        setSelectedFilter(filterArr);
+
+        // if (filterArr.length === 0) {
+        //     setFilteredEvents(events)
+        //     return
+        // }
+        for (let i = 0; i < events.length; i++) {
+            for (let j = 0; j < selectedFilter.length; j++) {
+                if (events[i].type && events[i].type.toLowerCase() === selectedFilter[j].toLowerCase()) {
+                    updatedFilteredEvent.push(events[i])
+                    continue;
+                }
+            }
+        }
+        setFilteredEvents(updatedFilteredEvent);
     }
 
     return (
@@ -143,43 +172,31 @@ const Events = () => {
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button className='flex gap-3' variant={!count() ? 'ghost' : 'secondary'}>
-                                    {!!count() &&
+                                <Button className='flex gap-3' variant={selectedFilter.length === 0 ? 'ghost' : 'secondary'}>
+                                    {selectedFilter.length > 0 &&
                                         <Badge className='flex items-center justify-center p-0 w-5 h-5'>
-                                            {count()}
+                                            {selectedFilter.length}
                                         </Badge>}
                                     Filter
                                     <ListFilter />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56">
-                                <DropdownMenuCheckboxItem
-                                    className='py-2'
-                                    checked={showNormalEvent}
-                                    onCheckedChange={setShowNormalEvent}
-                                >
-                                    Normal Event
-                                </DropdownMenuCheckboxItem>
+                                {
+                                    filterType.map(filter => (
+                                        <>
+                                            <DropdownMenuCheckboxItem
+                                                className='py-2'
+                                                checked={filter.checked}
+                                                onCheckedChange={() => handleFilter(filter.type)}
+                                            >
+                                                {filter.type} Event
+                                            </DropdownMenuCheckboxItem>
 
-                                <DropdownMenuSeparator />
-
-                                <DropdownMenuCheckboxItem
-                                    className='py-2'
-                                    checked={showRestrictedEvent}
-                                    onCheckedChange={setShowRestrictedEvent}
-                                >
-                                    Restricted Event
-                                </DropdownMenuCheckboxItem>
-
-                                <DropdownMenuSeparator />
-
-                                <DropdownMenuCheckboxItem
-                                    className='py-2'
-                                    checked={showSecretEvent}
-                                    onCheckedChange={setShowSecretEvent}
-                                >
-                                    Secret Event
-                                </DropdownMenuCheckboxItem>
+                                            <DropdownMenuSeparator />
+                                        </>
+                                    ))
+                                }
                             </DropdownMenuContent>
                         </DropdownMenu>
 
@@ -215,7 +232,7 @@ const Events = () => {
                 }
             </div>
             {
-                eventsCount > 0 && <Paginate
+                <Paginate
                     handlePageClick={handlePageClick}
                     numOfPages={numOfPages}
                 />

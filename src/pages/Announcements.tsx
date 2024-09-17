@@ -4,7 +4,7 @@ import { HEADER_HEIGHT } from "../lib/utils";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import { useEffect, useState } from "react";
-import { ListFilter, Loader2, PencilLine, Search, X } from "lucide-react";
+import { Loader2, PencilLine, Search, X } from "lucide-react";
 import { format } from "date-fns"
 import { toast } from "../components/ui/use-toast";
 import { IAnnouncements, ITenants } from "../models/interfaces";
