@@ -14,6 +14,8 @@ import { format } from 'date-fns';
 import Paginate from '../components/ui/paginate';
 import { NoEvents } from '../components/ui-custom/upcomingEvents';
 
+const PAGINATION_HEIGHT = 40;
+
 const Events = () => {
     const [eventsCount, setEventsCount] = useState<number>(0);
     const [currentPage, setCurrentPage] = useState(1);
@@ -133,103 +135,106 @@ const Events = () => {
     }
 
     return (
-        <div className="overflow-y-auto pb-5 pt-10 px-10 relative" style={{
-            height: `calc(100vh - ${HEADER_HEIGHT}px)`
-        }}>
-            <div className="flex justify-between py-5 ">
-                <Button className="lg:absolute top-5 right-10 p-0">
-                    <AddEvent currentStep={1} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} setReload={setReload}
-                        className="flex items-center gap-3 p-3">
-                        <PlusCircle />
-                        Create Event
-                    </AddEvent>
-                </Button>
-            </div>
+        <div className="pb-5 pt-10 px-10"
+            style={{
+                height: `calc(100vh - ${HEADER_HEIGHT}px - ${PAGINATION_HEIGHT}px)`,
+            }}>
+            <div className="h-full overflow-y-auto">
+                <div className="flex justify-between py-5 ">
+                    <Button className="lg:absolute top-5 right-10 p-0">
+                        <AddEvent currentStep={1} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} setReload={setReload}
+                            className="flex items-center gap-3 p-3">
+                            <PlusCircle />
+                            Create Event
+                        </AddEvent>
+                    </Button>
+                </div>
 
-            <div className="space-y-10">
-                <div className="xl:flex justify-between items-end space-y-3">
-                    <div className="">
-                        <Tabs defaultValue={eventType} onValueChange={(e) => updateEventType(e)} className="w-[400px]">
-                            <TabsList>
-                                <TabsTrigger value="today">Ongoing Events</TabsTrigger>
-                                <TabsTrigger value="upcoming">Upcoming Events</TabsTrigger>
-                                <TabsTrigger value="live">Live Events</TabsTrigger>
-                                <TabsTrigger value="past">Past Events</TabsTrigger>
-                            </TabsList>
-                        </Tabs>
-                    </div>
-                    <div className="flex gap-5 items-center">
-                        <div className="relative flex items-center w-fit">
-                            <form onSubmit={handleSearch} className="relative flex items-center">
-                                <Input value={searchValue} onChange={(e) => setSearchValue(e.target.value)} className='p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[250px]' />
-                                <div className="absolute right-5 opacity-30">
-                                    {
-                                        searchValue ? <X role="button" onClick={clearSearch} /> : <Search />
-                                    }
-                                </div>
-                            </form>
+                <div className="space-y-10">
+                    <div className="xl:flex justify-between items-end space-y-3">
+                        <div className="">
+                            <Tabs defaultValue={eventType} onValueChange={(e) => updateEventType(e)} className="w-[400px]">
+                                <TabsList>
+                                    <TabsTrigger value="today">Ongoing Events</TabsTrigger>
+                                    <TabsTrigger value="upcoming">Upcoming Events</TabsTrigger>
+                                    <TabsTrigger value="live">Live Events</TabsTrigger>
+                                    <TabsTrigger value="past">Past Events</TabsTrigger>
+                                </TabsList>
+                            </Tabs>
                         </div>
+                        <div className="flex gap-5 items-center">
+                            <div className="relative flex items-center w-fit">
+                                <form onSubmit={handleSearch} className="relative flex items-center">
+                                    <Input value={searchValue} onChange={(e) => setSearchValue(e.target.value)} className='p-6 pe-12 border-transparent rounded-full bg-foreground/5 w-[250px]' />
+                                    <div className="absolute right-5 opacity-30">
+                                        {
+                                            searchValue ? <X role="button" onClick={clearSearch} /> : <Search />
+                                        }
+                                    </div>
+                                </form>
+                            </div>
 
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button className='flex gap-3' variant={selectedFilter.length === 0 ? 'ghost' : 'secondary'}>
-                                    {selectedFilter.length > 0 &&
-                                        <Badge className='flex items-center justify-center p-0 w-5 h-5'>
-                                            {selectedFilter.length}
-                                        </Badge>}
-                                    Filter
-                                    <ListFilter />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-56">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button className='flex gap-3' variant={selectedFilter.length === 0 ? 'ghost' : 'secondary'}>
+                                        {selectedFilter.length > 0 &&
+                                            <Badge className='flex items-center justify-center p-0 w-5 h-5'>
+                                                {selectedFilter.length}
+                                            </Badge>}
+                                        Filter
+                                        <ListFilter />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-56">
+                                    {
+                                        filterType.map(filter => (
+                                            <>
+                                                <DropdownMenuCheckboxItem
+                                                    className='py-2'
+                                                    checked={filter.checked}
+                                                    onCheckedChange={() => handleFilter(filter.type)}
+                                                >
+                                                    {filter.type} Event
+                                                </DropdownMenuCheckboxItem>
+
+                                                <DropdownMenuSeparator />
+                                            </>
+                                        ))
+                                    }
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+
+                            <Button className='flex gap-3' variant={'ghost'} onClick={() => setIsList(!isList)}>
                                 {
-                                    filterType.map(filter => (
-                                        <>
-                                            <DropdownMenuCheckboxItem
-                                                className='py-2'
-                                                checked={filter.checked}
-                                                onCheckedChange={() => handleFilter(filter.type)}
-                                            >
-                                                {filter.type} Event
-                                            </DropdownMenuCheckboxItem>
-
-                                            <DropdownMenuSeparator />
-                                        </>
-                                    ))
-                                }
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-
-                        <Button className='flex gap-3' variant={'ghost'} onClick={() => setIsList(!isList)}>
-                            {
-                                isList ?
-                                    <ListOrdered /> :
-                                    <LayoutGrid />
-                            }
-                        </Button>
-                    </div>
-                </div>
-
-                <div className="">
-                    <h5 className="text-xl capitalize">
-                        {eventType} Events {`(${eventsCount})`}
-                    </h5>
-                </div>
-
-                {
-                    isFetching || isSearching ?
-                        <div className='w-full h-[400px] flex justify-center items-center'>
-                            <Loader2 className='animate-spin mx-auto' />
-                        </div> : (
-                            events.length > 0 ?
-                                (
                                     isList ?
-                                        <TableView events={filteredEvents} />
-                                        :
-                                        <GridView setReload={setReload} events={filteredEvents} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} eventType={eventType} />
-                                ) : <NoEvents noEventsLabel={`No ${eventType === 'today' ? 'ongoing' : eventType} event`} />
-                        )
-                }
+                                        <ListOrdered /> :
+                                        <LayoutGrid />
+                                }
+                            </Button>
+                        </div>
+                    </div>
+
+                    <div className="">
+                        <h5 className="text-xl capitalize">
+                            {eventType} Events {`(${eventsCount})`}
+                        </h5>
+                    </div>
+
+                    {
+                        isFetching || isSearching ?
+                            <div className='w-full h-[400px] flex justify-center items-center'>
+                                <Loader2 className='animate-spin mx-auto' />
+                            </div> : (
+                                events.length > 0 ?
+                                    (
+                                        isList ?
+                                            <TableView events={filteredEvents} />
+                                            :
+                                            <GridView setReload={setReload} events={filteredEvents} isEditEvent={isEditEvent} setIsEditEvent={setIsEditEvent} eventType={eventType} />
+                                    ) : <NoEvents noEventsLabel={`No ${eventType === 'today' ? 'ongoing' : eventType} event`} />
+                            )
+                    }
+                </div>
             </div>
             {
                 <Paginate

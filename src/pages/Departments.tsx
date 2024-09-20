@@ -20,9 +20,9 @@ import Paginate from "../components/ui/paginate";
 import CreateDepartment from "../components/ui-custom/create-department";
 import { IDepartment } from "../models/interfaces";
 
-const Departments = () => {
-  const PAGINATION_HEIGHT = 40;
+const PAGINATION_HEIGHT = 40;
 
+const Departments = () => {
   const [departments, setDepartment] = useState<IDepartment[]>([]);
   const [depsCount, setDepsCount] = useState(0);
   const [numOfPages, setNumOfPages] = useState(0);
@@ -196,7 +196,6 @@ const Departments = () => {
               numOfPages={numOfPages}
             />
           </>
-
         )
       }
 
