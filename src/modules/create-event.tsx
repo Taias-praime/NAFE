@@ -67,11 +67,9 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
             image: removeBase64(formik.values.image)
         };
         if (isEditEvent) {
-            editEvent(body)
-            setDisableEdit(true);
+            editEvent(body);
         } else {
             createEvent(body);
-            setDisableEdit(true);
         }
     }
 
@@ -98,9 +96,6 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
         else if (values.slots.start_time < 5) {
             errors.slots.start_time = 'Description be more that 5 characters';
         }
-        else if (values.department < 5) {
-            errors.department = 'Description be more that 5 characters';
-        }
         else if (values.event_link < 5) {
             errors.event_link = 'Description be more that 5 characters';
         }
@@ -110,9 +105,9 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
         else if (values.keynote_speakers < 5) {
             errors.keynote_speakers = 'Description be more that 5 characters';
         }
-        else if (values.adminInstructionsTitle < 1) {
-            errors.adminInstructionsTitle = 'Description be more that 5 characters';
-        }
+        // else if (values.adminInstructionsTitle < 1) {
+        //     errors.adminInstructionsTitle = 'Description be more that 5 characters';
+        // }
         return errors;
     };
 
@@ -132,8 +127,8 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                     end_time: ""
                 }
             ],
+            tenant_ids: [],
             description: '',
-            department: '',
             event_link: '',
             files: [] as File[] | [],
             moderators: [] as IEventSpeaker[],
@@ -154,11 +149,11 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
         formik.values.slots[0].date === "" ||
         formik.values.slots[0].end_time === "" ||
         formik.values.slots[0].start_time === "" ||
-        formik.values.department === "" ||
         formik.values.event_link === "" ||
         formik.values.moderators.length === 0 ||
         formik.values.keynote_speakers.length === 0 ||
-        formik.values.adminInstructionsTitle === ""
+        formik.values.tenant_ids.length === 0
+    // formik.values.adminInstructionsTitle === ""
 
     // get event types
     const { onFetch: onFetchEventTypes, isFetching: isFetchingEventTypes } = useFetch(
@@ -257,6 +252,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                 setMods([]);
                 setSpeakers([]);
                 setEditTenantsId([]);
+                setDisableEdit(true);
 
                 // refetch events data for dashboard
                 if (pathname === '/dashboard') reload();
@@ -298,6 +294,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                 setMods([]);
                 setSpeakers([]);
                 setEditTenantsId([]);
+                setDisableEdit(true);
 
                 // refetch events data for dashboard
                 reload();
@@ -389,6 +386,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
             setSpeakers(matchedSpeakers)
             setEditTenantsId(matchedTenants);
             formik.setValues(event)
+            formik.setFieldValue("tenant_ids", matchedTenants)
             setEventDate(event.start_date)
         }
     }, [event])
@@ -406,7 +404,10 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
 
     const handleNext = () => {
         if (step > MAX_STEPS) return;
-        else if (step === MAX_STEPS) handleSubmit(); // submit logic
+        else if (step === MAX_STEPS) {
+            if (!isDisabled) handleSubmit();
+            return
+        }
         else setStep(step + 1);
     }
 
@@ -498,7 +499,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                 value={formik.values.title}
                                                 onChange={formik.handleChange}
                                                 placeholder='Title for the event'
-                                                error={formik.errors.title}
+                                                // error={formik.errors.title}
                                             />
                                         </div>
                                         <div className="col-span-1">
@@ -508,7 +509,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                 value={formik.values.venue}
                                                 onChange={formik.handleChange}
                                                 placeholder='Location of the event'
-                                                error={formik.errors.venue}
+                                                // error={formik.errors.venue}
                                             />
                                         </div>
 
@@ -553,7 +554,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                 onChange={formik.handleChange}
                                                 value={formik.values.description}
                                                 placeholder='Event details'
-                                                error={formik.errors.description}
+                                                // error={formik.errors.description}
                                             />
                                         </div>
 
@@ -578,7 +579,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                 placeholder='eg: meet.google.com/abc-def-gh'
                                                 name='event_link'
                                                 onChange={formik.handleChange}
-                                                error={formik.errors.event_link}
+                                                // error={formik.errors.event_link}
                                             />
                                         </div>
 
@@ -613,7 +614,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                         value={formik.values.adminInstructionsTitle}
                                                         onChange={formik.handleChange}
                                                         className='max-w-[350px] mb-10'
-                                                        error={formik.errors.adminInstructionsTitle}
+                                                        // error={formik.errors.adminInstructionsTitle}
                                                     />
 
                                                     <Input
@@ -649,7 +650,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                         <Button variant='ghost' onClick={handleCancel}>Cancel</Button>
 
                                         {step === MAX_STEPS && (
-                                            <Button variant={isDisabled ? 'disabled' : 'default'} onClick={handleNext}>
+                                            <Button variant={isDisabled ? 'disabled' : 'default'} type={isDisabled ? "button" : "submit"} onClick={handleNext}>
                                                 {isCreatingEvent || isUpdatingEvent ? <Loader2 className='animate-spin mx-8' /> : (isEditEvent ? 'Update Event' : 'Create Event')}
                                             </Button>
                                         )}

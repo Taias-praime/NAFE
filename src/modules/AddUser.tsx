@@ -135,8 +135,6 @@ const AddUserActionSheet = ({
 		(data) => {
 			setUserList(data.data.results);
 			setFilterList(data.data.results)
-			console.log(data);
-
 		},
 		(error, status) => {
 			const { message } = error;
