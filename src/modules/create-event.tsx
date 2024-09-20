@@ -499,7 +499,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                 value={formik.values.title}
                                                 onChange={formik.handleChange}
                                                 placeholder='Title for the event'
-                                                // error={formik.errors.title}
+                                            // error={formik.errors.title}
                                             />
                                         </div>
                                         <div className="col-span-1">
@@ -509,7 +509,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                 value={formik.values.venue}
                                                 onChange={formik.handleChange}
                                                 placeholder='Location of the event'
-                                                // error={formik.errors.venue}
+                                            // error={formik.errors.venue}
                                             />
                                         </div>
 
@@ -521,6 +521,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                 onChange={(date) => {
                                                     setEventDate(date);
                                                 }}
+                                                placeholderText="09/04/2024"
                                                 className="w-full block outline-none bg-none focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                             // disabled={disableEdit}
                                             // error={formik.errors.slots.date}
@@ -554,7 +555,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                 onChange={formik.handleChange}
                                                 value={formik.values.description}
                                                 placeholder='Event details'
-                                                // error={formik.errors.description}
+                                            // error={formik.errors.description}
                                             />
                                         </div>
 
@@ -579,7 +580,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                 placeholder='eg: meet.google.com/abc-def-gh'
                                                 name='event_link'
                                                 onChange={formik.handleChange}
-                                                // error={formik.errors.event_link}
+                                            // error={formik.errors.event_link}
                                             />
                                         </div>
 
@@ -614,7 +615,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                         value={formik.values.adminInstructionsTitle}
                                                         onChange={formik.handleChange}
                                                         className='max-w-[350px] mb-10'
-                                                        // error={formik.errors.adminInstructionsTitle}
+                                                    // error={formik.errors.adminInstructionsTitle}
                                                     />
 
                                                     <Input

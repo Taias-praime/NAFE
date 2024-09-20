@@ -187,6 +187,7 @@ const CreateLiveEvents = ({ isLVEdit, setReload, title, label, id }: CreateLiveE
                                 onChange={(date) => {
                                     setEventDate(date);
                                 }}
+                                 placeholderText="09/04/2024"
                                 className="w-full block outline-none bg-none focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                 disabled={disableEdit}
                                 // error={formik.errors.date}
