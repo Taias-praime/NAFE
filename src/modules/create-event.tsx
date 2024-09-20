@@ -49,7 +49,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
     const [endTime, setEndTime] = useState<string>('');
     const [eventType, setEventType] = useState<any>();
     const [event, setEvent] = useState<any>(null);
-    const [disableEdit, setDisableEdit] = useState(true);
+    const [disableEdit, setDisableEdit] = useState(false);
 
     const [tenants, setTenants] = useState<ITenants[]>([]);
     const [tenantsId, setEditTenantsId] = useState<ITenants[]>([]);
@@ -358,6 +358,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
         getSpeakers();
         if (eventId) {
             getEvent();
+            setDisableEdit(true);
         }
     }, []);
 
@@ -595,11 +596,11 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                         </TabsList>
 
                                         <TabsContent className='p-5 overflow-x-auto' value="m">
-                                            <AddUser endpoint='/moderators/sa/' action='Moderator' setUsers={setMods} users={mods} />
+                                            <AddUser endpoint='/moderators/sa/?items_per_page=20' action='Moderator' setUsers={setMods} users={mods} />
                                         </TabsContent>
 
                                         <TabsContent className='p-5' value="k">
-                                            <AddUser endpoint='/keynote-speakers/sa/' action='Speaker' setUsers={setSpeakers} users={speakers} />
+                                            <AddUser endpoint='/keynote-speakers/sa/?items_per_page=20' action='Speaker' setUsers={setSpeakers} users={speakers} />
                                         </TabsContent>
 
                                         <TabsContent className='p-5' value="f">

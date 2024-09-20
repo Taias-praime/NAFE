@@ -80,7 +80,7 @@ const User = ({
 	return user ? (
 		// selected used
 		<div
-			className="relative rounded-lg border-2 border-gray-300 min-w-[200px] h-[250px] max-h-[200px] overflow-hidden flex items-center justify-center bg-cover bg-center"
+			className="relative rounded-lg  min-w-[200px] h-[250px] max-h-[200px] overflow-y-scroll flex items-center justify-center bg-cover bg-center"
 			style={{ backgroundImage: `url(${user.image})` }}>
 			<div className="absolute bottom-0 text-white w-full text-start p-2 bg-gradient-to-t h-1/2 from-black">
 				<div className="flex items-end h-full">
@@ -93,7 +93,7 @@ const User = ({
 			</div>
 		</div>
 	) : (
-		<div className="rounded-lg border-2 border-dotted border-gray-300 min-w-[200px] h-[250px] max-h-[200px] overflow-hidden flex items-center justify-center">
+		<div className="rounded-lg border-2 border-dotted border-gray-300 min-w-[200px] h-[250px] max-h-[200px] overflow-y-scroll flex items-center justify-center">
 			<Sheet>
 				<SheetTrigger>
 					<Button className="px-5" variant="secondary">
@@ -135,9 +135,11 @@ const AddUserActionSheet = ({
 		(data) => {
 			setUserList(data.data.results);
 			setFilterList(data.data.results)
+			console.log(data);
+
 		},
 		(error, status) => {
-			const { message} = error;
+			const { message } = error;
 			toast({
 				title: `${message} (${status})`,
 				variant: "destructive",
@@ -157,7 +159,7 @@ const AddUserActionSheet = ({
 
 
 	return (
-		<SheetContent className="!max-w-full w-[600px]">
+		<SheetContent className="!max-w-full w-[600px] overflow-y-scroll">
 			<SheetHeader>
 				<SheetTitle>Select {action}</SheetTitle>
 
