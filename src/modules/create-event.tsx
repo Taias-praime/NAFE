@@ -1,6 +1,5 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { format } from "date-fns";
-import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css";
 import { removeBase64 } from "../lib/utils";
 import { useToast } from '../components/ui/use-toast';
@@ -11,7 +10,6 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
-import TimeInput from '../components/ui-custom/timeInput';
 import { useDashboardContext } from '../contexts/dashboard.context';
 import { useLocation } from 'react-router-dom';
 import { IEventSpeaker, ITenants } from '../models/interfaces';
@@ -19,6 +17,8 @@ import AddUser from './AddUser';
 import ReactSelect from '../components/ui/multi-select';
 import { FileItem } from '../components/ui-custom/files';
 import ProfileImage from '../components/ui-custom/ProfileImage';
+import TimePicker from '../components/ui/timePicker';
+import CustomDatePicker from '../components/ui/datePicker';
 
 interface CreateEventProps {
     onCancel: () => void;
@@ -45,8 +45,8 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
     const [eventTypes, setEventTypes] = useState([]);
     const [step, setStep] = useState<number>(currentStep);
     const [eventDate, setEventDate] = useState<Date | null>();
-    const [startTime, setStartTime] = useState<string>('');
-    const [endTime, setEndTime] = useState<string>('');
+    const [endTime, setEndTime] = useState<Date | null>(null);
+    const [startTime, setStartTime] = useState<Date | null>(null);
     const [eventType, setEventType] = useState<any>();
     const [event, setEvent] = useState<any>(null);
     const [disableEdit, setDisableEdit] = useState(false);
@@ -122,9 +122,9 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
             theme_title: "",
             slots: [
                 {
-                    date: "",
-                    start_time: "",
-                    end_time: ""
+                    date: null as Date | null | string,
+                    start_time: null as Date | null,
+                    end_time: null as Date | null,
                 }
             ],
             tenant_ids: [],
@@ -146,9 +146,9 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
         formik.values.venue === "" ||
         formik.values.title === "" ||
         formik.values.description === "" ||
-        formik.values.slots[0].date === "" ||
-        formik.values.slots[0].end_time === "" ||
-        formik.values.slots[0].start_time === "" ||
+        formik.values.slots[0].date === null ||
+        formik.values.slots[0].end_time === null ||
+        formik.values.slots[0].start_time === null ||
         formik.values.event_link === "" ||
         formik.values.moderators.length === 0 ||
         formik.values.keynote_speakers.length === 0 ||
@@ -162,15 +162,12 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
             if (status === 200) setEventTypes(data.data.event_types);
         },
         (error) => {
-            // on error
             const { message } = error;
-            // notify
             toast({
                 title: `${message}`,
                 variant: "destructive",
             });
         },
-        {} // options
     );
 
     // get single event
@@ -178,9 +175,13 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
         `/events/sa/${eventId}/details`,
         (data) => {
             setEvent(data.data)
+            console.log(data.data.slots[0]);
+            const start = new Date(data.data.slots[0].start_time)
+            const end = new Date(data.data.slots[0].end_time)
+            setStartTime(isValidDate(start) ? start : new Date())
+            setEndTime(isValidDate(end) ? end : new Date())
             setDisableEdit(true);
         },
-        () => { },
     );
 
     // get tenants
@@ -247,8 +248,8 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                 formik.resetForm();
                 setFeaturedImg('');
                 setEventDate(undefined);
-                setStartTime('');
-                setEndTime('');
+                setStartTime(null)
+                setEndTime(null);
                 setMods([]);
                 setSpeakers([]);
                 setEditTenantsId([]);
@@ -289,12 +290,13 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                 formik.resetForm();
                 setFeaturedImg('');
                 setEventDate(undefined);
-                setStartTime('');
-                setEndTime('');
+                setStartTime(null);
+                setEndTime(null);
                 setMods([]);
                 setSpeakers([]);
                 setEditTenantsId([]);
                 setDisableEdit(true);
+                // formik.values.slots[0].start_time
 
                 // refetch events data for dashboard
                 reload();
@@ -390,6 +392,10 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
             setEventDate(event.start_date)
         }
     }, [event])
+
+    const isValidDate = (date: Date) => {
+        return date instanceof Date && !isNaN(date.getTime());
+    }
 
     const handleEventTypeSelect = (eventType: { name: string; value: string; }) => {
         formik.setFieldValue('type', eventType.value)
@@ -487,7 +493,9 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                         <div className="h-full w-full">
                             <div className="grid grid-cols-3 gap-5 h-full">
                                 <div className="col-span-1">
-                                    <ProfileImage disabled={disableEdit} setFeaturedImg={setFeaturedImg} featuredImg={featuredImg} error={formik.errors.image} height="h-full" />
+                                    <ProfileImage disabled={disableEdit} setFeaturedImg={setFeaturedImg} featuredImg={featuredImg}
+                                        // error={formik.errors.image}
+                                        height="h-full" />
                                 </div>
 
                                 <div className="col-span-2">
@@ -512,77 +520,58 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                             // error={formik.errors.venue}
                                             />
                                         </div>
-
-                                        <div className="col-span-1">
-                                            <label>Select Event Date</label>
-                                            <DatePicker
-                                                minDate={new Date()}
-                                                selected={eventDate}
-                                                onChange={(date) => {
-                                                    setEventDate(date);
-                                                }}
-                                                placeholderText="09/04/2024"
-                                                className="w-full block outline-none bg-none focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                                            // disabled={disableEdit}
-                                            // error={formik.errors.slots.date}
-                                            />
-                                        </div>
-
-                                        <div className="col-span-1">
-                                            <TimeInput
-                                                label='Start Time'
-                                                name='startTime'
-                                                onChange={(e) => setStartTime(e.target.value)}
-                                                value={formik.values.slots[0].start_time}
-                                            // error={formik.errors.slots[0].start_time}
-                                            />
-                                        </div>
-
-                                        <div className="col-span-1">
-                                            <TimeInput
-                                                label='End Time'
-                                                name='endTime'
-                                                onChange={(e) => setEndTime(e.target.value)}
-                                                value={formik.values.slots[0].end_time}
-                                            // error={formik.errors.slots[0].end_time}
-                                            />
-                                        </div>
-
-                                        <div className="col-span-2">
+                                        <CustomDatePicker
+                                            label="Select Event Date"
+                                            classname="col-span-1"
+                                            value={eventDate}
+                                            onChange={(date) => setEventDate(date)}
+                                        // disabled={disableEdit}
+                                        // error={formik.errors.slots.date}
+                                        />
+                                        <TimePicker
+                                            label="Start Time"
+                                            classname="col-span-1"
+                                            value={startTime}
+                                            onChange={(date) => setStartTime(date)}
+                                        />
+                                        <TimePicker
+                                            label="End Time"
+                                            classname="col-span-1"
+                                            value={endTime}
+                                            onChange={(date) => setEndTime(date)}
+                                        />
                                             <Textarea
                                                 label='About Event'
                                                 name='description'
                                                 onChange={formik.handleChange}
                                                 value={formik.values.description}
                                                 placeholder='Event details'
+                                                divClass="col-span-2"
                                             // error={formik.errors.description}
                                             />
-                                        </div>
 
-                                        <div className="col-span-1">
-                                            <ReactSelect
-                                                label="Select Department"
-                                                options={tenants}
-                                                handleSelect={handleSelect}
-                                                value={tenantsId}
-                                                isMulti={true}
-                                                optionName="name"
-                                                optionValue="tenant_id"
-                                            // error={formik.errors}
-                                            />
-                                        </div>
+                                        <ReactSelect
+                                            label="Select Department"
+                                            options={tenants}
+                                            handleSelect={handleSelect}
+                                            value={tenantsId}
+                                            isMulti={true}
+                                            optionName="name"
+                                            optionValue="tenant_id"
+                                            divClass="col-span-2"
+                                        // error={formik.errors}
+                                        />
 
-                                        <div className="col-span-1">
-                                            <Input
-                                                type='url'
-                                                label='Live link'
-                                                value={formik.values.event_link}
-                                                placeholder='eg: meet.google.com/abc-def-gh'
-                                                name='event_link'
-                                                onChange={formik.handleChange}
-                                            // error={formik.errors.event_link}
-                                            />
-                                        </div>
+                                        <Input
+                                            type='url'
+                                            label='Live link'
+                                            value={formik.values.event_link}
+                                            placeholder='eg: meet.google.com/abc-def-gh'
+                                            name='event_link'
+                                            onChange={formik.handleChange}
+                                            divClass="col-span-2"
+                                        // error={formik.errors.event_link}
+                                        />
 
                                     </div>
                                 </div>
