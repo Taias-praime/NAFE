@@ -6,11 +6,12 @@ interface TimePickerProps {
     label: string;
     error?: string;
     classname: string;
+    disabled?: boolean;
     value: Date | null;
     onChange: (e: Date | null) => void;
 }
 
-const TimePicker = ({ label, error, classname, value, onChange }: TimePickerProps) => {
+const TimePicker = ({ label, error, classname, disabled, value, onChange }: TimePickerProps) => {
 
     return (
         <div className={classname}>
@@ -23,6 +24,7 @@ const TimePicker = ({ label, error, classname, value, onChange }: TimePickerProp
                 timeIntervals={15}
                 dateFormat="h:mm aa"
                 placeholderText="00:00"
+                disabled={disabled}
                 className="w-full block outline-none bg-none focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             />
             <ErrorMessage error={error} />

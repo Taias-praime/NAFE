@@ -507,6 +507,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                 value={formik.values.title}
                                                 onChange={formik.handleChange}
                                                 placeholder='Title for the event'
+                                                disabled={disableEdit}
                                             // error={formik.errors.title}
                                             />
                                         </div>
@@ -517,6 +518,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                                 value={formik.values.venue}
                                                 onChange={formik.handleChange}
                                                 placeholder='Location of the event'
+                                                disabled={disableEdit}
                                             // error={formik.errors.venue}
                                             />
                                         </div>
@@ -525,7 +527,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                             classname="col-span-1"
                                             value={eventDate}
                                             onChange={(date) => setEventDate(date)}
-                                        // disabled={disableEdit}
+                                            disabled={disableEdit}
                                         // error={formik.errors.slots.date}
                                         />
                                         <TimePicker
@@ -533,22 +535,25 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                             classname="col-span-1"
                                             value={startTime}
                                             onChange={(date) => setStartTime(date)}
+                                            disabled={disableEdit}
                                         />
                                         <TimePicker
                                             label="End Time"
                                             classname="col-span-1"
                                             value={endTime}
                                             onChange={(date) => setEndTime(date)}
+                                            disabled={disableEdit}
                                         />
-                                            <Textarea
-                                                label='About Event'
-                                                name='description'
-                                                onChange={formik.handleChange}
-                                                value={formik.values.description}
-                                                placeholder='Event details'
-                                                divClass="col-span-2"
-                                            // error={formik.errors.description}
-                                            />
+                                        <Textarea
+                                            label='About Event'
+                                            name='description'
+                                            onChange={formik.handleChange}
+                                            value={formik.values.description}
+                                            placeholder='Event details'
+                                            divClass="col-span-2"
+                                            disabled={disableEdit}
+                                        // error={formik.errors.description}
+                                        />
 
                                         <ReactSelect
                                             label="Select Department"
@@ -559,6 +564,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                             optionName="name"
                                             optionValue="tenant_id"
                                             divClass="col-span-2"
+                                            disabled={disableEdit}
                                         // error={formik.errors}
                                         />
 
@@ -570,6 +576,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                             name='event_link'
                                             onChange={formik.handleChange}
                                             divClass="col-span-2"
+                                            disabled={disableEdit}
                                         // error={formik.errors.event_link}
                                         />
 
@@ -638,8 +645,8 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                     {/* ----- footer ---- */}
                                     <div className="flex justify-between py-5">
                                         <Button variant='ghost' onClick={handleCancel}>Cancel</Button>
-
-                                        {step === MAX_STEPS && (
+                                        {disableEdit && <Button onClick={() => setDisableEdit(false)} type='button' className="px-10">Edit </Button>}
+                                        {step === MAX_STEPS && !disableEdit && (
                                             <Button variant={isDisabled ? 'disabled' : 'default'} type={isDisabled ? "button" : "submit"} onClick={handleNext}>
                                                 {isCreatingEvent || isUpdatingEvent ? <Loader2 className='animate-spin mx-8' /> : (isEditEvent ? 'Update Event' : 'Create Event')}
                                             </Button>
