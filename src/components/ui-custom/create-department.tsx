@@ -92,13 +92,11 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
         },
         (e) => {
             const { message } = e;
-            // notify
             toast({
                 title: `${message} (${status})`,
                 variant: 'destructive',
             });
-        },
-        {},
+        }
     );
 
     // edit
@@ -111,13 +109,11 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
         },
         (e) => {
             const { message } = e;
-            // notify
             toast({
                 title: `${message} (${status})`,
                 variant: 'destructive',
             });
-        },
-        {},
+        }
     );
 
     // fetch department details
@@ -143,13 +139,12 @@ const CreateDepartment = ({ label, tenantId }: CreateDepartmentProps) => {
         },
         (e) => {
             const { message } = e;
-            // notify
+            
             toast({
                 title: `${message} (${status})`,
                 variant: 'destructive',
             });
-        },
-        {},
+        }
     );
 
     useEffect(() => {

@@ -17,11 +17,9 @@ const useAuth = () => {
     // login
     const { isFetching, onPost } = useFetch(
         '/o/oauth/token',
-        (data, status) => { // on submit
-            // notify
+        (data, status) => {
             toast({ description: data.message });
             
-            // navigate to dashboard
             if (status === 200) {
                 const { access_token, expires_in, token_type, scope, refresh_token } = data.data;
 
@@ -35,16 +33,15 @@ const useAuth = () => {
                 nav('/dashboard')
             }
         },
-        (error, status) => { // on error
+        (error, status) => {
             const { message} = error;
-            // notify
             toast({
                 title: `${message} (${status})`,
                
                 variant: 'destructive',
             })
         },
-        {}, // options
+        {},
         { 'Content-Type': 'application/x-www-form-urlencoded' } // optional headers 
     );
 

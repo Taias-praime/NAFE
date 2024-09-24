@@ -72,7 +72,7 @@ const EditChiefOfStaff = ({ id, setReload }: EditChiefOfStaffProps) => {
         },
         (e) => {
             const { message } = e;
-            // notify
+            
             toast({
                 title: `${message} (${status})`,
                 variant: 'destructive',
@@ -91,7 +91,7 @@ const EditChiefOfStaff = ({ id, setReload }: EditChiefOfStaffProps) => {
         },
         (e) => {
             const { message } = e;
-            // notify
+            
             toast({
                 title: `${message} (${status})`,
                 variant: 'destructive',

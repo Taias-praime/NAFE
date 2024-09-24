@@ -192,7 +192,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
         },
         (error) => {
             const { message } = error;
-            // notify
+            
             toast({
                 title: `${message}`,
                 variant: "destructive",
@@ -208,7 +208,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
         },
         (error) => {
             const { message } = error;
-            // notify
+            
             toast({
                 title: `${message}`,
                 variant: "destructive",
@@ -264,7 +264,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
         },
         (error, status) => {
             const { message } = error;
-            // notify
+            
             toast({
                 title: `Error: Failed to submit (${status})`,
                 description: message || '',
@@ -307,7 +307,7 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
         },
         (error, status) => {
             const { message } = error;
-            // notify
+            
             toast({
                 title: `Error: Failed to submit (${status})`,
                 description: message || '',

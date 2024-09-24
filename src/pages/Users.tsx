@@ -31,12 +31,10 @@ const Users = () => {
         setUsers(results);
       }
     },
-    (error, status) => { // on error
+    (error, status) => {
       const { message } = error;
-      // notify
       toast({
         title: `${message} (${status})`,
-
         variant: 'destructive',
       })
     },
@@ -44,7 +42,7 @@ const Users = () => {
 
   // search user
   const { onFetch: onSearchUser, isFetching: isSearching } = useFetch(
-    `/users/sa/?search_query${searchValue}`,
+    `/users/sa/?search_query${searchValue}&page=1&items_per_page=10`,
     (data, status) => {
       if (status === 200) {
         const _data = data.data;
@@ -54,12 +52,10 @@ const Users = () => {
         setUsers(results);
       }
     },
-    (error, status) => { // on error
+    (error, status) => {
       const { message } = error;
-      // notify
       toast({
         title: `${message} (${status})`,
-
         variant: 'destructive',
       })
     },

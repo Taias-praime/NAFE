@@ -22,12 +22,12 @@ const ResetPassword = () => {
 		}, // on success
 		(e) => {
 			const { message} = e;
-			// notify
+			
 			toast({
 				title: `${message} (${status})`,
 				variant: 'destructive',
 			});
-		}, // on error
+		},
 		{}, //
 		{
 			Authorization:

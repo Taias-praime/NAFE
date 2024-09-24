@@ -83,7 +83,7 @@ const CreatePressRelease = ({ isPREdit, setReload, PR, label, title }: CreatePre
         },
         (e) => {
             const { message, } = e;
-            // notify
+            
             toast({
                 title: `${message} (${status})`,
                 variant: 'destructive',
@@ -105,7 +105,7 @@ const CreatePressRelease = ({ isPREdit, setReload, PR, label, title }: CreatePre
         },
         (e) => {
             const { message } = e;
-            // notify
+            
             toast({
                 title: `${message} (${status})`,
                 variant: 'destructive',

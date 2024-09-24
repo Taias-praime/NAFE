@@ -42,10 +42,8 @@ const Departments = () => {
     },
     (error, status) => {
       const { message } = error;
-      // notify
       toast({
         title: `${message} (${status})`,
-
         variant: "destructive",
       });
     }
@@ -61,10 +59,8 @@ const Departments = () => {
     },
     (error, status) => {
       const { message } = error;
-      // notify
       toast({
         title: `${message} (${status})`,
-
         variant: "destructive",
       });
     }

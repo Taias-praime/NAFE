@@ -10,21 +10,18 @@ const useEvent = () => {
     const { isFetching: isFetchingEvents, onFetch: onFetchEvents } = useFetch(
         'events/sa/',
         (data, status) => { 
-            // navigate to dashboard
             if (status === 200) {
                 return data.data;
             }
         },
-        (error, status) => { // on error
+        (error, status) => {
             const { message} = error;
-            // notify
             toast({
                 title: `${message} (${status})`,
                
                 variant: 'destructive',
             })
-        },
-        {}, // options
+        }
     );
 
     // get event types
@@ -35,16 +32,14 @@ const useEvent = () => {
                 return data.data;
             }
         },
-        (error, status) => { // on error
+        (error, status) => {
             const { message} = error;
-            // notify
             toast({
                 title: `${message} (${status})`,
                
                 variant: 'destructive',
             })
-        },
-        {}, // options
+        }
     );
 
     const getEventTypes = () => onFetchEventTypes();

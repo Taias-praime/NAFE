@@ -87,13 +87,11 @@ const CreateLiveEvents = ({ isLVEdit, setReload, title, label, id }: CreateLiveE
         },
         (e) => {
             const { message, } = e;
-            // notify
             toast({
                 title: `${message} (${status})`,
                 variant: 'destructive',
             });
-        },
-        {},
+        }
     );
 
     // edit
@@ -108,13 +106,11 @@ const CreateLiveEvents = ({ isLVEdit, setReload, title, label, id }: CreateLiveE
         },
         (e) => {
             const { message, } = e;
-            // notify
             toast({
                 title: `${message} (${status})`,
                 variant: 'destructive',
             });
-        },
-        {},
+        }
     );
 
     const { onFetch, isFetching } = useFetch(
@@ -136,15 +132,12 @@ const CreateLiveEvents = ({ isLVEdit, setReload, title, label, id }: CreateLiveE
             }
         },
         (error, status) => {
-            // on error
             const { message } = error;
-            // notify
             toast({
                 title: `${message} (${status})`,
                 variant: "destructive",
             });
-        },
-        {} // options
+        }
     );
 
     useEffect(() => {

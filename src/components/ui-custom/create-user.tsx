@@ -99,7 +99,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
         },
         (e) => {
             const { message, } = e;
-            // notify
+            
             toast({
                 title: `${message}`,
                 variant: 'destructive',
@@ -120,7 +120,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
         },
         (e) => {
             const { message, } = e;
-            // notify
+            
             toast({
                 title: `${message}`,
                 variant: 'destructive',
@@ -149,7 +149,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
         },
         (e) => {
             const { message, } = e;
-            // notify
+            
             toast({
                 title: `${message}`,
                 variant: 'destructive',
@@ -166,7 +166,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
         },
         (error) => {
             const { message } = error;
-            // notify
+            
             toast({
                 title: `${message}`,
                 variant: "destructive",
@@ -184,7 +184,7 @@ const CreateUser = ({ label, tenantId }: CreateUserProps) => {
         },
         (error) => {
             const { message } = error;
-            // notify
+            
             toast({
                 title: `${message}`,
                 variant: "destructive",

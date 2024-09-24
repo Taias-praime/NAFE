@@ -59,7 +59,7 @@ const KeynoteSpeaker = ({ setReload, setModalOpen, open, label, title }: AddKeyn
         },
         (error, status) => {
             const { message } = error;
-            // notify
+            
             toast({
                 title: `Error: Failed to submit (${status})`,
                 description: message || '',

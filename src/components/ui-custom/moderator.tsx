@@ -63,7 +63,7 @@ const Moderator = ({ setModalOpen, setReload, open, label, title }: ModeratorPro
         },
         (error, status) => {
             const { message } = error;
-            // notify
+            
             toast({
                 title: `Error: Failed to submit (${status})`,
                 description: message || '',
@@ -82,7 +82,7 @@ const Moderator = ({ setModalOpen, setReload, open, label, title }: ModeratorPro
         },
         (error, status) => {
             const { message } = error;
-            // notify
+            
             toast({
                 title: `Error: Failed to submit (${status})`,
                 description: message || '',

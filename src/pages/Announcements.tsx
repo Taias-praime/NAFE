@@ -61,26 +61,23 @@ const Announcements = () => {
       setAnnouncement(data.data.results);
       setNumOfAnnouncement(data.data.number_of_items);
       setNumOfPages(data.data.number_of_pages);
-    },
-    () => { },
+    }
   );
 
   const { onFetch: getTenants } = useFetch(
     '/tenants/sa/',
     (data) => {
       setTenants(data.data.results)
-    },
-    () => { },
+    }
   );
 
   const { onFetch: searchAnnouncement, isFetching: isSearching } = useFetch(
-    `/announcements/sa/?search_query${searchValue}`,
+    `/announcements/sa/?search_query=${searchValue}&page=1&items_per_page=3`,
     (data) => {
       setAnnouncement(data.data.results);
       setNumOfAnnouncement(data.data.number_of_items);
       setNumOfPages(data.data.number_of_pages);
-    },
-    () => { },
+    }
   );
 
   const { onPost, isFetching: isLoadingCreate } = useFetch(
@@ -94,13 +91,12 @@ const Announcements = () => {
     },
     (e) => {
       const { message } = e;
-      // notify
+      
       toast({
         title: `${message} (${status})`,
         variant: 'destructive',
       });
-    },
-    {},
+    }
   );
 
   const { onPut, isFetching: isLoadingEdit } = useFetch(
@@ -114,13 +110,12 @@ const Announcements = () => {
     },
     (e) => {
       const { message } = e;
-      // notify
+      
       toast({
         title: `${message} (${status})`,
         variant: 'destructive',
       });
-    },
-    {},
+    }
   );
 
   useEffect(() => {

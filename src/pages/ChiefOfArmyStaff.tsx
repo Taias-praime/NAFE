@@ -47,9 +47,7 @@ const ChiefOfArmyStaff = () => {
             }
         },
         (error, status) => {
-            // on error
             const { message } = error;
-            // notify
             toast({
                 title: `${message} (${status})`,
                 variant: "destructive",
@@ -69,9 +67,7 @@ const ChiefOfArmyStaff = () => {
             }
         },
         (error, status) => {
-            // on error
             const { message } = error;
-            // notify
             toast({
                 title: `${message} (${status})`,
                 variant: "destructive",
@@ -90,9 +86,7 @@ const ChiefOfArmyStaff = () => {
             }
         },
         (error, status) => {
-            // on error
             const { message } = error;
-            // notify
             toast({
                 title: `${message} (${status})`,
                 variant: "destructive",
@@ -112,9 +106,7 @@ const ChiefOfArmyStaff = () => {
             }
         },
         (error, status) => {
-            // on error
             const { message } = error;
-            // notify
             toast({
                 title: `${message} (${status})`,
                 variant: "destructive",
