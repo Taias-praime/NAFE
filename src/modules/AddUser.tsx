@@ -133,8 +133,8 @@ const AddUserActionSheet = ({
 	const { onFetch: fetchUsers, isFetching } = useFetch(
 		endpoint,
 		(data) => {
-			setUserList(data.data.results);
-			setFilterList(data.data.results)
+			setUserList(data.data);
+			setFilterList(data.data)
 		},
 		(error, status) => {
 			const { message } = error;

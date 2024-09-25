@@ -594,11 +594,11 @@ const CreateEvent = ({ onCancel, setIsOpen, setReload, currentStep, isEditEvent,
                                         </TabsList>
 
                                         <TabsContent className='p-5 overflow-x-auto' value="m">
-                                            <AddUser endpoint='/moderators/sa/?items_per_page=20' action='Moderator' setUsers={setMods} users={mods} />
+                                            <AddUser endpoint='/moderators/sa/?paginate=false' action='Moderator' setUsers={setMods} users={mods} />
                                         </TabsContent>
 
                                         <TabsContent className='p-5' value="k">
-                                            <AddUser endpoint='/keynote-speakers/sa/?items_per_page=20' action='Speaker' setUsers={setSpeakers} users={speakers} />
+                                            <AddUser endpoint='/keynote-speakers/sa/?paginate=false' action='Speaker' setUsers={setSpeakers} users={speakers} />
                                         </TabsContent>
 
                                         <TabsContent className='p-5' value="f">
